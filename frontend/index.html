@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Decision System</title>
+  <link rel="stylesheet" href="/static/src/styles/main.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <!-- ── Top Bar ─────────────────────────────────────────────────── -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="brand-icon">⬡</div>
+        <div class="brand-text">
+          <span class="brand-name">OASIS</span>
+          <span class="brand-sub">AI Decision System</span>
+        </div>
+      </div>
+      <div class="topbar-status" id="systemStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">Initializing...</span>
+      </div>
+      <div class="topbar-meta">
+        <span class="meta-item" id="totalAnalyses">— analyses</span>
+        <span class="meta-sep">·</span>
+        <span class="meta-item" id="llmModel">—</span>
+      </div>
+    </header>
+
+    <!-- ── Main Layout ────────────────────────────────────────────── -->
+    <div class="layout">
+
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <!-- Query Input -->
+        <div class="sidebar-section">
+          <div class="section-label">ANALYZE EVENT</div>
+          <div class="query-input-wrap">
+            <textarea
+              id="queryInput"
+              class="query-input"
+              placeholder="Will Bayern Munich win their next Bundesliga match?"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="input-options">
+            <div class="input-option">
+              <label class="opt-label">Market Odds (optional)</label>
+              <input
+                type="text"
+                id="oddsInput"
+                class="opt-input"
+                placeholder="e.g. 1.75 or -140 or 57%"
+              />
+            </div>
+          </div>
+          <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()">
+            <span class="btn-icon">▶</span>
+            <span class="btn-text">Run Analysis</span>
+          </button>
+          <div class="example-queries">
+            <div class="eq-label">Examples:</div>
+            <div class="eq-item" onclick="setQuery('Will Bayern Munich beat Dortmund in their next match?')">Bayern vs Dortmund</div>
+            <div class="eq-item" onclick="setQuery('Will the Lakers win tonight vs the Celtics?')">Lakers vs Celtics</div>
+            <div class="eq-item" onclick="setQuery('Will Bitcoin reach $100k before end of 2025?')">Bitcoin $100k</div>
+            <div class="eq-item" onclick="setQuery('Will Elon Musk remain Tesla CEO through 2025?')">Elon Tesla CEO</div>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div class="sidebar-section history-section">
+          <div class="section-label">RECENT ANALYSES</div>
+          <div id="historyList" class="history-list">
+            <div class="history-empty">No analyses yet</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center: Main Analysis View -->
+      <main class="main-panel">
+        <!-- Welcome State -->
+        <div class="welcome-state" id="welcomeState">
+          <div class="welcome-icon">⬡</div>
+          <h2 class="welcome-title">Multi-Agent Decision Engine</h2>
+          <p class="welcome-desc">
+            Enter an event or prediction question to start a full AI analysis.
+            10 specialized agents will collaborate, debate, and synthesize a decision.
+          </p>
+          <div class="agent-preview">
+            <div class="ap-item"><span class="ap-icon">🔍</span> Scanner</div>
+            <div class="ap-item"><span class="ap-icon">📊</span> Research</div>
+            <div class="ap-item"><span class="ap-icon">🎯</span> Predictor</div>
+            <div class="ap-item"><span class="ap-icon">📈</span> Analyst</div>
+            <div class="ap-item"><span class="ap-icon">⚔️</span> Skeptic</div>
+            <div class="ap-item"><span class="ap-icon">🌐</span> Scenarios</div>
+            <div class="ap-item"><span class="ap-icon">✓</span> Validator</div>
+            <div class="ap-item"><span class="ap-icon">⚖️</span> Synthesis</div>
+            <div class="ap-item"><span class="ap-icon">🏆</span> Scoring</div>
+          </div>
+        </div>
+
+        <!-- Running State -->
+        <div class="running-state hidden" id="runningState">
+          <div class="running-header">
+            <div class="running-query" id="runningQuery"></div>
+            <div class="running-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+              </div>
+              <span class="progress-text" id="progressText">Initializing...</span>
+            </div>
+          </div>
+          <div class="pipeline-stages" id="pipelineStages"></div>
+        </div>
+
+        <!-- Results State -->
+        <div class="results-state hidden" id="resultsState">
+          <!-- Decision Banner -->
+          <div class="decision-banner" id="decisionBanner">
+            <div class="db-left">
+              <div class="db-decision" id="dbDecision">—</div>
+              <div class="db-query" id="dbQuery"></div>
+            </div>
+            <div class="db-metrics">
+              <div class="db-metric">
+                <div class="dbm-value" id="dbProbability">—</div>
+                <div class="dbm-label">Probability</div>
+              </div>
+              <div class="db-metric">
+                <div class="dbm-value" id="dbEdge">—</div>
+                <div class="dbm-label">Edge</div>
+              </div>
+              <div class="db-metric">
+                <div class="dbm-value" id="dbConfidence">—</div>
+                <div class="dbm-label">Confidence</div>
+              </div>
+              <div class="db-metric">
+                <div class="dbm-value risk-value" id="dbRisk">—</div>
+                <div class="dbm-label">Risk</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explanation -->
+          <div class="result-section">
+            <div class="rs-label">DECISION RATIONALE</div>
+            <div class="rs-content explanation-text" id="decisionExplanation"></div>
+          </div>
+
+          <!-- Bull vs Bear -->
+          <div class="bull-bear-grid">
+            <div class="bb-card bull-card">
+              <div class="bb-header">
+                <span class="bb-icon">📈</span>
+                <span class="bb-title">BULL CASE</span>
+                <span class="bb-strength" id="bullStrength"></span>
+              </div>
+              <div class="bb-content" id="bullCase"></div>
+            </div>
+            <div class="bb-card bear-card">
+              <div class="bb-header">
+                <span class="bb-icon">📉</span>
+                <span class="bb-title">BEAR CASE</span>
+                <span class="bb-strength" id="bearStrength"></span>
+              </div>
+              <div class="bb-content" id="bearCase"></div>
+            </div>
+          </div>
+
+          <!-- Scenarios -->
+          <div class="result-section" id="scenariosSection">
+            <div class="rs-label">SCENARIO ANALYSIS</div>
+            <div class="scenarios-grid" id="scenariosGrid"></div>
+          </div>
+
+          <!-- Score Breakdown -->
+          <div class="result-section">
+            <div class="rs-label">SCORE BREAKDOWN</div>
+            <div class="score-bars" id="scoreBars"></div>
+          </div>
+
+          <!-- Risk Warnings -->
+          <div class="result-section" id="riskSection">
+            <div class="rs-label">RISK ASSESSMENT</div>
+            <div class="risk-warnings" id="riskWarnings"></div>
+          </div>
+
+          <!-- Agent Conflicts -->
+          <div class="result-section" id="conflictsSection">
+            <div class="rs-label">AGENT CONFLICTS</div>
+            <div class="conflicts-list" id="conflictsList"></div>
+          </div>
+
+          <!-- Key Insights -->
+          <div class="result-section">
+            <div class="rs-label">KEY INSIGHTS</div>
+            <div class="insights-list" id="insightsList"></div>
+          </div>
+
+          <!-- Full Narrative -->
+          <div class="result-section">
+            <div class="rs-label">ANALYSIS NARRATIVE</div>
+            <div class="narrative-text" id="narrativeText"></div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-row">
+            <button class="action-btn primary" onclick="confirmDecision()">
+              ✓ Confirm &amp; Act
+            </button>
+            <button class="action-btn secondary" onclick="newAnalysis()">
+              + New Analysis
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Panel: Agent Feed -->
+      <aside class="agent-panel">
+        <div class="ap-header">
+          <div class="section-label">AGENT ACTIVITY</div>
+          <div class="agent-count" id="agentCount">0/10</div>
+        </div>
+        <div class="agent-feed" id="agentFeed">
+          <div class="af-empty">Agents will appear here during analysis</div>
+        </div>
+      </aside>
+
+    </div><!-- /layout -->
+  </div><!-- /app -->
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay hidden" id="confirmModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Confirm Decision</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc" id="modalDecisionText"></p>
+        <div class="modal-warning">
+          ⚠️ This system provides analysis only. All decisions and any actions taken are solely your responsibility.
+          Past performance does not guarantee future results.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="action-btn primary" onclick="closeModal()">I Understand</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/src/app.js"></script>
+</body>
+</html>
