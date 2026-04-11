@@ -1,6 +1,6 @@
 """
 Central configuration for the AI Decision System.
-Loads from environment variables / .env file.
+All settings load from environment variables or a .env file.
 """
 from pydantic_settings import BaseSettings
 from pydantic import Field
@@ -8,36 +8,43 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
-    # ── LLM ──────────────────────────────────────────────────────────
-    LLM_PROVIDER: str = Field("anthropic", description="LLM backend: anthropic | openai")
-    LLM_MODEL: str = Field("claude-opus-4-6", description="Model identifier")
+    # ── LLM ──────────────────────────────────────────────────────────────
+    LLM_PROVIDER: str = Field("anthropic", description="anthropic | openai")
+    LLM_MODEL: str = Field("claude-opus-4-6")
     AGENT_TEMPERATURE: float = Field(0.7, ge=0.0, le=1.0)
 
-    # ── API Keys ──────────────────────────────────────────────────────
-    ANTHROPIC_API_KEY: str = Field("", description="Anthropic API key")
-    OPENAI_API_KEY: str = Field("", description="OpenAI API key")
-    SERPER_API_KEY: str = Field("", description="Serper.dev Google search key")
-    TAVILY_API_KEY: str = Field("", description="Tavily AI search key")
+    # ── API Keys ──────────────────────────────────────────────────────────
+    ANTHROPIC_API_KEY: str = Field("")
+    OPENAI_API_KEY: str = Field("")
+    TAVILY_API_KEY: str = Field("")          # Primary research provider
+    SERPER_API_KEY: str = Field("")          # Fallback Google search
 
-    # ── App ───────────────────────────────────────────────────────────
+    # ── Polymarket ────────────────────────────────────────────────────────
+    POLYMARKET_GAMMA_API: str = "https://gamma-api.polymarket.com"
+    POLYMARKET_CLOB_API: str  = "https://clob.polymarket.com"
+    POLYMARKET_MAX_MARKETS: int = 5          # Max markets to show per search
+
+    # ── App ───────────────────────────────────────────────────────────────
     APP_HOST: str = "0.0.0.0"
     APP_PORT: int = 8000
     DEBUG: bool = True
-    DEMO_MODE: bool = Field(False, description="Simulated responses, no API keys needed")
+    DEMO_MODE: bool = Field(False, description="Simulated responses, no API keys")
 
-    # ── Database ──────────────────────────────────────────────────────
+    # ── Database ──────────────────────────────────────────────────────────
     DATABASE_URL: str = "sqlite+aiosqlite:///./data/decisions.db"
 
-    # ── Research ──────────────────────────────────────────────────────
-    MAX_RESEARCH_SOURCES: int = 5
+    # ── Research (Tavily cost control) ────────────────────────────────────
+    TAVILY_MAX_RESULTS: int = Field(4, ge=1, le=10, description="Keep low to save API credits")
+    TAVILY_SEARCH_DEPTH: str = Field("basic", description="basic=1 credit, advanced=2 credits")
+    RESEARCH_CACHE_TTL_SECONDS: int = 300    # Cache same queries for 5 min
 
-    # ── Scoring thresholds ────────────────────────────────────────────
+    # ── Scoring thresholds ────────────────────────────────────────────────
     BET_EDGE_THRESHOLD: float = 0.10
     BET_CONFIDENCE_THRESHOLD: float = 0.65
     WATCH_EDGE_THRESHOLD: float = 0.03
     MAX_RISK_FOR_BET: float = 0.70
 
-    # ── Memory ───────────────────────────────────────────────────────
+    # ── Memory ────────────────────────────────────────────────────────────
     ENABLE_MEMORY: bool = True
 
     class Config:
