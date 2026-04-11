@@ -1,344 +1,269 @@
 """
-API Routes
-==========
-FastAPI router implementing all REST endpoints and SSE streaming.
-
-Endpoints:
-  POST /api/analyze              → Start analysis session
-  GET  /api/analyze/{id}/stream  → SSE stream of agent progress
-  GET  /api/analyze/{id}         → Get session status and results
-  GET  /api/history              → Get analysis history
-  POST /api/outcome/{id}         → Record actual outcome (calibration)
-  GET  /api/health               → Health check
-  GET  /api/stats                → System statistics
+API Routes  (updated — Polymarket endpoint, BetType param, SSE cleanup)
 """
 import asyncio
 import json
 from datetime import datetime
-from typing import Any, AsyncGenerator, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import structlog
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
-from fastapi.responses import StreamingResponse
 from sse_starlette.sse import EventSourceResponse
 
 from backend.api.models import (
-    AgentOutput,
-    AnalysisRequest,
-    AnalysisResponse,
-    HistoryItem,
-    HistoryResponse,
-    SessionStatusResponse,
+    AnalysisRequest, AnalysisResponse, BetType,
+    HistoryItem, HistoryResponse, SessionStatusResponse,
 )
-from backend.core.memory import get_memory
-from backend.core.orchestrator import get_orchestrator
+from backend.core.memory             import get_memory
+from backend.core.orchestrator       import get_orchestrator
 from backend.services.market_service import get_market_service
+from backend.services.polymarket_service import get_polymarket_service
 
 logger = structlog.get_logger(__name__)
 router = APIRouter(prefix="/api")
 
-# In-memory SSE queues per session
+# Per-session SSE queues  {session_id: asyncio.Queue}
 _sse_queues: Dict[str, asyncio.Queue] = {}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Analysis Endpoints
+# Analysis
 # ─────────────────────────────────────────────────────────────────────────────
 
 @router.post("/analyze", response_model=AnalysisResponse)
-async def start_analysis(
-    request: AnalysisRequest,
-    background_tasks: BackgroundTasks,
-):
-    """
-    Start a new multi-agent analysis session.
-    Returns session_id immediately; use /analyze/{id}/stream for live updates.
-    """
+async def start_analysis(req: AnalysisRequest, background_tasks: BackgroundTasks):
+    """Start a new analysis session. Returns session_id immediately."""
     orchestrator = get_orchestrator()
-    market = get_market_service()
+    market       = get_market_service()
 
-    # Parse implied probability from odds string
-    implied_prob = request.implied_probability
-    if not implied_prob and request.market_odds:
-        implied_prob = market.parse_odds(request.market_odds)
+    implied_prob = req.implied_probability
+    if not implied_prob and req.market_odds:
+        implied_prob = market.parse_odds(req.market_odds)
 
-    # Create session
-    session_id = orchestrator.create_session(
-        query=request.query,
-        implied_probability=implied_prob,
-    )
+    session_id = orchestrator.create_session(query=req.query, bet_type=req.bet_type)
 
-    # Create SSE queue for this session
-    queue: asyncio.Queue = asyncio.Queue()
+    queue: asyncio.Queue = asyncio.Queue(maxsize=200)
     _sse_queues[session_id] = queue
 
-    def on_progress(agent_output: AgentOutput):
-        """Callback fired by each agent — puts event into SSE queue."""
+    from backend.api.models import AgentOutput
+
+    def on_progress(agent_out: AgentOutput):
         try:
             queue.put_nowait({
-                "event": (
-                    "agent_running" if agent_output.status == "running"
-                    else "agent_complete"
-                ),
-                "data": agent_output.model_dump(mode="json"),
+                "event": "agent_running" if agent_out.status == "running" else "agent_complete",
+                "data":  agent_out.model_dump(mode="json"),
             })
         except asyncio.QueueFull:
-            logger.warning("sse_queue_full", session_id=session_id)
+            pass   # drop if consumer is too slow
 
-    # Run analysis in background
     background_tasks.add_task(
-        _run_analysis_background,
+        _run_bg,
         session_id=session_id,
-        query=request.query,
+        query=req.query,
+        bet_type=req.bet_type,
         implied_probability=implied_prob,
-        market_odds=request.market_odds,
-        context=request.context,
+        market_odds=req.market_odds,
+        context=req.context,
         on_progress=on_progress,
         queue=queue,
     )
 
-    logger.info("analysis_started", session_id=session_id, query=request.query[:80])
+    logger.info("analysis_started", sid=session_id, query=req.query[:60])
     return AnalysisResponse(
         session_id=session_id,
         status="running",
-        message="Analysis started. Connect to /api/analyze/{session_id}/stream for live updates.",
+        message=f"Analysis started. Stream: /api/analyze/{session_id}/stream",
     )
 
 
 @router.get("/analyze/{session_id}/stream")
 async def stream_analysis(session_id: str):
-    """
-    SSE endpoint — streams real-time agent progress for a session.
-    Events: agent_running, agent_complete, session_complete, error
-    """
+    """SSE stream of real-time agent progress."""
     queue = _sse_queues.get(session_id)
     if queue is None:
-        # Session might already be complete, check DB
+        # Already completed — return a single done event
         orchestrator = get_orchestrator()
-        session = orchestrator.get_session(session_id)
-        if session is None:
-            raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
+        sess = orchestrator.get_session(session_id)
+        if not sess:
+            raise HTTPException(404, f"Session {session_id} not found")
 
-        # Session complete — send final event
-        async def complete_stream():
-            yield {
-                "event": "session_complete",
-                "data": json.dumps(_session_to_dict(session)),
-            }
-        return EventSourceResponse(complete_stream())
+        async def _done():
+            yield {"event": "session_complete", "data": json.dumps(_sess_dict(sess))}
 
-    async def event_generator():
+        return EventSourceResponse(_done())
+
+    async def _generator():
         try:
             while True:
                 try:
-                    event = await asyncio.wait_for(queue.get(), timeout=120.0)
+                    ev = await asyncio.wait_for(queue.get(), timeout=180.0)
                 except asyncio.TimeoutError:
-                    # Send keepalive
                     yield {"event": "keepalive", "data": "{}"}
                     continue
 
-                if event.get("event") == "session_complete":
-                    yield {
-                        "event": "session_complete",
-                        "data": json.dumps(event.get("data", {})),
-                    }
+                if ev.get("event") == "session_complete":
+                    yield {"event": "session_complete",
+                           "data": json.dumps(ev.get("data", {}))}
                     break
-                elif event.get("event") == "error":
-                    yield {
-                        "event": "error",
-                        "data": json.dumps({"error": event.get("error", "Unknown error")}),
-                    }
+                elif ev.get("event") == "error":
+                    yield {"event": "error",
+                           "data": json.dumps({"error": ev.get("error", "Unknown")})}
                     break
                 else:
-                    yield {
-                        "event": event["event"],
-                        "data": json.dumps(event["data"]),
-                    }
-        except Exception as e:
-            logger.error("sse_stream_error", session_id=session_id, error=str(e))
-            yield {"event": "error", "data": json.dumps({"error": str(e)})}
+                    yield {"event": ev["event"],
+                           "data": json.dumps(ev["data"])}
+        except Exception as exc:
+            yield {"event": "error", "data": json.dumps({"error": str(exc)})}
         finally:
-            _sse_queues.pop(session_id, None)
+            _sse_queues.pop(session_id, None)   # cleanup
 
-    return EventSourceResponse(event_generator())
+    return EventSourceResponse(_generator())
 
 
 @router.get("/analyze/{session_id}", response_model=SessionStatusResponse)
 async def get_analysis(session_id: str):
-    """Get the current status and results of an analysis session."""
     orchestrator = get_orchestrator()
-    memory = get_memory()
+    memory       = get_memory()
 
-    # Check in-memory first
-    session = orchestrator.get_session(session_id)
-    if session:
+    sess = orchestrator.get_session(session_id)
+    if sess:
         return SessionStatusResponse(
-            session_id=session_id,
-            status=session.status,
-            agent_outputs=session.agent_outputs,
-            final_decision=session.final_decision,
-            error=session.error,
+            session_id=session_id, status=sess.status,
+            agent_outputs=sess.agent_outputs,
+            final_decision=sess.final_decision, error=sess.error,
         )
 
-    # Check database
-    db_session = await memory.get_session(session_id)
-    if db_session:
+    db = await memory.get_session(session_id)
+    if db:
         return SessionStatusResponse(
             session_id=session_id,
-            status=db_session.get("status", "unknown"),
+            status=db.get("status", "unknown"),
             agent_outputs=[],
-            final_decision=db_session.get("final_decision"),
-            error=db_session.get("error"),
+            final_decision=db.get("final_decision"),
+            error=db.get("error"),
         )
 
-    raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
+    raise HTTPException(404, f"Session {session_id} not found")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# History & Calibration
+# Polymarket
+# ─────────────────────────────────────────────────────────────────────────────
+
+@router.get("/polymarket/search")
+async def polymarket_search(
+    q:        str      = Query(..., min_length=2),
+    bet_type: BetType  = Query(BetType.MATCH_WINNER),
+    limit:    int      = Query(5, ge=1, le=20),
+):
+    """Search Polymarket Gamma API for prediction markets."""
+    svc = get_polymarket_service()
+    markets = await svc.search_markets(query=q, bet_type=bet_type.value, limit=limit)
+    return {"markets": markets, "count": len(markets)}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# History & calibration
 # ─────────────────────────────────────────────────────────────────────────────
 
 @router.get("/history", response_model=HistoryResponse)
 async def get_history(
-    limit: int = Query(20, ge=1, le=100),
-    offset: int = Query(0, ge=0),
+    limit:  int = Query(20, ge=1, le=100),
+    offset: int = Query(0,  ge=0),
 ):
-    """Get paginated analysis history."""
-    memory = get_memory()
-    items_raw = await memory.get_history(limit=limit, offset=offset)
-    total = await memory.get_total_sessions()
-
-    items = [
+    memory  = get_memory()
+    rows    = await memory.get_history(limit=limit, offset=offset)
+    total   = await memory.get_total_sessions()
+    items   = [
         HistoryItem(
-            session_id=row["session_id"],
-            query=row["query"],
-            decision=row.get("decision"),
-            confidence=row.get("confidence"),
-            created_at=_parse_dt(row.get("created_at")),
-            status=row.get("status", "unknown"),
+            session_id=r["session_id"], query=r["query"],
+            decision=r.get("decision"), confidence=r.get("confidence"),
+            created_at=_parse_dt(r.get("created_at")),
+            status=r.get("status", "unknown"),
         )
-        for row in items_raw
+        for r in rows
     ]
-
     return HistoryResponse(items=items, total=total)
 
 
 @router.post("/outcome/{session_id}")
 async def record_outcome(
-    session_id: str,
-    actual_outcome: str = Query(..., description="What actually happened"),
-    was_correct: bool = Query(..., description="Did the system's prediction prove correct?"),
+    session_id:    str,
+    actual_outcome: str  = Query(...),
+    was_correct:   bool  = Query(...),
 ):
-    """Record the actual outcome for calibration and learning."""
     memory = get_memory()
-    session = await memory.get_session(session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-
+    if not await memory.get_session(session_id):
+        raise HTTPException(404, "Session not found")
     await memory.record_outcome(session_id, actual_outcome, was_correct)
-    return {"status": "recorded", "session_id": session_id}
+    return {"status": "recorded"}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# System Endpoints
+# System
 # ─────────────────────────────────────────────────────────────────────────────
 
 @router.get("/health")
-async def health_check():
-    """System health check."""
+async def health():
     from backend.config import settings
     return {
-        "status": "healthy",
-        "version": "1.0.0",
+        "status":       "healthy",
+        "version":      "2.0.0",
         "llm_provider": settings.LLM_PROVIDER,
-        "llm_model": settings.LLM_MODEL,
-        "demo_mode": settings.DEMO_MODE,
-        "timestamp": datetime.utcnow().isoformat(),
+        "llm_model":    settings.LLM_MODEL,
+        "demo_mode":    settings.DEMO_MODE,
+        "timestamp":    datetime.utcnow().isoformat(),
     }
 
 
 @router.get("/stats")
-async def get_stats():
-    """Get system statistics including calibration metrics."""
-    memory = get_memory()
-    total = await memory.get_total_sessions()
+async def stats():
+    memory      = get_memory()
+    total       = await memory.get_total_sessions()
     calibration = await memory.get_calibration_stats()
-
-    return {
-        "total_analyses": total,
-        "calibration": calibration,
-        "agents": [
-            "ScannerAgent", "InputParserAgent", "ResearchAgent",
-            "PredictorAgent", "AnalystAgent", "SkepticAgent",
-            "ScenarioAgent", "ValidatorAgent", "SynthesizerAgent",
-            "ScoringAgent"
-        ],
-    }
+    return {"total_analyses": total, "calibration": calibration,
+            "agents": 10, "pipeline_stages": 8}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Background Task
+# Background task
 # ─────────────────────────────────────────────────────────────────────────────
 
-async def _run_analysis_background(
-    session_id: str,
-    query: str,
-    implied_probability: Optional[float],
-    market_odds: Optional[str],
-    context: Optional[str],
-    on_progress,
-    queue: asyncio.Queue,
-):
-    """Background coroutine that runs the full analysis pipeline."""
+async def _run_bg(session_id, query, bet_type, implied_probability,
+                  market_odds, context, on_progress, queue):
     try:
         orchestrator = get_orchestrator()
-        session = await orchestrator.run_analysis(
-            session_id=session_id,
-            query=query,
-            implied_probability=implied_probability,
-            market_odds=market_odds,
-            context=context,
-            on_progress=on_progress,
+        sess = await orchestrator.run_analysis(
+            session_id=session_id, query=query, bet_type=bet_type,
+            implied_probability=implied_probability, market_odds=market_odds,
+            context=context, on_progress=on_progress,
         )
-
-        # Emit session_complete event
-        queue.put_nowait({
-            "event": "session_complete",
-            "data": _session_to_dict(session),
-        })
-
-    except Exception as e:
-        logger.error("background_analysis_error", session_id=session_id, error=str(e))
-        queue.put_nowait({
-            "event": "error",
-            "error": str(e),
-        })
+        queue.put_nowait({"event": "session_complete", "data": _sess_dict(sess)})
+    except Exception as exc:
+        logger.error("bg_error", sid=session_id, error=str(exc))
+        queue.put_nowait({"event": "error", "error": str(exc)})
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _session_to_dict(session) -> Dict[str, Any]:
-    """Convert AnalysisSession to JSON-serializable dict."""
+def _sess_dict(sess) -> Dict[str, Any]:
     return {
-        "session_id": session.session_id,
-        "status": session.status,
-        "query": session.query,
-        "final_decision": (
-            session.final_decision.model_dump(mode="json")
-            if session.final_decision
-            else None
-        ),
-        "agent_count": len(session.agent_outputs),
-        "error": session.error,
+        "session_id":    sess.session_id,
+        "status":        sess.status,
+        "query":         sess.query,
+        "final_decision": (sess.final_decision.model_dump(mode="json")
+                           if sess.final_decision else None),
+        "agent_count":   len(sess.agent_outputs),
+        "error":         sess.error,
     }
 
 
-def _parse_dt(dt_str) -> datetime:
-    if not dt_str:
+def _parse_dt(s) -> datetime:
+    if not s:
         return datetime.utcnow()
     try:
-        return datetime.fromisoformat(dt_str)
+        return datetime.fromisoformat(s)
     except Exception:
         return datetime.utcnow()

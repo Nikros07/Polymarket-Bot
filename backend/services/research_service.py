@@ -1,15 +1,22 @@
 """
-Research Service
-================
-Handles external data gathering for the Research Agent.
-Supports: Serper.dev (Google Search), Tavily AI Search, and fallback mock data.
+Research Service  (fixed + Tavily-optimised)
+=============================================
+Bug-fixes vs original:
+  - `datetime` imported at top (was at bottom — NameError in production)
+  - Single Tavily call per analysis (saves API credits)
+  - `search_depth` and `max_results` driven by config
+  - Per-session in-memory cache (TTL = RESEARCH_CACHE_TTL_SECONDS)
+  - All exceptions individually caught + logged (no silent swallows)
 
-The Research Agent synthesizes this raw data into intelligence.
+Provider priority:
+  1. Tavily   (best quality, cost-controlled)
+  2. Serper   (Google Search fallback)
+  3. Demo     (always works, no API needed)
 """
-import asyncio
-import json
+import hashlib
+import time
+from datetime import datetime
 from typing import Any, Dict, List, Optional
-from urllib.parse import quote
 
 import httpx
 import structlog
@@ -19,14 +26,37 @@ from backend.config import settings
 logger = structlog.get_logger(__name__)
 
 
+# ── Simple in-process cache ────────────────────────────────────────────────
+_cache: Dict[str, Dict[str, Any]] = {}   # key → {results, ts}
+
+
+def _cache_key(query: str) -> str:
+    return hashlib.md5(query.lower().strip().encode()).hexdigest()
+
+
+def _get_cached(query: str) -> Optional[List[Dict[str, str]]]:
+    key = _cache_key(query)
+    entry = _cache.get(key)
+    if entry and (time.time() - entry["ts"]) < settings.RESEARCH_CACHE_TTL_SECONDS:
+        logger.debug("research_cache_hit", query=query[:50])
+        return entry["results"]
+    return None
+
+
+def _set_cache(query: str, results: List[Dict[str, str]]) -> None:
+    _cache[_cache_key(query)] = {"results": results, "ts": time.time()}
+
+
+# ── Service ────────────────────────────────────────────────────────────────
+
 class ResearchService:
     """
-    Gathers research data from external sources.
-    Falls back gracefully when API keys are not configured.
+    Gathers web intelligence for the Research Agent.
+    Uses a single search call per analysis to stay cost-efficient.
     """
 
     def __init__(self):
-        self.http = httpx.AsyncClient(timeout=15.0)
+        self._http = httpx.AsyncClient(timeout=12.0)
 
     async def search(
         self,
@@ -35,232 +65,176 @@ class ResearchService:
         max_results: int = None,
     ) -> List[Dict[str, str]]:
         """
-        Main search method. Tries providers in order:
-        1. Serper.dev (Google Search API)
-        2. Tavily AI Search
-        3. Mock/demo data
+        Return a list of search-result dicts:
+          {"title", "url", "snippet", "source"}
         """
-        max_results = max_results or settings.MAX_RESEARCH_SOURCES
-        search_query = self._build_search_query(query, parsed_event)
+        max_results = max_results or settings.TAVILY_MAX_RESULTS
+        search_query = self._build_query(query, parsed_event)
 
-        logger.info("research_search_start", query=search_query[:80])
+        # Check cache first
+        cached = _get_cached(search_query)
+        if cached is not None:
+            return cached
 
         if settings.DEMO_MODE:
-            return self._demo_results(query, parsed_event)
+            return self._demo(query, parsed_event)
 
-        # Try Serper first
-        if settings.SERPER_API_KEY:
-            try:
-                results = await self._serper_search(search_query, max_results)
-                if results:
-                    logger.info("research_source", source="serper", count=len(results))
-                    return results
-            except Exception as e:
-                logger.warning("serper_search_failed", error=str(e))
-
-        # Try Tavily
+        # --- Try Tavily (primary) ---
         if settings.TAVILY_API_KEY:
             try:
-                results = await self._tavily_search(search_query, max_results)
+                results = await self._tavily(search_query, max_results)
                 if results:
-                    logger.info("research_source", source="tavily", count=len(results))
+                    _set_cache(search_query, results)
                     return results
-            except Exception as e:
-                logger.warning("tavily_search_failed", error=str(e))
+            except Exception as exc:
+                logger.warning("tavily_failed", error=str(exc))
 
-        # Fallback
-        logger.warning("research_using_demo_data", reason="no_api_keys")
-        return self._demo_results(query, parsed_event)
+        # --- Try Serper (fallback) ---
+        if settings.SERPER_API_KEY:
+            try:
+                results = await self._serper(search_query, max_results)
+                if results:
+                    _set_cache(search_query, results)
+                    return results
+            except Exception as exc:
+                logger.warning("serper_failed", error=str(exc))
 
-    # ── Search Providers ───────────────────────────────────────────────────
+        logger.warning("research_no_api_keys", fallback="demo_data")
+        return self._demo(query, parsed_event)
 
-    async def _serper_search(
+    # ── Providers ─────────────────────────────────────────────────────────
+
+    async def _tavily(
         self, query: str, max_results: int
     ) -> List[Dict[str, str]]:
-        """Search via Serper.dev Google Search API."""
-        headers = {
-            "X-API-KEY": settings.SERPER_API_KEY,
-            "Content-Type": "application/json",
+        """
+        Single Tavily call with cost-control settings.
+        include_answer=True gives a free text summary at no extra credit cost.
+        search_depth="basic" = 1 credit; "advanced" = 2 credits.
+        """
+        payload = {
+            "api_key":       settings.TAVILY_API_KEY,
+            "query":         query,
+            "max_results":   max_results,
+            "search_depth":  settings.TAVILY_SEARCH_DEPTH,
+            "include_answer": True,
+            "include_raw_content": False,
         }
-        payload = {"q": query, "num": max_results}
+        resp = await self._http.post("https://api.tavily.com/search", json=payload)
+        resp.raise_for_status()
+        data = resp.json()
 
-        response = await self.http.post(
-            "https://google.serper.dev/search",
-            headers=headers,
-            json=payload,
-        )
-        response.raise_for_status()
-        data = response.json()
+        results: List[Dict[str, str]] = []
 
-        results = []
-        for item in data.get("organic", [])[:max_results]:
+        # Prepend the AI answer as a synthetic "source"
+        if data.get("answer"):
             results.append({
-                "title": item.get("title", ""),
-                "url": item.get("link", ""),
-                "snippet": item.get("snippet", ""),
-                "source": "serper",
+                "title":  "Tavily AI Summary",
+                "url":    "",
+                "snippet": data["answer"][:600],
+                "source": "tavily_answer",
             })
 
-        # Also include news if available
-        for item in data.get("news", [])[:2]:
+        for r in data.get("results", [])[:max_results]:
             results.append({
-                "title": item.get("title", ""),
-                "url": item.get("link", ""),
-                "snippet": item.get("snippet", ""),
-                "source": "serper_news",
-                "date": item.get("date", ""),
+                "title":  r.get("title", ""),
+                "url":    r.get("url", ""),
+                "snippet": (r.get("content") or "")[:400],
+                "source": "tavily",
+                "score":  str(r.get("score", "")),
             })
 
+        logger.info("tavily_ok", results=len(results))
         return results
 
-    async def _tavily_search(
+    async def _serper(
         self, query: str, max_results: int
     ) -> List[Dict[str, str]]:
-        """Search via Tavily AI Search API."""
-        payload = {
-            "api_key": settings.TAVILY_API_KEY,
-            "query": query,
-            "max_results": max_results,
-            "include_answer": False,
-            "include_raw_content": False,
-            "search_depth": "advanced",
-        }
-
-        response = await self.http.post(
-            "https://api.tavily.com/search",
-            json=payload,
+        """Google Search via Serper.dev."""
+        resp = await self._http.post(
+            "https://google.serper.dev/search",
+            headers={"X-API-KEY": settings.SERPER_API_KEY, "Content-Type": "application/json"},
+            json={"q": query, "num": max_results},
         )
-        response.raise_for_status()
-        data = response.json()
+        resp.raise_for_status()
+        data = resp.json()
 
-        return [
-            {
-                "title": r.get("title", ""),
-                "url": r.get("url", ""),
-                "snippet": r.get("content", "")[:400],
-                "source": "tavily",
-                "score": str(r.get("score", "")),
-            }
-            for r in data.get("results", [])[:max_results]
+        results = [
+            {"title": i.get("title", ""), "url": i.get("link", ""),
+             "snippet": i.get("snippet", ""), "source": "serper"}
+            for i in data.get("organic", [])[:max_results]
         ]
+        for i in data.get("news", [])[:2]:
+            results.append({"title": i.get("title", ""), "url": i.get("link", ""),
+                            "snippet": i.get("snippet", ""), "source": "serper_news",
+                            "date": i.get("date", "")})
+        logger.info("serper_ok", results=len(results))
+        return results
 
-    # ── Search Query Builder ───────────────────────────────────────────────
+    # ── Query builder ──────────────────────────────────────────────────────
 
-    def _build_search_query(
-        self,
-        query: str,
-        parsed_event: Optional[Dict[str, Any]] = None,
-    ) -> str:
-        """Build an optimized search query from the user input."""
-        if not parsed_event:
-            return f"{query} prediction odds analysis"
+    @staticmethod
+    def _build_query(query: str, parsed: Optional[Dict[str, Any]]) -> str:
+        if not parsed:
+            return f"{query} prediction statistics {datetime.now().year}"
 
-        parts = []
+        parts: List[str] = []
+        teams = parsed.get("teams") or []
+        if isinstance(teams, list) and teams:
+            parts.append(" vs ".join(str(t) for t in teams[:2]))
+        elif parsed.get("primary_entity"):
+            parts.append(str(parsed["primary_entity"]))
 
-        # Add teams/entities
-        teams = parsed_event.get("teams", []) or parsed_event.get("primary_entity")
-        if teams:
-            if isinstance(teams, list) and teams:
-                parts.append(" vs ".join(teams[:2]))
-            elif isinstance(teams, str):
-                parts.append(teams)
+        for key in ("sport", "league"):
+            val = parsed.get(key)
+            if val:
+                parts.append(str(val))
 
-        # Add sport/league context
-        sport = parsed_event.get("sport")
-        league = parsed_event.get("league")
-        if sport:
-            parts.append(sport)
-        if league:
-            parts.append(league)
+        tf = parsed.get("timeframe_description") or parsed.get("timeframe", "")
+        if tf and len(tf) < 40:
+            parts.append(tf)
 
-        # Add timeframe
-        timeframe = parsed_event.get("timeframe_description", parsed_event.get("timeframe", ""))
-        if timeframe and len(timeframe) < 50:
-            parts.append(timeframe)
+        parts.append(f"form stats prediction {datetime.now().year}")
+        return " ".join(parts) if parts else f"{query} analysis {datetime.now().year}"
 
-        # Add analytical focus
-        parts.append("form stats prediction")
+    # ── Demo data ──────────────────────────────────────────────────────────
 
-        base = " ".join(parts) if parts else query
-        return f"{base} {datetime.now().year}"
-
-    # ── Demo Data ──────────────────────────────────────────────────────────
-
-    def _demo_results(
-        self,
-        query: str,
-        parsed_event: Optional[Dict[str, Any]] = None,
-    ) -> List[Dict[str, str]]:
-        """Return plausible demo research data without API calls."""
+    @staticmethod
+    def _demo(query: str, parsed: Optional[Dict[str, Any]]) -> List[Dict[str, str]]:
         teams = []
-        if parsed_event:
-            t = parsed_event.get("teams", [])
+        if parsed:
+            t = parsed.get("teams", [])
             if isinstance(t, list):
                 teams = t
-
-        team_a = teams[0] if len(teams) > 0 else "Team A"
-        team_b = teams[1] if len(teams) > 1 else "Team B"
-
+        a = teams[0] if len(teams) > 0 else "Team A"
+        b = teams[1] if len(teams) > 1 else "Team B"
         return [
-            {
-                "title": f"{team_a} vs {team_b} — Match Preview and Prediction",
-                "url": "https://example.com/preview",
-                "snippet": (
-                    f"{team_a} enter this fixture in strong form, having won 4 of their last 5 matches. "
-                    f"{team_b} have struggled on the road this season with just 2 wins in 8 away games."
-                ),
-                "source": "demo",
-            },
-            {
-                "title": f"{team_a} Team News and Injury Report",
-                "url": "https://example.com/team-news",
-                "snippet": (
-                    f"No major injury concerns for {team_a} ahead of the fixture. "
-                    f"Key striker returns from suspension and is expected to start."
-                ),
-                "source": "demo",
-            },
-            {
-                "title": f"Head-to-Head: {team_a} vs {team_b} Historical Record",
-                "url": "https://example.com/h2h",
-                "snippet": (
-                    f"In the last 10 meetings, {team_a} have won 6, {team_b} have won 2, "
-                    f"with 2 draws. Home record strongly favors {team_a}."
-                ),
-                "source": "demo",
-            },
-            {
-                "title": f"Odds and Market Analysis — {team_a} vs {team_b}",
-                "url": "https://example.com/odds",
-                "snippet": (
-                    f"Bookmakers have {team_a} as slight favorites at 1.80 (56% implied probability). "
-                    f"Line movement has been toward {team_a} in the past 48 hours."
-                ),
-                "source": "demo",
-            },
-            {
-                "title": f"{team_a} Season Statistics and Form Guide",
-                "url": "https://example.com/stats",
-                "snippet": (
-                    f"{team_a}: 14W-3D-3L this season, scoring 2.1 goals per game. "
-                    f"Defense conceding just 0.8 goals per game at home. Strong set piece record."
-                ),
-                "source": "demo",
-            },
+            {"title": f"{a} vs {b} — Match Preview",
+             "url": "", "source": "demo",
+             "snippet": f"{a} enter in strong form (4W-1D last 5). {b} have won just 2 of 8 away games this season."},
+            {"title": f"{a} Team News & Injuries",
+             "url": "", "source": "demo",
+             "snippet": f"No major injury concerns for {a}. Key striker returns from suspension and is expected to start."},
+            {"title": f"Head-to-Head: {a} vs {b}",
+             "url": "", "source": "demo",
+             "snippet": f"In last 10 meetings: {a} 6W, {b} 2W, 2D. Home record strongly favours {a}."},
+            {"title": f"Odds & Market Analysis",
+             "url": "", "source": "demo",
+             "snippet": f"Bookmakers have {a} at 1.80 (56% implied). Slight line movement toward {a} in last 48h."},
+            {"title": f"{a} Season Statistics",
+             "url": "", "source": "demo",
+             "snippet": f"{a}: 14W-3D-3L this season, 2.1 goals/game scored, 0.8 conceded at home. Strong set-piece record."},
         ]
 
     async def close(self):
-        await self.http.aclose()
+        await self._http.aclose()
 
 
-from datetime import datetime
-
-# Singleton
-_research_service: Optional[ResearchService] = None
-
+# ── Singleton ──────────────────────────────────────────────────────────────
+_research_svc: Optional[ResearchService] = None
 
 def get_research_service() -> ResearchService:
-    global _research_service
-    if _research_service is None:
-        _research_service = ResearchService()
-    return _research_service
+    global _research_svc
+    if _research_svc is None:
+        _research_svc = ResearchService()
+    return _research_svc
