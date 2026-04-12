@@ -144,6 +144,8 @@ class ScoreBreakdown(BaseModel):
     agent_agreement:          float = 0.5
     composite_score:          float = 0.5
     edge:                     float = 0.0
+    adjusted_edge:            float = 0.0    # edge × confidence (fee-adjusted, used for BET decision)
+    kelly_fraction:           float = 0.0    # Quarter-Kelly recommended stake as % of bankroll
 
 
 class RiskWarning(BaseModel):

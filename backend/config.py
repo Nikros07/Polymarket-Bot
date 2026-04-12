@@ -9,13 +9,16 @@ from typing import Optional
 
 class Settings(BaseSettings):
     # ── LLM ──────────────────────────────────────────────────────────────
-    LLM_PROVIDER: str = Field("anthropic", description="anthropic | openai")
+    LLM_PROVIDER: str = Field("anthropic", description="anthropic | openai | openrouter")
     LLM_MODEL: str = Field("claude-opus-4-6")
     AGENT_TEMPERATURE: float = Field(0.7, ge=0.0, le=1.0)
+    LLM_MAX_TOKENS: int = Field(2048, description="Max output tokens; use ≤2048 for free OpenRouter models")
 
     # ── API Keys ──────────────────────────────────────────────────────────
     ANTHROPIC_API_KEY: str = Field("")
     OPENAI_API_KEY: str = Field("")
+    OPENROUTER_API_KEY: str = Field("")      # Get free key at openrouter.ai
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
     TAVILY_API_KEY: str = Field("")          # Primary research provider
     SERPER_API_KEY: str = Field("")          # Fallback Google search
 
@@ -23,6 +26,8 @@ class Settings(BaseSettings):
     POLYMARKET_GAMMA_API: str = "https://gamma-api.polymarket.com"
     POLYMARKET_CLOB_API: str  = "https://clob.polymarket.com"
     POLYMARKET_MAX_MARKETS: int = 5          # Max markets to show per search
+    POLYMARKET_FEE_RATE: float = Field(0.02, description="Polymarket trading fee deducted from edge (2%)")
+    POLYMARKET_MIN_VOLUME: float = Field(500.0, description="Min USD volume to include a market in results")
 
     # ── App ───────────────────────────────────────────────────────────────
     APP_HOST: str = "0.0.0.0"
@@ -43,6 +48,9 @@ class Settings(BaseSettings):
     BET_CONFIDENCE_THRESHOLD: float = 0.65
     WATCH_EDGE_THRESHOLD: float = 0.03
     MAX_RISK_FOR_BET: float = 0.70
+
+    # ── Position Sizing (Kelly Criterion) ─────────────────────────────────
+    KELLY_FRACTION: float = Field(0.25, description="Kelly multiplier (0.25=quarter-Kelly, conservative)")
 
     # ── Memory ────────────────────────────────────────────────────────────
     ENABLE_MEMORY: bool = True

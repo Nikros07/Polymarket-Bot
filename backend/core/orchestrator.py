@@ -117,6 +117,11 @@ class OASISOrchestrator:
             session.parsed_event = _to_parsed_event(parse_out.output, bet_type)
 
             # ── Stage 2: Research + Polymarket (parallel) ────────────────
+            # Inject feature engineering context before research runs
+            env["research_feature_context"] = self.research_svc.build_feature_context(
+                query=query, parsed=parse_out.output
+            )
+
             raw_sources, poly_markets = await asyncio.gather(
                 self.research_svc.search(query=query, parsed_event=parse_out.output),
                 self.polymarket_svc.search_markets(query=query, bet_type=bet_type.value),

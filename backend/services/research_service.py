@@ -197,6 +197,60 @@ class ResearchService:
         parts.append(f"form stats prediction {datetime.now().year}")
         return " ".join(parts) if parts else f"{query} analysis {datetime.now().year}"
 
+    @staticmethod
+    def build_feature_context(query: str, parsed: Optional[Dict[str, Any]]) -> str:
+        """Build a supplemental research context string for the ResearchAgent.
+
+        This provides structured prompting hints so the agent focuses on the
+        quantitative features that matter most for edge calculation:
+        injuries, fatigue, motivation, and head-to-head record.
+
+        The context is injected into env["research_feature_context"] and
+        included in the ResearchAgent's user message.
+        """
+        if not parsed:
+            return ""
+
+        year = datetime.now().year
+        teams = parsed.get("teams") or []
+        team_a = teams[0] if len(teams) > 0 else parsed.get("primary_entity", "")
+        team_b = teams[1] if len(teams) > 1 else parsed.get("secondary_entity", "")
+        sport  = parsed.get("sport", "")
+
+        hints: List[str] = []
+
+        if team_a:
+            hints.append(
+                f"Injury/suspension check: '{team_a} injury suspended unavailable {year}'"
+            )
+            hints.append(
+                f"Fatigue/schedule: '{team_a} fixtures schedule rest days {year}'"
+            )
+            hints.append(
+                f"Motivation/context: '{team_a} standings {sport} motivation relegation title {year}'"
+            )
+
+        if team_b:
+            hints.append(
+                f"Opponent injury check: '{team_b} injury suspended unavailable {year}'"
+            )
+
+        if team_a and team_b:
+            hints.append(
+                f"H2H record: '{team_a} vs {team_b} head to head history {sport}'"
+            )
+            hints.append(
+                f"Venue/travel: '{team_a} home away record {sport} {year}'"
+            )
+
+        if not hints:
+            return ""
+
+        return (
+            "KEY RESEARCH ANGLES (search for these specifically):\n"
+            + "\n".join(f"  • {h}" for h in hints)
+        )
+
     # ── Demo data ──────────────────────────────────────────────────────────
 
     @staticmethod

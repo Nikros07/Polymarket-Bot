@@ -46,7 +46,7 @@ except ImportError:
 # ─────────────────────────────────────────────────────────────────────────────
 
 class _FallbackLLMClient:
-    """Direct Anthropic/OpenAI client — used when camel-ai is not installed."""
+    """Direct Anthropic/OpenAI/OpenRouter client — used when camel-ai is not installed."""
 
     def __init__(self):
         self._anthropic = None
@@ -64,6 +64,16 @@ class _FallbackLLMClient:
             try:
                 from openai import AsyncOpenAI
                 self._openai = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+            except ImportError:
+                pass
+        elif settings.LLM_PROVIDER == "openrouter" and settings.OPENROUTER_API_KEY:
+            try:
+                from openai import AsyncOpenAI
+                # OpenRouter uses the OpenAI SDK with a custom base_url
+                self._openai = AsyncOpenAI(
+                    api_key=settings.OPENROUTER_API_KEY,
+                    base_url=settings.OPENROUTER_BASE_URL,
+                )
             except ImportError:
                 pass
 
@@ -92,14 +102,30 @@ class _FallbackLLMClient:
         return resp.content[0].text
 
     async def _do_openai(self, sys, usr, temp, max_tokens):
-        resp = await self._openai.chat.completions.create(
-            model=settings.LLM_MODEL,
-            max_tokens=max_tokens,
-            temperature=temp,
-            messages=[{"role": "system", "content": sys},
-                      {"role": "user",   "content": usr}],
-        )
-        return resp.choices[0].message.content
+        """Call OpenAI-compatible API with retry on 429 rate-limit errors."""
+        last_exc: Exception = RuntimeError("no attempts made")
+        for attempt in range(3):
+            try:
+                resp = await self._openai.chat.completions.create(
+                    model=settings.LLM_MODEL,
+                    max_tokens=settings.LLM_MAX_TOKENS,
+                    temperature=temp,
+                    messages=[{"role": "system", "content": sys},
+                              {"role": "user",   "content": usr}],
+                )
+                return resp.choices[0].message.content
+            except Exception as exc:
+                last_exc = exc
+                err = str(exc).lower()
+                if "429" in err or "rate limit" in err or "too many requests" in err:
+                    wait = 2 ** attempt   # 1s → 2s → 4s
+                    logger.warning("openai_rate_limit_retry",
+                                   provider=settings.LLM_PROVIDER,
+                                   attempt=attempt + 1, wait_s=wait)
+                    await asyncio.sleep(wait)
+                else:
+                    raise
+        raise last_exc
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -198,8 +224,13 @@ class _CamelLLMClient:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def make_llm_client(system_prompt: str, temperature: float = None):
-    """Return a camel-ai client if available, else fallback."""
-    if CAMEL_AVAILABLE and not settings.DEMO_MODE:
+    """Return best available LLM client.
+
+    camel-ai is skipped for OpenRouter because it has no native OpenRouter
+    support — the fallback client handles it via the OpenAI SDK with a
+    custom base_url, which OpenRouter fully supports.
+    """
+    if CAMEL_AVAILABLE and not settings.DEMO_MODE and settings.LLM_PROVIDER != "openrouter":
         return _CamelLLMClient(system_prompt, temperature)
     return _FallbackLLMClient()
 

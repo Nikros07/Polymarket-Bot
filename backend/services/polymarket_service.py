@@ -86,8 +86,20 @@ class PolymarketService:
             raw: List[Dict] = resp.json()
 
             markets = [self._clean_market(m) for m in raw if self._is_usable(m)]
-            markets = sorted(markets, key=lambda m: m["volume"], reverse=True)
-            result   = markets[:limit]
+            markets = sorted(markets, key=lambda m: m["volume_usd"], reverse=True)
+
+            # Filter out low-liquidity markets (configurable threshold)
+            min_vol = settings.POLYMARKET_MIN_VOLUME
+            liquid  = [m for m in markets if m["volume_usd"] >= min_vol]
+            # If nothing passes the filter, show top markets with a warning flag
+            if not liquid and markets:
+                logger.warning("polymarket_all_low_liquidity",
+                               min_vol=min_vol, highest=markets[0]["volume_usd"])
+                for m in markets:
+                    m["low_liquidity"] = True
+                liquid = markets
+
+            result   = liquid[:limit]
 
             logger.info("polymarket_found", count=len(result))
             return result
@@ -173,18 +185,19 @@ class PolymarketService:
         end_date = end_date_raw[:10] if end_date_raw else None
 
         return {
-            "id":           raw.get("id") or raw.get("conditionId", ""),
-            "question":     raw.get("question", "Unknown market"),
-            "slug":         raw.get("slug", ""),
-            "description":  (raw.get("description") or "")[:300],
-            "outcomes":     outcomes,
-            "prices":       prices,
-            "yes_prob":     round(yes_prob, 4) if yes_prob is not None else None,
-            "no_prob":      round(no_prob,  4) if no_prob  is not None else None,
-            "volume_usd":   round(volume, 2),
-            "end_date":     end_date,
-            "url":          f"https://polymarket.com/event/{raw.get('slug', '')}",
-            "active":       bool(raw.get("active", True)),
+            "id":            raw.get("id") or raw.get("conditionId", ""),
+            "question":      raw.get("question", "Unknown market"),
+            "slug":          raw.get("slug", ""),
+            "description":   (raw.get("description") or "")[:300],
+            "outcomes":      outcomes,
+            "prices":        prices,
+            "yes_prob":      round(yes_prob, 4) if yes_prob is not None else None,
+            "no_prob":       round(no_prob,  4) if no_prob  is not None else None,
+            "volume_usd":    round(volume, 2),
+            "end_date":      end_date,
+            "url":           f"https://polymarket.com/event/{raw.get('slug', '')}",
+            "active":        bool(raw.get("active", True)),
+            "low_liquidity": volume < 1000.0,   # warn below $1k volume
         }
 
 

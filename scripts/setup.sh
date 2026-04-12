@@ -35,9 +35,9 @@ fi
 source .venv/bin/activate
 
 # ── Install Dependencies ──────────────────────────────────────────────────
-echo -e "${BLUE}→ Installing backend dependencies...${NC}"
+echo -e "${BLUE}→ Installing dependencies (FastAPI + Streamlit + AI)...${NC}"
 pip install --upgrade pip -q
-pip install -r backend/requirements.txt -q
+pip install -r requirements.txt -q
 echo -e "${GREEN}✓ Dependencies installed${NC}"
 
 # ── Environment File ──────────────────────────────────────────────────────
@@ -46,8 +46,10 @@ if [ ! -f ".env" ]; then
   cp .env.example .env
   echo -e "${YELLOW}
 ⚠ IMPORTANT: Edit .env and add your API key(s):
-  - ANTHROPIC_API_KEY=your_key  (for Claude)
-  - Or set DEMO_MODE=true to run without API keys
+  - OPENROUTER_API_KEY=sk-or-v1-...   ← Free tier at openrouter.ai (recommended)
+  - ANTHROPIC_API_KEY=your_key         ← Claude models
+  - OPENAI_API_KEY=your_key            ← OpenAI models
+  - Or set DEMO_MODE=true to run with simulated responses
 ${NC}"
 else
   echo -e "${GREEN}✓ .env file exists${NC}"
@@ -63,12 +65,18 @@ echo -e "${GREEN}
 ╚═══════════════════════════════════════════╝
 
 Next steps:
-  1. Edit .env and add your ANTHROPIC_API_KEY
-     (or set DEMO_MODE=true for testing)
+  1. Edit .env and set your API key:
+       OPENROUTER_API_KEY=sk-or-v1-...  ← free at openrouter.ai
+       LLM_PROVIDER=openrouter
+       LLM_MODEL=meta-llama/llama-3.1-8b-instruct:free
+     (or set DEMO_MODE=true for testing without a key)
 
-  2. Start the system:
-     ./scripts/start.sh
+  2. Start the Streamlit UI:
+       ./scripts/start_streamlit.sh
 
   3. Open your browser:
-     http://localhost:8000
+       http://localhost:8501
+
+  Optional — also start the FastAPI backend:
+       ./scripts/start.sh  →  http://localhost:8000/docs
 ${NC}"

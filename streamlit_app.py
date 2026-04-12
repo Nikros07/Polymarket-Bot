@@ -179,8 +179,13 @@ def run_async(coro):
 def render_sidebar():
     with st.sidebar:
         st.markdown("### ⬡ AI Decision System")
-        st.markdown("<p style='color:#7a8ba5;font-size:0.75rem;'>OASIS Multi-Agent Engine v2.0</p>",
-                    unsafe_allow_html=True)
+        _provider = os.getenv("LLM_PROVIDER", "anthropic")
+        _model    = os.getenv("LLM_MODEL", "—")[:36]
+        st.markdown(
+            f"<p style='color:#7a8ba5;font-size:0.75rem;'>OASIS Multi-Agent Engine v2.0</p>"
+            f"<p style='color:#3b82f6;font-size:0.72rem;margin-top:-8px;'>🔌 {_provider} / {_model}</p>",
+            unsafe_allow_html=True,
+        )
         st.divider()
 
         # ── Input form ─────────────────────────────────────────────────────
@@ -402,25 +407,30 @@ def render_results(session):
     conf  = fd.confidence_score
     edge  = fd.edge
     risk  = fd.risk
+    sb    = fd.score_breakdown
+    kelly = sb.kelly_fraction if sb else 0.0
+    adj_edge = sb.adjusted_edge if sb else 0.0
 
     # ── Decision Banner ─────────────────────────────────────────────────────
     card_cls = {"BET": "bet-card", "WATCH": "watch-card", "SKIP": "skip-card"}.get(dec, "watch-card")
     edge_sign = "+" if edge >= 0 else ""
     edge_col  = "#22c55e" if edge >= 0.05 else ("#f59e0b" if edge >= 0 else "#ef4444")
     risk_level = str(risk.level).replace("RiskLevel.", "").lower() if risk else "medium"
+    kelly_col = "#22c55e" if kelly > 0.01 else ("#f59e0b" if kelly > 0 else "#ef4444")
+    kelly_str = f"{kelly*100:.1f}%" if kelly > 0 else "—"
 
     st.markdown(f"""
     <div class="decision-card {card_cls}">
       <div class="decision-label-{dec}">{dec}</div>
       <p style="color:#9ca3af;margin:6px 0 16px;font-size:0.9rem">{session.query}</p>
-      <div style="display:flex;gap:28px;flex-wrap:wrap;">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;">
         <div class="metric-box">
           <div class="metric-value" style="color:#93c5fd">{prob*100:.1f}%</div>
           <div class="metric-label">PROBABILITY</div>
         </div>
         <div class="metric-box">
           <div class="metric-value" style="color:{edge_col}">{edge_sign}{edge*100:.1f}%</div>
-          <div class="metric-label">EDGE</div>
+          <div class="metric-label">EDGE (net)</div>
         </div>
         <div class="metric-box">
           <div class="metric-value" style="color:#a78bfa">{conf*100:.1f}%</div>
@@ -429,6 +439,10 @@ def render_results(session):
         <div class="metric-box">
           <div class="metric-value risk-{risk_level}">{risk_level.upper()}</div>
           <div class="metric-label">RISK</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value" style="color:{kelly_col}">{kelly_str}</div>
+          <div class="metric-label">KELLY STAKE</div>
         </div>
       </div>
     </div>
@@ -439,7 +453,7 @@ def render_results(session):
         st.markdown(f'<div class="info-box">💡 {fd.explanation}</div>', unsafe_allow_html=True)
 
     # ── Tabs ────────────────────────────────────────────────────────────────
-    tabs = st.tabs(["📊 Analysis", "🌐 Polymarket", "📈 Scores", "⚠️ Risk", "📝 Full Report"])
+    tabs = st.tabs(["📊 Analysis", "🌐 Polymarket", "📈 Scores", "⚠️ Risk", "📝 Full Report", "📉 Performance"])
 
     # TAB 1 — Analysis
     with tabs[0]:
@@ -548,7 +562,6 @@ def render_results(session):
 
     # TAB 3 — Scores
     with tabs[2]:
-        sb = fd.score_breakdown
         if sb:
             metrics = [
                 ("Predicted Probability",    sb.predicted_probability,    "#3b82f6"),
@@ -566,16 +579,41 @@ def render_results(session):
                 <div class="score-bar-bg"><div class="score-bar" style="width:{pct}%;background:{clr}"></div></div>
                 """, unsafe_allow_html=True)
 
-            # Edge
+            # Edge + Adjusted Edge + Kelly — three-column display
             edge_clr = "#22c55e" if edge >= 0 else "#ef4444"
-            st.markdown(f"""
-            <div style="background:#141820;border:1px solid #1e2535;border-radius:8px;
-                        padding:14px 18px;margin-top:12px;text-align:center;">
-              <span style="color:#7a8ba5;font-size:0.8rem">EDGE vs MARKET</span><br>
-              <span style="color:{edge_clr};font-size:2rem;font-weight:700;font-family:monospace">
-                {'+' if edge >= 0 else ''}{edge*100:.2f}%
-              </span>
-            </div>""", unsafe_allow_html=True)
+            adj_edge_clr = "#22c55e" if adj_edge >= 0.05 else ("#f59e0b" if adj_edge >= 0 else "#ef4444")
+            kelly_disp_col = "#22c55e" if kelly > 0.01 else ("#f59e0b" if kelly > 0 else "#ef4444")
+            ec1, ec2, ec3 = st.columns(3)
+            with ec1:
+                st.markdown(f"""
+                <div style="background:#141820;border:1px solid #1e2535;border-radius:8px;
+                            padding:14px 18px;margin-top:12px;text-align:center;">
+                  <div style="color:#7a8ba5;font-size:0.7rem;letter-spacing:1px">GROSS EDGE</div>
+                  <div style="color:{edge_clr};font-size:1.6rem;font-weight:700;font-family:monospace">
+                    {'+' if edge >= 0 else ''}{edge*100:.2f}%
+                  </div>
+                  <div style="color:#4a5570;font-size:0.65rem;margin-top:2px">after 2% fee</div>
+                </div>""", unsafe_allow_html=True)
+            with ec2:
+                st.markdown(f"""
+                <div style="background:#141820;border:1px solid #1e2535;border-radius:8px;
+                            padding:14px 18px;margin-top:12px;text-align:center;">
+                  <div style="color:#7a8ba5;font-size:0.7rem;letter-spacing:1px">ADJ. EDGE</div>
+                  <div style="color:{adj_edge_clr};font-size:1.6rem;font-weight:700;font-family:monospace">
+                    {'+' if adj_edge >= 0 else ''}{adj_edge*100:.2f}%
+                  </div>
+                  <div style="color:#4a5570;font-size:0.65rem;margin-top:2px">edge × confidence</div>
+                </div>""", unsafe_allow_html=True)
+            with ec3:
+                st.markdown(f"""
+                <div style="background:#141820;border:1px solid #1e2535;border-radius:8px;
+                            padding:14px 18px;margin-top:12px;text-align:center;">
+                  <div style="color:#7a8ba5;font-size:0.7rem;letter-spacing:1px">KELLY STAKE</div>
+                  <div style="color:{kelly_disp_col};font-size:1.6rem;font-weight:700;font-family:monospace">
+                    {kelly_str}
+                  </div>
+                  <div style="color:#4a5570;font-size:0.65rem;margin-top:2px">of bankroll (¼-Kelly)</div>
+                </div>""", unsafe_allow_html=True)
 
     # TAB 4 — Risk
     with tabs[3]:
@@ -617,6 +655,88 @@ def render_results(session):
                         st.json(ao.output)
                     if ao.error:
                         st.error(f"Error: {ao.error}")
+
+    # TAB 6 — Performance / Analytics
+    with tabs[5]:
+        st.markdown("#### 📉 Historical Performance")
+        if BACKEND_OK:
+            try:
+                memory = get_memory()
+                cal    = run_async(memory.get_calibration_stats())
+                hist   = run_async(memory.get_history(limit=50))
+
+                # ── Calibration summary ──────────────────────────────────
+                total  = cal.get("total_outcomes", 0)
+                if total > 0:
+                    correct  = cal.get("correct", 0)
+                    accuracy = cal.get("accuracy", 0.0)
+                    avg_conf = cal.get("avg_confidence") or 0.0
+                    cal_gap  = avg_conf - accuracy
+
+                    pc1, pc2, pc3, pc4 = st.columns(4)
+                    with pc1:
+                        st.metric("Total Outcomes", total)
+                    with pc2:
+                        st.metric("Correct", correct, delta=None)
+                    with pc3:
+                        st.metric("Accuracy", f"{accuracy*100:.1f}%")
+                    with pc4:
+                        gap_str = f"{cal_gap*100:+.1f}%"
+                        help_txt = "Positive = overconfident, Negative = underconfident"
+                        st.metric("Calibration Gap", gap_str, help=help_txt)
+                else:
+                    st.info("No outcomes recorded yet. After each analysis, click "
+                            "**✅ Mark as Correct** to start tracking accuracy.")
+
+                # ── Decision distribution ────────────────────────────────
+                if hist:
+                    from collections import Counter
+                    decision_counts = Counter(r.get("decision") for r in hist if r.get("decision"))
+                    st.markdown("**Decision Distribution** (last 50)")
+                    dc1, dc2, dc3 = st.columns(3)
+                    with dc1:
+                        st.markdown(f'<div style="background:#0a120a;border:1px solid #22c55e44;'
+                                    f'border-radius:8px;padding:12px;text-align:center;">'
+                                    f'<div style="color:#22c55e;font-size:1.8rem;font-weight:700">'
+                                    f'{decision_counts.get("BET", 0)}</div>'
+                                    f'<div style="color:#7a8ba5;font-size:0.75rem">BET</div></div>',
+                                    unsafe_allow_html=True)
+                    with dc2:
+                        st.markdown(f'<div style="background:#1a1500;border:1px solid #f59e0b44;'
+                                    f'border-radius:8px;padding:12px;text-align:center;">'
+                                    f'<div style="color:#f59e0b;font-size:1.8rem;font-weight:700">'
+                                    f'{decision_counts.get("WATCH", 0)}</div>'
+                                    f'<div style="color:#7a8ba5;font-size:0.75rem">WATCH</div></div>',
+                                    unsafe_allow_html=True)
+                    with dc3:
+                        st.markdown(f'<div style="background:#120a0a;border:1px solid #ef444444;'
+                                    f'border-radius:8px;padding:12px;text-align:center;">'
+                                    f'<div style="color:#ef4444;font-size:1.8rem;font-weight:700">'
+                                    f'{decision_counts.get("SKIP", 0)}</div>'
+                                    f'<div style="color:#7a8ba5;font-size:0.75rem">SKIP</div></div>',
+                                    unsafe_allow_html=True)
+
+                    # ── Recent analyses table ────────────────────────────
+                    st.markdown("**Recent Analyses**")
+                    for r in hist[:15]:
+                        d = r.get("decision", "—")
+                        col = {"BET": "🟢", "WATCH": "🟡", "SKIP": "🔴"}.get(d, "⚪")
+                        conf_val = r.get("confidence")
+                        conf_str = f"{conf_val*100:.0f}%" if conf_val else "—"
+                        q = r.get("query", "")[:55]
+                        st.markdown(
+                            f'<div style="background:#141820;border:1px solid #1e2535;'
+                            f'border-radius:6px;padding:8px 12px;margin-bottom:4px;'
+                            f'font-size:0.8rem;display:flex;justify-content:space-between;">'
+                            f'<span>{col} {q}</span>'
+                            f'<span style="color:#7a8ba5;font-family:monospace">{d} · {conf_str}</span>'
+                            f'</div>',
+                            unsafe_allow_html=True,
+                        )
+            except Exception as _pe:
+                st.warning(f"Could not load performance data: {_pe}")
+        else:
+            st.warning("Backend unavailable.")
 
     # ── Action row ──────────────────────────────────────────────────────────
     st.markdown("---")
@@ -676,16 +796,23 @@ def render_welcome():
         </div>""", unsafe_allow_html=True)
 
     # Config check
-    api_key = os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY")
+    api_key = (os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY")
+               or os.getenv("OPENROUTER_API_KEY"))
     demo    = os.getenv("DEMO_MODE", "false").lower() == "true"
     if not api_key and not demo:
-        st.warning("⚠️ No API key found. Add **ANTHROPIC_API_KEY** to your `.env` file, "
-                   "or set **DEMO_MODE=true** to run with simulated responses.")
+        st.warning(
+            "⚠️ No API key found. Add one of these to your `.env` file:\n"
+            "- `OPENROUTER_API_KEY` — free models at openrouter.ai\n"
+            "- `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`\n"
+            "- Or set `DEMO_MODE=true` to run with simulated responses."
+        )
     elif demo:
         st.info("ℹ️ Running in **Demo Mode** — responses are simulated. "
                 "Set DEMO_MODE=false and add an API key for real analysis.")
     else:
-        st.success("✅ API key configured. System ready.")
+        provider = os.getenv("LLM_PROVIDER", "anthropic")
+        model    = os.getenv("LLM_MODEL", "—")
+        st.success(f"✅ Ready — {provider} / {model}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

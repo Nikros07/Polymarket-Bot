@@ -130,8 +130,13 @@ class ScoringEngine:
         scores: Dict[str, float],
         implied_probability: float,
     ) -> ScoreBreakdown:
-        """Apply weighted formula to produce composite score."""
+        """Apply weighted formula to produce composite score.
 
+        Quantitative improvements:
+        - Edge is fee-adjusted (Polymarket ~2% fee deducted from gross edge)
+        - Adjusted edge = fee-adjusted edge × confidence (penalises low-conviction calls)
+        - Kelly fraction computed for position sizing guidance
+        """
         # Normalize market signal from [-1, 1] to [0, 1] for weighting
         market_signal_normalized = (scores["market_signal"] + 1) / 2
 
@@ -146,7 +151,23 @@ class ScoringEngine:
         }
 
         composite = sum(weighted_scores.values())
-        edge = scores["predicted_probability"] - implied_probability
+
+        # ── Fee-adjusted edge ──────────────────────────────────────────────
+        # Raw edge minus Polymarket trading fee → true realizable edge
+        raw_edge = scores["predicted_probability"] - implied_probability
+        fee_adjusted_edge = raw_edge - settings.POLYMARKET_FEE_RATE
+
+        # ── Confidence-weighted edge ───────────────────────────────────────
+        # Multiply by confidence so low-conviction predictions don't produce
+        # false BET signals even when raw edge looks large.
+        adjusted_edge = fee_adjusted_edge * scores["confidence_score"]
+
+        # ── Quarter-Kelly position sizing ──────────────────────────────────
+        kelly = _kelly_fraction(
+            p=scores["predicted_probability"],
+            implied_prob=implied_probability,
+            fraction=settings.KELLY_FRACTION,
+        )
 
         return ScoreBreakdown(
             predicted_probability=scores["predicted_probability"],
@@ -159,7 +180,9 @@ class ScoringEngine:
             validation_score=scores["validation_score"],
             agent_agreement=scores["confidence_score"],
             composite_score=_clamp(composite),
-            edge=edge,
+            edge=fee_adjusted_edge,
+            adjusted_edge=adjusted_edge,
+            kelly_fraction=kelly,
         )
 
     def _assess_risk(
@@ -167,8 +190,13 @@ class ScoringEngine:
         agent_outputs: Dict[str, Any],
         breakdown: ScoreBreakdown,
     ) -> RiskWarning:
-        """Compute risk level and warnings."""
+        """Compute risk level and warnings.
 
+        Quantitative improvements:
+        - Kelly-based exposure guidance instead of fixed percentage ranges
+        - Negative Kelly flagged as an explicit no-bet signal
+        - Fee-adjusted edge checked (not raw edge)
+        """
         risk_score = 0.0
         warnings = []
 
@@ -211,26 +239,41 @@ class ScoringEngine:
                     risk_score += RISK_WEIGHT_FACTORS["high_variance"]
                     warnings.append("High variance — no dominant outcome scenario")
 
-        # Edge too small
+        # Fee-adjusted edge too small (use breakdown.edge which is already fee-adjusted)
         if abs(breakdown.edge) < 0.03:
             risk_score += 0.10
-            warnings.append("Edge is very thin — may not be profitable after variance")
+            warnings.append("Edge is very thin after fees — may not be profitable after variance")
+
+        # Negative Kelly → outright no-bet signal
+        if breakdown.kelly_fraction <= 0:
+            risk_score += 0.20
+            warnings.append("Kelly Criterion negative — expected value is unfavourable; do not bet")
 
         risk_score = _clamp(risk_score)
 
         # Categorize
         if risk_score < 0.3:
             level = RiskLevel.LOW
-            exposure = "Up to 2-3% of bankroll"
         elif risk_score < 0.55:
             level = RiskLevel.MEDIUM
-            exposure = "Up to 1-2% of bankroll"
         elif risk_score < 0.75:
             level = RiskLevel.HIGH
-            exposure = "Avoid or micro-stake only (0.5%)"
         else:
             level = RiskLevel.EXTREME
-            exposure = "Do not bet — risk is too high"
+
+        # ── Kelly-based exposure guidance ──────────────────────────────────
+        kelly = breakdown.kelly_fraction
+        if level == RiskLevel.EXTREME or kelly <= 0:
+            exposure = "Do not bet — Kelly is negative or risk is too high"
+        elif level == RiskLevel.HIGH:
+            # Cap at half the Kelly suggestion for high-risk situations
+            capped = kelly * 0.5
+            exposure = f"Max {capped:.1%} of bankroll (Kelly ÷ 2 for high risk)"
+        else:
+            exposure = (
+                f"Suggested stake: {kelly:.1%} of bankroll "
+                f"(Quarter-Kelly, {settings.KELLY_FRACTION*100:.0f}% multiplier)"
+            )
 
         # Update breakdown risk_level
         breakdown.risk_level = risk_score
@@ -246,16 +289,22 @@ class ScoringEngine:
         breakdown: ScoreBreakdown,
         risk: RiskWarning,
     ) -> DecisionType:
-        """Apply threshold rules to produce BET / WATCH / SKIP."""
+        """Apply threshold rules to produce BET / WATCH / SKIP.
 
+        Uses `adjusted_edge` (fee-adjusted × confidence) instead of raw edge
+        for the BET gate, which prevents false signals from low-conviction or
+        high-fee situations. Kelly must also be positive.
+        """
+        adjusted_edge = breakdown.adjusted_edge
         edge = breakdown.edge
         confidence = breakdown.confidence_score
         risk_level = breakdown.risk_level
 
         if (
-            edge >= settings.BET_EDGE_THRESHOLD
+            adjusted_edge >= settings.BET_EDGE_THRESHOLD
             and confidence >= settings.BET_CONFIDENCE_THRESHOLD
             and risk_level < settings.MAX_RISK_FOR_BET
+            and breakdown.kelly_fraction > 0       # Kelly must confirm positive EV
         ):
             return DecisionType.BET
 
@@ -274,6 +323,28 @@ class ScoringEngine:
 
 def _clamp(val: float, lo: float = 0.0, hi: float = 1.0) -> float:
     return float(max(lo, min(hi, val)))
+
+
+def _kelly_fraction(p: float, implied_prob: float, fraction: float = 0.25) -> float:
+    """Compute fractional Kelly Criterion stake size.
+
+    Kelly formula: f* = (b*p - q) / b
+      p            = predicted probability of winning
+      q            = 1 - p  (probability of losing)
+      b            = decimal odds - 1  (= 1/implied_prob - 1)
+      fraction     = Kelly multiplier (0.25 = quarter-Kelly for safety)
+
+    Returns 0.0 if Kelly is negative (bet has negative expected value).
+    Clamped to [0, 0.25] to prevent extreme stakes.
+    """
+    if implied_prob <= 0.0 or implied_prob >= 1.0 or p <= 0.0 or p >= 1.0:
+        return 0.0
+    b = (1.0 / implied_prob) - 1.0   # decimal odds - 1
+    if b <= 0:
+        return 0.0
+    q = 1.0 - p
+    kelly = (b * p - q) / b
+    return float(max(0.0, min(kelly * fraction, 0.25)))
 
 
 # Singleton
