@@ -14,7 +14,9 @@ from backend.api.models import (
     DecisionType,
     FinalDecision,
     ParsedEvent,
+    PersonaBreakdown,
     Scenario,
+    SportsPredictions,
 )
 from backend.core.scoring import get_scoring_engine
 
@@ -89,6 +91,18 @@ class DecisionEngine:
         # Reasoning summary
         reasoning_summary = synthesis.get("narrative", synthesis.get("summary", ""))
 
+        # Debate summary
+        debate = agent_outputs.get("debate_output", {})
+        debate_summary = debate.get("debate_summary", "")
+
+        # Sports predictions
+        sports_predictions = self._extract_sports_predictions(
+            synthesis, agent_outputs
+        )
+
+        # Persona breakdown (Wisdom-of-Crowd)
+        persona_breakdown = self._extract_persona_breakdown(synthesis, final_prob)
+
         logger.info(
             "decision_assembled",
             decision=decision_type,
@@ -108,9 +122,178 @@ class DecisionEngine:
             reasoning_summary=reasoning_summary,
             bull_case=analyst.get("bull_case", ""),
             bear_case=skeptic.get("bear_case", ""),
+            debate_summary=debate_summary,
             scenarios=scenarios,
             conflicts=conflict_strs,
             key_insights=key_insights if isinstance(key_insights, list) else [],
+            sports_predictions=sports_predictions,
+            persona_breakdown=persona_breakdown,
+        )
+
+    def _extract_sports_predictions(
+        self,
+        synthesis: Dict[str, Any],
+        agent_outputs: Dict[str, Any],
+    ) -> Optional[SportsPredictions]:
+        """Extract sport-specific probabilities from synthesizer output."""
+        sp_raw = synthesis.get("sports_predictions")
+        if not sp_raw or not isinstance(sp_raw, dict):
+            return None
+
+        def _f(key, default=None):
+            v = sp_raw.get(key, default)
+            if v is None:
+                return None
+            try:
+                return float(max(0.0, min(1.0, v)))
+            except (TypeError, ValueError):
+                return None
+
+        home_win = _f("home_win_probability")
+        draw = _f("draw_probability")
+        away_win = _f("away_win_probability")
+        over_2_5 = _f("over_2_5_probability")
+        under_2_5 = _f("under_2_5_probability")
+        btts_yes = _f("btts_yes_probability")
+        btts_no = _f("btts_no_probability")
+
+        # Normalize match winner probabilities to sum to 1
+        if home_win is not None and draw is not None and away_win is not None:
+            total = home_win + draw + away_win
+            if total > 0:
+                home_win /= total
+                draw /= total
+                away_win /= total
+
+        # Normalize over/under
+        if over_2_5 is not None and under_2_5 is None:
+            under_2_5 = 1.0 - over_2_5
+        elif under_2_5 is not None and over_2_5 is None:
+            over_2_5 = 1.0 - under_2_5
+
+        # Normalize BTTS
+        if btts_yes is not None and btts_no is None:
+            btts_no = 1.0 - btts_yes
+        elif btts_no is not None and btts_yes is None:
+            btts_yes = 1.0 - btts_no
+
+        # Extract team names
+        parsed = agent_outputs.get("parsed_event", {})
+        teams = []
+        if isinstance(parsed, dict):
+            teams = parsed.get("teams", [])
+
+        # Generate bet recommendations (threshold: 65%)
+        BET_THRESHOLD = 0.65
+
+        match_winner_bet = None
+        if home_win is not None and draw is not None and away_win is not None:
+            best_prob = max(home_win, draw, away_win)
+            if best_prob >= BET_THRESHOLD:
+                if best_prob == home_win:
+                    match_winner_bet = "HOME"
+                elif best_prob == away_win:
+                    match_winner_bet = "AWAY"
+                else:
+                    match_winner_bet = "DRAW"
+            else:
+                match_winner_bet = "NO BET"
+
+        over_under_bet = None
+        if over_2_5 is not None:
+            if over_2_5 >= BET_THRESHOLD:
+                over_under_bet = "OVER"
+            elif (1.0 - over_2_5) >= BET_THRESHOLD:
+                over_under_bet = "UNDER"
+            else:
+                over_under_bet = "NO BET"
+
+        btts_bet = None
+        if btts_yes is not None:
+            if btts_yes >= BET_THRESHOLD:
+                btts_bet = "YES"
+            elif btts_no is not None and btts_no >= BET_THRESHOLD:
+                btts_bet = "NO"
+            else:
+                btts_bet = "NO BET"
+
+        return SportsPredictions(
+            home_team=teams[0] if len(teams) > 0 else None,
+            away_team=teams[1] if len(teams) > 1 else None,
+            home_win_probability=home_win,
+            draw_probability=draw,
+            away_win_probability=away_win,
+            over_2_5_probability=over_2_5,
+            under_2_5_probability=under_2_5,
+            btts_yes_probability=btts_yes,
+            btts_no_probability=btts_no,
+            match_winner_bet=match_winner_bet,
+            over_under_bet=over_under_bet,
+            btts_bet=btts_bet,
+        )
+
+    def _extract_persona_breakdown(
+        self,
+        synthesis: Dict[str, Any],
+        final_prob: float,
+    ) -> Optional[PersonaBreakdown]:
+        """Extract Wisdom-of-Crowd persona probabilities and compute aggregation."""
+        pp_raw = synthesis.get("persona_probabilities")
+        if not pp_raw or not isinstance(pp_raw, dict):
+            return None
+
+        def _f(key, fallback=final_prob):
+            v = pp_raw.get(key)
+            if v is None:
+                return fallback
+            try:
+                return float(max(0.0, min(1.0, v)))
+            except (TypeError, ValueError):
+                return fallback
+
+        analyst_p = _f("analyst")
+        skeptic_p = _f("skeptic")
+        market_p = _f("market_reader")
+        heuristic_p = _f("heuristic")
+        synth_p = _f("synthesizer")
+
+        # Wisdom-of-Crowd weights (from Nick's docs)
+        weights = {"analyst": 0.30, "skeptic": 0.15, "market_reader": 0.20,
+                   "heuristic": 0.20, "synthesizer": 0.15}
+
+        weighted_prob = (
+            analyst_p * weights["analyst"] +
+            skeptic_p * weights["skeptic"] +
+            market_p * weights["market_reader"] +
+            heuristic_p * weights["heuristic"] +
+            synth_p * weights["synthesizer"]
+        )
+        weighted_prob = max(0.0, min(1.0, weighted_prob))
+
+        # Herd behavior adjustment (from Nick's ARCHITECTURE.md)
+        probs = [analyst_p, skeptic_p, market_p, heuristic_p, synth_p]
+        mean_p = weighted_prob
+        variance = sum((p - mean_p) ** 2 for p in probs) / len(probs)
+        disagreement = variance ** 0.5  # std dev
+
+        if mean_p > 0.65:
+            herd_factor = 0.92 - (disagreement * 0.5)
+        elif mean_p < 0.35:
+            herd_factor = 1.08 + (disagreement * 0.5)
+        else:
+            herd_factor = 1.0
+
+        herd_adjusted = max(0.0, min(1.0, weighted_prob * herd_factor))
+
+        return PersonaBreakdown(
+            analyst=analyst_p,
+            skeptic=skeptic_p,
+            market_reader=market_p,
+            heuristic=heuristic_p,
+            synthesizer=synth_p,
+            weighted_probability=round(weighted_prob, 4),
+            herd_adjusted_probability=round(herd_adjusted, 4),
+            disagreement=round(disagreement, 4),
         )
 
     def _extract_scenarios(self, scenario_data: Dict[str, Any]) -> List[Scenario]:

@@ -13,7 +13,9 @@ Provider priority:
   2. Serper   (Google Search fallback)
   3. Demo     (always works, no API needed)
 """
+import asyncio
 import hashlib
+import json
 import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -286,6 +288,7 @@ class ResearchService:
 
 # ── Singleton ──────────────────────────────────────────────────────────────
 _research_svc: Optional[ResearchService] = None
+
 
 def get_research_service() -> ResearchService:
     global _research_svc

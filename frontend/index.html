@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Decision System</title>
+  <title>OASIS · AI Decision System</title>
   <link rel="stylesheet" href="/static/src/styles/main.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -87,7 +87,7 @@
           <h2 class="welcome-title">Multi-Agent Decision Engine</h2>
           <p class="welcome-desc">
             Enter an event or prediction question to start a full AI analysis.
-            10 specialized agents will collaborate, debate, and synthesize a decision.
+            11 specialized agents collaborate, debate, and synthesize a Wisdom-of-Crowd decision.
           </p>
           <div class="agent-preview">
             <div class="ap-item"><span class="ap-icon">🔍</span> Scanner</div>
@@ -95,6 +95,7 @@
             <div class="ap-item"><span class="ap-icon">🎯</span> Predictor</div>
             <div class="ap-item"><span class="ap-icon">📈</span> Analyst</div>
             <div class="ap-item"><span class="ap-icon">⚔️</span> Skeptic</div>
+            <div class="ap-item"><span class="ap-icon">⚡</span> Debate</div>
             <div class="ap-item"><span class="ap-icon">🌐</span> Scenarios</div>
             <div class="ap-item"><span class="ap-icon">✓</span> Validator</div>
             <div class="ap-item"><span class="ap-icon">⚖️</span> Synthesis</div>
@@ -150,6 +151,12 @@
             <div class="rs-content explanation-text" id="decisionExplanation"></div>
           </div>
 
+          <!-- Sports Predictions (shown for sports events only) -->
+          <div class="result-section hidden" id="sportsPredictionsSection">
+            <div class="rs-label">⚽ SPORTS MARKET PREDICTIONS</div>
+            <div id="sportsPredictionsContent"></div>
+          </div>
+
           <!-- Bull vs Bear -->
           <div class="bull-bear-grid">
             <div class="bb-card bull-card">
@@ -168,6 +175,18 @@
               </div>
               <div class="bb-content" id="bearCase"></div>
             </div>
+          </div>
+
+          <!-- Debate Summary -->
+          <div class="result-section hidden" id="debateSection">
+            <div class="rs-label">⚡ DEBATE SUMMARY</div>
+            <div class="debate-text" id="debateSummaryText"></div>
+          </div>
+
+          <!-- Persona Breakdown (Wisdom-of-Crowd) -->
+          <div class="result-section hidden" id="personaSection">
+            <div class="rs-label">🧠 WISDOM-OF-CROWD BREAKDOWN</div>
+            <div id="personaContent"></div>
           </div>
 
           <!-- Scenarios -->
@@ -222,7 +241,7 @@
       <aside class="agent-panel">
         <div class="ap-header">
           <div class="section-label">AGENT ACTIVITY</div>
-          <div class="agent-count" id="agentCount">0/10</div>
+          <div class="agent-count" id="agentCount">0/11</div>
         </div>
         <div class="agent-feed" id="agentFeed">
           <div class="af-empty">Agents will appear here during analysis</div>

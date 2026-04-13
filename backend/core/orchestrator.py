@@ -17,14 +17,15 @@ import structlog
 
 from backend.agents.analyst_agent    import AnalystAgent
 from backend.agents.input_parser_agent import InputParserAgent
-from backend.agents.predictor_agent  import PredictorAgent
 from backend.agents.research_agent   import ResearchAgent
-from backend.agents.scanner_agent    import ScannerAgent
-from backend.agents.scenario_agent   import ScenarioAgent
-from backend.agents.scoring_agent    import ScoringAgent
+from backend.agents.predictor_agent  import PredictorAgent
 from backend.agents.skeptic_agent    import SkepticAgent
-from backend.agents.synthesizer_agent import SynthesizerAgent
+from backend.agents.debate_agent     import DebateAgent
+from backend.agents.scenario_agent   import ScenarioAgent
 from backend.agents.validator_agent  import ValidatorAgent
+from backend.agents.synthesizer_agent import SynthesizerAgent
+from backend.agents.scanner_agent    import ScannerAgent
+from backend.agents.scoring_agent    import ScoringAgent
 from backend.api.models              import (AgentOutput, AgentRole,
                                               AnalysisSession, BetType,
                                               PolymarketMarket)
@@ -45,12 +46,14 @@ class OASISOrchestrator:
     """
 
     def __init__(self):
+        # Initialize all agents (the OASIS "society")
         self.scanner     = ScannerAgent()
         self.parser      = InputParserAgent()
         self.researcher  = ResearchAgent()
         self.predictor   = PredictorAgent()
         self.analyst     = AnalystAgent()
         self.skeptic     = SkepticAgent()
+        self.debate      = DebateAgent()
         self.scenario    = ScenarioAgent()
         self.validator   = ValidatorAgent()
         self.synthesizer = SynthesizerAgent()
@@ -151,6 +154,11 @@ class OASISOrchestrator:
             )
             env["analyst_output"] = analyst_out.output
             env["skeptic_output"] = skeptic_out.output
+
+            # ── Stage 4.5: Debate ─────────────────────────────────────────
+            logger.info("stage_debate_start", session_id=session_id)
+            debate_out = await self._run(self.debate, env, session, on_progress)
+            env["debate_output"] = debate_out.output
 
             # ── Stage 5: Scenarios ────────────────────────────────────────
             scen_out = await self._run(self.scenario, env, session, on_progress)

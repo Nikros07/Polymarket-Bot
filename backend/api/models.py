@@ -63,6 +63,7 @@ class AgentRole(str, Enum):
     PREDICTOR    = "predictor"
     ANALYST      = "analyst"
     SKEPTIC      = "skeptic"
+    DEBATE       = "debate"
     SCENARIO     = "scenario"
     VALIDATOR    = "validator"
     SYNTHESIZER  = "synthesizer"
@@ -154,21 +155,59 @@ class RiskWarning(BaseModel):
     max_exposure_recommendation:  str = ""
 
 
+class SportsPredictions(BaseModel):
+    """Sport-specific probability breakdowns (football/soccer-style)."""
+    home_team: Optional[str] = None
+    away_team: Optional[str] = None
+    # Match Winner
+    home_win_probability: Optional[float] = Field(None, ge=0.0, le=1.0)
+    draw_probability: Optional[float] = Field(None, ge=0.0, le=1.0)
+    away_win_probability: Optional[float] = Field(None, ge=0.0, le=1.0)
+    # Over/Under 2.5 goals
+    over_2_5_probability: Optional[float] = Field(None, ge=0.0, le=1.0)
+    under_2_5_probability: Optional[float] = Field(None, ge=0.0, le=1.0)
+    # Both Teams to Score
+    btts_yes_probability: Optional[float] = Field(None, ge=0.0, le=1.0)
+    btts_no_probability: Optional[float] = Field(None, ge=0.0, le=1.0)
+    # Bet recommendations per market
+    match_winner_bet: Optional[str] = None   # "HOME", "DRAW", "AWAY", "NO BET"
+    over_under_bet: Optional[str] = None     # "OVER", "UNDER", "NO BET"
+    btts_bet: Optional[str] = None          # "YES", "NO", "NO BET"
+
+
+class PersonaBreakdown(BaseModel):
+    """Wisdom-of-Crowd: each persona's probability and weight."""
+    analyst: float = Field(0.5, ge=0.0, le=1.0)
+    skeptic: float = Field(0.5, ge=0.0, le=1.0)
+    market_reader: float = Field(0.5, ge=0.0, le=1.0)
+    heuristic: float = Field(0.5, ge=0.0, le=1.0)
+    synthesizer: float = Field(0.5, ge=0.0, le=1.0)
+    # Weighted aggregate
+    weighted_probability: float = Field(0.5, ge=0.0, le=1.0)
+    # Herd adjustment
+    herd_adjusted_probability: float = Field(0.5, ge=0.0, le=1.0)
+    # Disagreement (std dev across personas)
+    disagreement: float = Field(0.0, ge=0.0, le=1.0)
+
+
 class FinalDecision(BaseModel):
     decision:              DecisionType
     confidence_score:      float = Field(0.5, ge=0.0, le=1.0)
     predicted_probability: float = Field(0.5, ge=0.0, le=1.0)
-    edge:                  float = 0.0
-    risk:                  RiskWarning
-    score_breakdown:       ScoreBreakdown
-    explanation:           str = ""
-    reasoning_summary:     str = ""
-    bull_case:             str = ""
-    bear_case:             str = ""
-    scenarios:             List[Scenario] = Field(default_factory=list)
-    conflicts:             List[str]      = Field(default_factory=list)
-    key_insights:          List[str]      = Field(default_factory=list)
-    polymarket_markets:    List[PolymarketMarket] = Field(default_factory=list)
+    edge: float = 0.0
+    risk: RiskWarning
+    score_breakdown: ScoreBreakdown
+    explanation: str = ""
+    reasoning_summary: str = ""
+    bull_case: str = ""
+    bear_case: str = ""
+    debate_summary: str = ""
+    scenarios: List[Scenario] = Field(default_factory=list)
+    conflicts: List[str] = Field(default_factory=list)
+    key_insights: List[str] = Field(default_factory=list)
+    sports_predictions: Optional[SportsPredictions] = None
+    persona_breakdown: Optional[PersonaBreakdown] = None
+    polymarket_markets: List[PolymarketMarket] = Field(default_factory=list)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

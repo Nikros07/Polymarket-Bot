@@ -19,6 +19,7 @@ from typing import Any, Dict, Optional, TypeVar
 from datetime import datetime
 
 import structlog
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from backend.config import settings
 from backend.api.models import AgentOutput, AgentRole
@@ -65,67 +66,221 @@ class _FallbackLLMClient:
                 from openai import AsyncOpenAI
                 self._openai = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
             except ImportError:
-                pass
+                logger.warning("openai package not available")
         elif settings.LLM_PROVIDER == "openrouter" and settings.OPENROUTER_API_KEY:
             try:
                 from openai import AsyncOpenAI
-                # OpenRouter uses the OpenAI SDK with a custom base_url
                 self._openai = AsyncOpenAI(
                     api_key=settings.OPENROUTER_API_KEY,
-                    base_url=settings.OPENROUTER_BASE_URL,
+                    base_url="https://openrouter.ai/api/v1",
+                    default_headers={
+                        "HTTP-Referer": "https://github.com/Nikros07/Polymarket-Bot",
+                        "X-Title": "OASIS AI Decision System",
+                    },
                 )
+                logger.info("openrouter_client_initialized", model=settings.LLM_MODEL)
             except ImportError:
-                pass
+                logger.warning("openai package not available — needed for OpenRouter")
 
     async def complete(self, system_prompt: str, user_message: str,
                        temperature: float = None, max_tokens: int = 4096) -> str:
         temp = temperature if temperature is not None else settings.AGENT_TEMPERATURE
         if settings.DEMO_MODE:
-            return _demo_response(system_prompt)
-        if self._anthropic:
-            return await self._do_anthropic(system_prompt, user_message, temp, max_tokens)
-        if self._openai:
-            return await self._do_openai(system_prompt, user_message, temp, max_tokens)
-        logger.warning("no_llm_client_available", fallback="demo_mode")
-        return _demo_response(system_prompt)
+            return self._demo_response(system_prompt, user_message)
 
-    async def _do_anthropic(self, sys, usr, temp, max_tokens):
-        import anthropic as _ant
-        client = self._anthropic
-        resp = await client.messages.create(
+        try:
+            if self._anthropic:
+                return await self._anthropic_complete(
+                    system_prompt, user_message, temp, max_tokens
+                )
+            elif self._openai:
+                return await self._openai_complete(
+                    system_prompt, user_message, temp, max_tokens
+                )
+            else:
+                logger.warning("no_llm_client_configured_using_demo_fallback",
+                               provider=settings.LLM_PROVIDER)
+                return self._demo_response(system_prompt, user_message)
+        except Exception as e:
+            logger.warning(
+                "llm_call_failed_fallback_to_demo",
+                error=str(e),
+                provider=settings.LLM_PROVIDER,
+                model=settings.LLM_MODEL,
+            )
+            return self._demo_response(system_prompt, user_message)
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        reraise=True,
+    )
+    async def _anthropic_complete(
+        self,
+        system_prompt: str,
+        user_message: str,
+        temperature: float,
+        max_tokens: int,
+    ) -> str:
+        response = await self._anthropic.messages.create(
             model=settings.LLM_MODEL,
             max_tokens=max_tokens,
-            temperature=temp,
-            system=sys,
-            messages=[{"role": "user", "content": usr}],
+            temperature=temperature,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_message}],
         )
-        return resp.content[0].text
+        return response.content[0].text
 
-    async def _do_openai(self, sys, usr, temp, max_tokens):
-        """Call OpenAI-compatible API with retry on 429 rate-limit errors."""
-        last_exc: Exception = RuntimeError("no attempts made")
-        for attempt in range(3):
-            try:
-                resp = await self._openai.chat.completions.create(
-                    model=settings.LLM_MODEL,
-                    max_tokens=settings.LLM_MAX_TOKENS,
-                    temperature=temp,
-                    messages=[{"role": "system", "content": sys},
-                              {"role": "user",   "content": usr}],
-                )
-                return resp.choices[0].message.content
-            except Exception as exc:
-                last_exc = exc
-                err = str(exc).lower()
-                if "429" in err or "rate limit" in err or "too many requests" in err:
-                    wait = 2 ** attempt   # 1s → 2s → 4s
-                    logger.warning("openai_rate_limit_retry",
-                                   provider=settings.LLM_PROVIDER,
-                                   attempt=attempt + 1, wait_s=wait)
-                    await asyncio.sleep(wait)
-                else:
-                    raise
-        raise last_exc
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        reraise=True,
+    )
+    async def _openai_complete(
+        self,
+        system_prompt: str,
+        user_message: str,
+        temperature: float,
+        max_tokens: int,
+    ) -> str:
+        response = await self._openai.chat.completions.create(
+            model=settings.LLM_MODEL,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+        )
+        return response.choices[0].message.content
+
+    def _demo_response(self, system_prompt: str, user_message: str) -> str:
+        """Generate a plausible demo response without calling an LLM."""
+        role_hint = system_prompt[:100].lower()
+        if "scanner" in role_hint:
+            return json.dumps({
+                "event_type": "sports",
+                "sport": "football",
+                "teams": ["Team A", "Team B"],
+                "outcome": "Team A wins",
+                "timeframe": "upcoming match",
+                "confidence": 0.7
+            })
+        elif "research" in role_hint:
+            return json.dumps({
+                "key_facts": ["Team A has won 4 of last 5 matches", "Home advantage significant"],
+                "recent_news": ["Team A in good form", "No major injuries reported"],
+                "data_quality_score": 0.65,
+                "summary": "Team A appears to be in strong form heading into this fixture."
+            })
+        elif "predict" in role_hint:
+            return json.dumps({
+                "predicted_probability": 0.62,
+                "reasoning": "Based on recent form and historical performance, Team A has a clear edge.",
+                "key_factors": ["Recent form", "Home advantage", "Head-to-head record"],
+                "uncertainty_factors": ["Weather conditions", "Potential tactical changes"]
+            })
+        elif "analyst" in role_hint or "bull" in role_hint:
+            return json.dumps({
+                "bull_case": "Strong recent form and favorable conditions point to a positive outcome.",
+                "bull_factors": ["5-game win streak", "Strong home record", "Opponent weaknesses"],
+                "argument_strength": 0.72,
+                "supporting_evidence": ["4W-1D in last 5", "Opponent missing key players"]
+            })
+        elif "skeptic" in role_hint or "bear" in role_hint:
+            return json.dumps({
+                "bear_case": "Market may be over-pricing the favorite. Historical variance is high.",
+                "bear_factors": ["Overvalued by market", "Historical upset rate", "Fixture congestion"],
+                "counter_argument_strength": 0.58,
+                "risks": ["Short odds leave little value", "Cup fatigue possible"],
+                "flaws": ["Small sample size", "Ignores opponent's recent away form"]
+            })
+        elif "scenario" in role_hint:
+            return json.dumps({
+                "scenarios": [
+                    {"name": "Dominant Win", "probability": 0.35, "description": "Clear victory", "outcome": "WIN", "impact": "High value"},
+                    {"name": "Narrow Win", "probability": 0.27, "description": "Close but wins", "outcome": "WIN", "impact": "Moderate value"},
+                    {"name": "Draw", "probability": 0.22, "description": "Balanced contest", "outcome": "DRAW", "impact": "Loss"},
+                    {"name": "Upset Loss", "probability": 0.16, "description": "Underdog wins", "outcome": "LOSS", "impact": "Full loss"}
+                ],
+                "most_likely": "Narrow Win",
+                "tail_risk": "Upset Loss (16% probability) represents significant downside."
+            })
+        elif "valid" in role_hint:
+            return json.dumps({
+                "is_consistent": True,
+                "logical_issues": [],
+                "data_quality_flags": ["Limited historical data available"],
+                "bias_warnings": ["Recency bias possible in form analysis"],
+                "adjusted_confidence": 0.63,
+                "validation_score": 0.75
+            })
+        elif "debate" in role_hint or "moderator" in role_hint:
+            return json.dumps({
+                "analyst_rebuttal": "The Analyst acknowledges the market risk concern but argues the form data strongly supports the prediction.",
+                "skeptic_counter": "The Skeptic concedes the form data is solid but maintains that the implied probability already reflects it.",
+                "key_disagreements": [
+                    {
+                        "topic": "Market efficiency",
+                        "analyst_position": "Market has not fully priced in recent form improvement",
+                        "skeptic_position": "Odds already incorporate the form advantage",
+                        "resolution": "Partial — Analyst has stronger recent data"
+                    }
+                ],
+                "analyst_concessions": ["Short odds leave limited upside", "Opponent not as weak as initial research suggested"],
+                "skeptic_concessions": ["Recent form is genuinely strong", "Home advantage is real and significant"],
+                "debate_winner": "analyst",
+                "debate_summary": "Analyst's bull case holds up under scrutiny. The key debate was around market efficiency — Analyst produced more recent evidence supporting their position. Skeptic's main concern (limited value in tight odds) is valid but not sufficient to override the edge.",
+                "consensus": "There is a genuine edge, but it is modest. Both sides agree the outcome is likely but not certain.",
+                "post_debate_probability_range": {
+                    "analyst_revised": 0.64,
+                    "skeptic_revised": 0.58,
+                    "midpoint": 0.61
+                },
+                "unresolved_conflicts": ["Exact size of home advantage in this specific context"],
+                "confidence": 0.68,
+                "reasoning": "The debate refined the initial estimate downward slightly, reflecting valid skeptic concerns about market efficiency."
+            })
+        elif "synth" in role_hint:
+            return json.dumps({
+                "summary": "Agents generally agree on a moderate edge, with the skeptic raising valid concerns about market pricing. The debate produced a refined estimate of ~60% probability.",
+                "key_insights": ["Clear form advantage", "Market may be pricing correctly", "Risk is manageable", "Debate confirmed bull case holds under scrutiny"],
+                "agent_agreement_level": 0.68,
+                "conflicts": [{"agents": ["analyst", "skeptic"], "conflict": "Market efficiency — has the form improvement been priced in?", "resolution": "Analyst's more recent data tilts the debate in their favor"}],
+                "final_probability": 0.62,
+                "probability_adjustment": "Reduced by 2% from initial prediction due to valid skeptic concerns about market pricing",
+                "confidence_adjustment": "Maintained at moderate level — debate confirmed edge but also confirmed uncertainty",
+                "narrative": "The weight of evidence suggests a genuine but modest edge. Team A's recent form (4W-1D in last 5) provides a solid foundation. The market odds imply a 55% probability, and our multi-agent analysis suggests 62%, yielding a ~7% edge. The skeptic's concerns about luck vs. skill are partially valid but do not override the consistent statistical signal. This qualifies as a watchable opportunity.",
+                "action_relevance": "The 7% edge exceeds the WATCH threshold. Consider if odds are available at 1.80 or better.",
+                "key_uncertainties": ["Weather conditions day-of", "Potential last-minute lineup changes"],
+                "agent_weight_rationale": "Predictor and Analyst weighted most heavily due to strong data quality. Skeptic weighted 15% as a bias corrector.",
+                "sports_predictions": {
+                    "home_win_probability": 0.55,
+                    "draw_probability": 0.24,
+                    "away_win_probability": 0.21,
+                    "over_2_5_probability": 0.62,
+                    "under_2_5_probability": 0.38,
+                    "btts_yes_probability": 0.58,
+                    "btts_no_probability": 0.42
+                },
+                "persona_probabilities": {
+                    "analyst": 0.66,
+                    "skeptic": 0.55,
+                    "market_reader": 0.58,
+                    "heuristic": 0.63,
+                    "synthesizer": 0.62
+                },
+                "confidence": 0.68,
+                "reasoning": "Synthesis weighted towards analyst and predictor, moderated by skeptic's valid market efficiency concern."
+            })
+        else:
+            return json.dumps({
+                "composite_score": 0.63,
+                "edge": 0.10,
+                "decision": "WATCH",
+                "confidence": 0.63,
+                "risk_level": 0.45
+            })
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -192,7 +347,8 @@ class _CamelLLMClient:
     async def complete(self, system_prompt: str, user_message: str,
                        temperature: float = None, max_tokens: int = 4096) -> str:
         if settings.DEMO_MODE:
-            return _demo_response(system_prompt)
+            fb = _FallbackLLMClient()
+            return fb._demo_response(system_prompt, user_message)
 
         if self._agent is None:
             # camel agent failed to init — use fallback
@@ -233,117 +389,6 @@ def make_llm_client(system_prompt: str, temperature: float = None):
     if CAMEL_AVAILABLE and not settings.DEMO_MODE and settings.LLM_PROVIDER != "openrouter":
         return _CamelLLMClient(system_prompt, temperature)
     return _FallbackLLMClient()
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Demo response generator
-# ─────────────────────────────────────────────────────────────────────────────
-
-def _demo_response(system_prompt: str) -> str:
-    """Deterministic demo responses so the UI works without any API key."""
-    sp = system_prompt.lower()
-    if "scanner" in sp:
-        return json.dumps({"event_type": "sports", "sport": "football",
-            "teams": ["Team A", "Team B"], "outcome_description": "Team A wins",
-            "timeframe": "upcoming match", "market_type": "match_result",
-            "implied_probability": 0.55, "scan_confidence": 0.75,
-            "reasoning": "Demo: identified football match between two teams."})
-    if "parser" in sp or "input_parser" in sp:
-        return json.dumps({"canonical_query": "Will Team A beat Team B?",
-            "event_type": "sports", "sport": "football", "primary_entity": "Team A",
-            "secondary_entity": "Team B", "prediction_target": "Team A wins",
-            "timeframe_description": "next scheduled match", "market_type": "match_result",
-            "implied_probability": 0.55, "data_requirements": ["recent form", "H2H record"],
-            "parsing_issues": [], "confidence": 0.80,
-            "reasoning": "Demo: parsed match winner market."})
-    if "research" in sp:
-        return json.dumps({"key_facts": ["Team A: 4W-1D in last 5", "Strong home record",
-            "Opponent missing key striker"], "recent_news": ["Team A in excellent form",
-            "No injury concerns reported"], "statistics": {"recent_form": "4W-1D",
-            "head_to_head": "Team A leads 6-2-2", "home_away_splits": "W75% at home"},
-            "market_signals": {"odds_movement": "Slight drift toward Team A",
-            "sharp_money_indicators": "Line movement suggests professional backing"},
-            "data_quality_score": 0.70, "missing_information": ["Lineup confirmation"],
-            "summary": "Team A holds a meaningful form and H2H advantage.",
-            "confidence": 0.70, "reasoning": "Demo: good quality data available."})
-    if "predict" in sp:
-        return json.dumps({"predicted_probability": 0.62,
-            "uncertainty_range": {"low": 0.54, "high": 0.70},
-            "implied_market_probability": 0.55, "estimated_edge": 0.07,
-            "key_factors": ["Recent form", "H2H dominance", "Home advantage"],
-            "upside_factors": ["Opponent missing players"],
-            "downside_factors": ["High-pressure fixture"],
-            "base_rate": "Home favorites win ~58% of matches in this league.",
-            "reasoning": "Demo: 62% estimated based on form and H2H.",
-            "confidence": 0.65})
-    if "analyst" in sp or "bull" in sp:
-        return json.dumps({"bull_case": "Team A's 4-match winning run, combined with their exceptional home record and an injury-hampered opponent, makes this a strong value opportunity. The H2H record of 6 wins in 10 suggests systematic dominance.",
-            "bull_factors": [{"factor": "Current form", "strength": "high", "evidence": "4W-1D last 5"},
-                {"factor": "H2H dominance", "strength": "high", "evidence": "6-2-2 record"},
-                {"factor": "Opponent weaknesses", "strength": "medium", "evidence": "Missing striker"}],
-            "argument_strength": 0.72, "supporting_evidence": ["4W-1D run", "6-2-2 H2H"],
-            "why_skeptics_are_wrong": "The form advantage is recent and consistent, not a small sample.",
-            "hidden_edges": ["Market may be slow to price in injury news"],
-            "key_risk_to_bull_case": "Tactical surprise from underdog manager",
-            "confidence": 0.72, "reasoning": "Demo: solid bull case."})
-    if "skeptic" in sp or "bear" in sp:
-        return json.dumps({"bear_case": "At odds implying 55% probability, the market may already be fair. Favorites in this league underperform against motivated underdogs. The 7% edge is smaller than the vig in most books.",
-            "bear_factors": [{"factor": "Market efficiency", "severity": "medium", "evidence": "Line movement modest"},
-                {"factor": "Underdog motivation", "severity": "medium", "evidence": "Relegation battle"},
-                {"factor": "Short odds value", "severity": "high", "evidence": "7% edge pre-vig"}],
-            "counter_argument_strength": 0.55,
-            "flaws_in_analysis": ["Small sample size (5 games)", "Recency bias possible"],
-            "risks": ["Tactical adjustment", "Set-piece vulnerability"],
-            "market_efficiency_concern": "7% edge is thin after accounting for variance.",
-            "cognitive_biases_detected": ["Recency bias", "Home team bias"],
-            "upset_probability": 0.38,
-            "key_question_unanswered": "Is the squad depth sufficient for rotation?",
-            "confidence": 0.55, "reasoning": "Demo: fair counter-arguments found."})
-    if "scenario" in sp:
-        return json.dumps({"scenarios": [
-            {"name": "Comfortable Win", "description": "Team A controls from kick-off", "probability": 0.32, "outcome": "WIN", "impact": "Strong return", "trigger_conditions": ["Early goal", "Opponent low energy"]},
-            {"name": "Narrow Win", "description": "Tight game, edges it late", "probability": 0.30, "outcome": "WIN", "impact": "As expected", "trigger_conditions": ["Set piece goal"]},
-            {"name": "Draw", "description": "Both teams cancel out", "probability": 0.22, "outcome": "DRAW", "impact": "Loss on win bet", "trigger_conditions": ["Defensive discipline from underdog"]},
-            {"name": "Upset Loss", "description": "Underdog takes all three points", "probability": 0.16, "outcome": "LOSS", "impact": "Full stake lost", "trigger_conditions": ["Counter-attack goals", "Goalkeeper heroics"]}],
-            "probability_check": "0.32+0.30+0.22+0.16=1.00 ✓",
-            "most_likely_scenario": "Narrow Win", "tail_risk": "Upset loss at 16%",
-            "variance_assessment": "Medium variance — no dominant scenario above 35%.",
-            "scenario_count": 4, "confidence": 0.68, "reasoning": "Demo: reasonable distribution."})
-    if "valid" in sp:
-        return json.dumps({"is_consistent": True,
-            "consistency_issues": [],
-            "logical_issues": ["Small sample size (5 games) limits confidence"],
-            "data_quality_flags": ["Lineup not yet confirmed"],
-            "cognitive_biases_detected": [{"bias": "Recency bias", "description": "Overweighting last 5 matches", "severity": "medium"},
-                {"bias": "Home team bias", "description": "Home advantage may be overstated", "severity": "low"}],
-            "unfounded_assumptions": ["Opponent will maintain current tactics"],
-            "missing_critical_information": ["Official starting lineups", "Weather conditions"],
-            "inter_agent_conflicts": ["Analyst and Skeptic disagree on market efficiency"],
-            "adjusted_confidence": 0.60, "validation_score": 0.72,
-            "reliability_assessment": "Moderate reliability — data is reasonable but thin.",
-            "confidence": 0.72, "reasoning": "Demo: validation found minor issues."})
-    if "synth" in sp:
-        return json.dumps({"summary": "The analysis shows a modest but genuine edge for Team A. The Analyst's strong bull case is partially offset by the Skeptic's valid concerns about market efficiency and the 16% upset probability.",
-            "key_insights": ["Form advantage is real but small sample", "Market may be fair-priced", "16% upset risk is non-trivial", "Missing lineup confirmation adds uncertainty"],
-            "agent_agreement_level": 0.65,
-            "conflicts": [{"agents": ["AnalystAgent", "SkepticAgent"], "conflict": "Disagreement on whether 7% edge survives vig", "resolution": "Reduced final probability slightly"}],
-            "final_probability": 0.60, "probability_adjustment": "Reduced from 0.62 to 0.60 after skeptic's market efficiency argument.",
-            "confidence_adjustment": "Validation reduced confidence by 5% for missing lineup info.",
-            "narrative": "Team A is the rightful favorite based on form and H2H data. However, the Skeptic correctly notes that the edge is thin. This is a WATCH candidate unless odds improve or lineup confirms key players.",
-            "action_relevance": "Edge is real but marginal — monitor for better entry.",
-            "key_uncertainties": ["Starting lineup", "Tactical setup"],
-            "agent_weight_rationale": "Gave higher weight to Validator and Skeptic due to data quality flags.",
-            "confidence": 0.65, "reasoning": "Demo: balanced synthesis."})
-    # scoring default
-    return json.dumps({"scores": {"predicted_probability": 0.60, "confidence_score": 0.62,
-        "data_quality": 0.70, "argument_strength": 0.72, "counter_argument_impact": 0.45,
-        "validation_score": 0.72, "market_signal": 0.0},
-        "composite_score": 0.63, "edge": 0.05, "risk_level": 0.42,
-        "risk_category": "medium", "decision": "WATCH",
-        "decision_explanation": "Edge is present but below the BET threshold. Monitor.",
-        "risk_warnings": ["7% edge is thin after vig", "16% upset probability"],
-        "max_exposure_guidance": "0.5-1% of bankroll if betting",
-        "confidence": 0.63, "reasoning": "Demo: WATCH recommendation."})
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -421,30 +466,46 @@ class OASISBaseAgent(ABC):
     # ── Helpers ─────────────────────────────────────────────────────────────
 
     def _safe_parse(self, raw: str) -> Dict[str, Any]:
-        """Robust JSON extraction — handles markdown fences and partial JSON."""
-        if not raw:
-            return {"raw_output": "", "reasoning": "Empty response"}
+        """Parse JSON from LLM response using multi-strategy extraction.
 
-        # Strip markdown fences
-        cleaned = re.sub(r"```(?:json)?\s*", "", raw, flags=re.IGNORECASE).strip()
-        cleaned = cleaned.rstrip("`").strip()
+        Strategy 1 — Direct parse (ideal case: clean JSON string).
+        Strategy 2 — Bracket counting (robust for nested JSON with surrounding text).
+        Strategy 3 — Non-greedy regex (last resort).
+        """
+        # Strip markdown code fences and surrounding whitespace
+        cleaned = re.sub(r"```(?:json)?\s*", "", raw).strip().rstrip("`").strip()
 
-        # Try full string
+        # Strategy 1: parse the whole cleaned string directly
         try:
             return json.loads(cleaned)
         except json.JSONDecodeError:
             pass
 
-        # Find first JSON object
-        m = re.search(r'\{.*\}', cleaned, re.DOTALL)
+        # Strategy 2: bracket-count to locate the outermost { … } block
+        start = cleaned.find("{")
+        if start != -1:
+            depth = 0
+            for i, ch in enumerate(cleaned[start:], start=start):
+                if ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0:
+                        try:
+                            return json.loads(cleaned[start : i + 1])
+                        except json.JSONDecodeError:
+                            break  # malformed even after correct boundary; fall through
+
+        # Strategy 3: non-greedy regex fallback
+        m = re.search(r"\{.*?\}", cleaned, re.DOTALL)
         if m:
             try:
                 return json.loads(m.group())
             except json.JSONDecodeError:
                 pass
 
-        # Last resort: wrap as raw
-        return {"raw_output": raw[:1000], "reasoning": raw[:500]}
+        # Final fallback: return raw text so downstream agents don't KeyError
+        return {"raw_output": raw, "reasoning": raw}
 
     def _extract_confidence(self, output: Dict[str, Any]) -> float:
         for key in ("confidence", "adjusted_confidence", "validation_score",

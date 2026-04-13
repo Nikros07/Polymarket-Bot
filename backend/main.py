@@ -65,7 +65,7 @@ async def lifespan(app: FastAPI):
         elif settings.LLM_PROVIDER == "openrouter" and not settings.OPENROUTER_API_KEY:
             logger.warning(
                 "openrouter_key_missing",
-                hint="Set OPENROUTER_API_KEY in .env — free keys at openrouter.ai",
+                hint="Set OPENROUTER_API_KEY in .env or enable DEMO_MODE=true",
             )
 
     logger.info("ai_decision_system_ready", host=settings.APP_HOST, port=settings.APP_PORT)

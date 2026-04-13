@@ -19,18 +19,20 @@ const AGENT_META = {
   predictor:    { icon: '🎯', name: 'Predictor',   desc: 'Estimating probability' },
   analyst:      { icon: '📈', name: 'Analyst',     desc: 'Building bull case' },
   skeptic:      { icon: '⚔️', name: 'Skeptic',     desc: 'Challenging the thesis' },
+  debate:       { icon: '⚡', name: 'Debate',      desc: 'Moderating bull vs bear' },
   scenario:     { icon: '🌐', name: 'Scenarios',   desc: 'Modeling outcomes' },
   validator:    { icon: '✓',  name: 'Validator',   desc: 'Checking consistency' },
   synthesizer:  { icon: '⚖️', name: 'Synthesizer', desc: 'Merging perspectives' },
   scoring:      { icon: '🏆', name: 'Scoring',     desc: 'Computing final score' },
 };
 
+const TOTAL_AGENTS = 11;
+
 // ── State ─────────────────────────────────────────────────────────────────
 let currentSessionId = null;
 let eventSource      = null;
 let agentCards       = {};
 let completedAgents  = 0;
-const TOTAL_AGENTS   = 10;
 
 // ── Init ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -129,10 +131,19 @@ function connectSSE(sessionId) {
     resetBtn();
   });
 
-  eventSource.onerror = () => {
-    if (eventSource.readyState === EventSource.CLOSED) {
-      // Normal close, handled by session_complete
+  eventSource.onerror = (e) => {
+    if (eventSource && eventSource.readyState === EventSource.CLOSED) {
+      // Normal close after session_complete — do nothing
+      return;
     }
+    if (eventSource && eventSource.readyState === EventSource.CONNECTING) {
+      // Transient network issue — SSE will auto-reconnect, just log it
+      return;
+    }
+    // Persistent error
+    showError('Connection to analysis stream lost. Please try again.');
+    if (eventSource) { eventSource.close(); eventSource = null; }
+    resetBtn();
   };
 }
 
@@ -193,10 +204,11 @@ function renderPipelineStages() {
     { key: 'research',      label: 'Stage 2: Research',        agents: ['research'],                icon: '📊' },
     { key: 'predict',       label: 'Stage 3: Predict',         agents: ['predictor'],               icon: '🎯' },
     { key: 'analyze',       label: 'Stage 4: Analyze',         agents: ['analyst', 'skeptic'],      icon: '⚡' },
-    { key: 'scenario',      label: 'Stage 5: Scenarios',       agents: ['scenario'],                icon: '🌐' },
-    { key: 'validate',      label: 'Stage 6: Validate',        agents: ['validator'],               icon: '✓' },
-    { key: 'synthesize',    label: 'Stage 7: Synthesize',      agents: ['synthesizer'],             icon: '⚖️' },
-    { key: 'score',         label: 'Stage 8: Score',           agents: ['scoring'],                 icon: '🏆' },
+    { key: 'debate',        label: 'Stage 5: Debate',          agents: ['debate'],                  icon: '🥊' },
+    { key: 'scenario',      label: 'Stage 6: Scenarios',       agents: ['scenario'],                icon: '🌐' },
+    { key: 'validate',      label: 'Stage 7: Validate',        agents: ['validator'],               icon: '✓' },
+    { key: 'synthesize',    label: 'Stage 8: Synthesize',      agents: ['synthesizer'],             icon: '⚖️' },
+    { key: 'score',         label: 'Stage 9: Score',           agents: ['scoring'],                 icon: '🏆' },
   ];
 
   const container = document.getElementById('pipelineStages');
@@ -284,6 +296,7 @@ function updatePipelineStage(role, status) {
     research: 'research',
     predictor: 'predict',
     analyst: 'analyze', skeptic: 'analyze',
+    debate: 'debate',
     scenario: 'scenario',
     validator: 'validate',
     synthesizer: 'synthesize',
@@ -358,8 +371,142 @@ function renderDecision(query, d) {
   // Insights
   renderInsights(d.key_insights || []);
 
+  // Debate summary
+  const debateEl = document.getElementById('debateSummaryText');
+  const debateSection = document.getElementById('debateSection');
+  if (d.debate_summary && debateEl) {
+    debateEl.textContent = d.debate_summary;
+    if (debateSection) debateSection.classList.remove('hidden');
+  } else if (debateSection) {
+    debateSection.classList.add('hidden');
+  }
+
+  // Sports Predictions
+  renderSportsPredictions(d.sports_predictions);
+
+  // Persona Breakdown
+  renderPersonaBreakdown(d.persona_breakdown);
+
   // Narrative
   document.getElementById('narrativeText').textContent = d.reasoning_summary || '—';
+}
+
+function renderSportsPredictions(sp) {
+  const section = document.getElementById('sportsPredictionsSection');
+  if (!section) return;
+  if (!sp || sp.home_win_probability == null) {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+
+  const homeTeam = sp.home_team || 'Home';
+  const awayTeam = sp.away_team || 'Away';
+
+  // Helper: render a market row with probabilities and bet badge
+  function marketRow(label, entries, betValue) {
+    const betBadge = betValue && betValue !== 'NO BET'
+      ? `<span class="bet-badge bet">${betValue} ✅ BET</span>`
+      : betValue === 'NO BET' ? `<span class="bet-badge no-bet">NO BET</span>` : '';
+
+    const bars = entries.map(e => {
+      const p = e.prob != null ? e.prob : 0;
+      const pct_val = (p * 100).toFixed(1);
+      const isTop = entries.reduce((mx, x) => x.prob > mx ? x.prob : mx, 0) === p && p >= 0.5;
+      const barColor = isTop ? 'var(--accent-green)' : p > 0.35 ? 'var(--accent-blue)' : 'var(--text-dim)';
+      return `
+        <div class="sp-entry">
+          <div class="sp-label">${escapeHtml(e.label)}</div>
+          <div class="sp-bar-wrap">
+            <div class="sp-bar" style="width:${Math.max(4, p*100).toFixed(0)}%;background:${barColor}"></div>
+          </div>
+          <div class="sp-value" style="color:${barColor}">${pct_val}%</div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="sp-market">
+        <div class="sp-market-header">
+          <span class="sp-market-label">${escapeHtml(label)}</span>
+          ${betBadge}
+        </div>
+        ${bars}
+      </div>`;
+  }
+
+  const html = `
+    <div class="sp-teams">${escapeHtml(homeTeam)} <span class="sp-vs">vs</span> ${escapeHtml(awayTeam)}</div>
+    <div class="sp-markets">
+      ${marketRow('Match Winner', [
+          { label: homeTeam, prob: sp.home_win_probability },
+          { label: 'Draw',   prob: sp.draw_probability },
+          { label: awayTeam, prob: sp.away_win_probability },
+        ], sp.match_winner_bet)}
+      ${sp.over_2_5_probability != null ? marketRow('Over / Under 2.5 Goals', [
+          { label: 'Over 2.5',  prob: sp.over_2_5_probability },
+          { label: 'Under 2.5', prob: sp.under_2_5_probability },
+        ], sp.over_under_bet) : ''}
+      ${sp.btts_yes_probability != null ? marketRow('Both Teams to Score', [
+          { label: 'BTTS Yes', prob: sp.btts_yes_probability },
+          { label: 'BTTS No',  prob: sp.btts_no_probability },
+        ], sp.btts_bet) : ''}
+    </div>`;
+
+  document.getElementById('sportsPredictionsContent').innerHTML = html;
+}
+
+function renderPersonaBreakdown(pb) {
+  const section = document.getElementById('personaSection');
+  if (!section) return;
+  if (!pb) {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+
+  const personas = [
+    { key: 'analyst',      label: 'Analyst (Data)',    weight: '30%', color: 'var(--accent-blue)' },
+    { key: 'skeptic',      label: 'Skeptic (Bear)',    weight: '15%', color: 'var(--accent-red, #ef4444)' },
+    { key: 'market_reader',label: 'Market Reader',     weight: '20%', color: 'var(--accent-amber)' },
+    { key: 'heuristic',    label: 'Heuristic (Pattern)',weight: '20%',color: 'var(--accent-teal)' },
+    { key: 'synthesizer',  label: 'Synthesizer (Meta)',weight: '15%', color: 'var(--accent-purple)' },
+  ];
+
+  const bars = personas.map(p => {
+    const val = pb[p.key] ?? 0;
+    return `
+      <div class="persona-row">
+        <div class="pr-label">
+          <span>${escapeHtml(p.label)}</span>
+          <span class="pr-weight">${p.weight}</span>
+        </div>
+        <div class="pr-bar-wrap">
+          <div class="pr-bar" style="width:${(val*100).toFixed(0)}%;background:${p.color}"></div>
+        </div>
+        <div class="pr-value" style="color:${p.color}">${(val*100).toFixed(1)}%</div>
+      </div>`;
+  }).join('');
+
+  const weightedPct = ((pb.weighted_probability || 0) * 100).toFixed(1);
+  const herdPct = ((pb.herd_adjusted_probability || 0) * 100).toFixed(1);
+  const disagPct = ((pb.disagreement || 0) * 100).toFixed(1);
+
+  document.getElementById('personaContent').innerHTML = `
+    <div class="persona-bars">${bars}</div>
+    <div class="persona-aggregates">
+      <div class="pa-item">
+        <span class="pa-label">Weighted Prob</span>
+        <span class="pa-value color-blue">${weightedPct}%</span>
+      </div>
+      <div class="pa-item">
+        <span class="pa-label">Herd-Adjusted</span>
+        <span class="pa-value color-green">${herdPct}%</span>
+      </div>
+      <div class="pa-item">
+        <span class="pa-label">Disagreement σ</span>
+        <span class="pa-value ${pb.disagreement > 0.1 ? 'color-amber' : 'color-teal'}">${disagPct}%</span>
+      </div>
+    </div>`;
 }
 
 function renderScenarios(scenarios) {
@@ -479,7 +626,10 @@ async function loadSession(sessionId) {
     const data = await fetch(`${API_BASE}/api/analyze/${sessionId}`).then(r => r.json());
     if (data.final_decision) {
       resetState();
-      showResults('', data.final_decision);
+      // Try to get query from history list item
+      const histItem = document.querySelector(`.history-item[onclick="loadSession('${sessionId}')"]`);
+      const query = histItem ? histItem.querySelector('.hi-query')?.textContent || '' : '';
+      showResults(query, data.final_decision);
     }
   } catch {}
 }

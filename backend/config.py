@@ -8,19 +8,18 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
-    # ── LLM ──────────────────────────────────────────────────────────────
-    LLM_PROVIDER: str = Field("anthropic", description="anthropic | openai | openrouter")
-    LLM_MODEL: str = Field("claude-opus-4-6")
+    # ── LLM ──────────────────────────────────────────────────────────
+    LLM_PROVIDER: str = Field("openrouter", description="LLM backend: anthropic | openai | openrouter")
+    LLM_MODEL: str = Field("meta-llama/llama-3.3-70b-instruct:free", description="Model identifier")
     AGENT_TEMPERATURE: float = Field(0.7, ge=0.0, le=1.0)
     LLM_MAX_TOKENS: int = Field(2048, description="Max output tokens; use ≤2048 for free OpenRouter models")
 
-    # ── API Keys ──────────────────────────────────────────────────────────
-    ANTHROPIC_API_KEY: str = Field("")
-    OPENAI_API_KEY: str = Field("")
-    OPENROUTER_API_KEY: str = Field("")      # Get free key at openrouter.ai
-    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
-    TAVILY_API_KEY: str = Field("")          # Primary research provider
-    SERPER_API_KEY: str = Field("")          # Fallback Google search
+    # ── API Keys ──────────────────────────────────────────────────────
+    ANTHROPIC_API_KEY: str = Field("", description="Anthropic API key")
+    OPENAI_API_KEY: str = Field("", description="OpenAI API key")
+    OPENROUTER_API_KEY: str = Field("", description="OpenRouter API key (openrouter.ai)")
+    SERPER_API_KEY: str = Field("", description="Serper.dev Google search key")
+    TAVILY_API_KEY: str = Field("", description="Tavily AI search key")
 
     # ── Polymarket ────────────────────────────────────────────────────────
     POLYMARKET_GAMMA_API: str = "https://gamma-api.polymarket.com"
