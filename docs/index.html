@@ -2,606 +2,209 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Polymarket Bot — AI-Powered Multi-Agent Decision Engine</title>
-  <meta name="description" content="10-agent OASIS architecture for sports betting & prediction markets. Kelly Criterion sizing, fee-aware edge calculation, real-time streaming." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>PolyBot — AI Betting Analyzer</title>
+  <meta name="description" content="10-agent AI analysis pipeline for sports betting & prediction markets. Runs in your browser via OpenRouter." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+<div id="app">
 
-<!-- ─── NAV ─────────────────────────────────────────────────────────────── -->
-<header class="nav-wrapper">
-  <nav class="nav">
-    <a class="nav-logo" href="#">
-      <span class="logo-icon">⚡</span>
-      <span class="logo-text">Polymarket<span class="accent">Bot</span></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="#features">Features</a></li>
-      <li><a href="#architecture">Architecture</a></li>
-      <li><a href="#scoring">Scoring</a></li>
-      <li><a href="#api">API</a></li>
-      <li><a href="#setup">Setup</a></li>
-    </ul>
-    <a class="btn btn-outline nav-cta" href="https://github.com/nikros07/polymarket-bot" target="_blank">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-      GitHub
-    </a>
-  </nav>
-</header>
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 1 — SETUP
+  ═════════════════════════════════════════════════════════════════════════ -->
+  <div id="screen-setup" class="screen">
+    <div class="setup-page">
+      <div class="setup-logo">
+        <span class="logo-bolt">⚡</span>
+        <span class="logo-text">Poly<span class="accent">Bot</span></span>
+      </div>
+      <h1 class="setup-heading">AI Betting Analyzer</h1>
+      <p class="setup-sub">10 AI agents debate every prediction.<br>Runs entirely in your browser via OpenRouter.</p>
 
-<!-- ─── HERO ─────────────────────────────────────────────────────────────── -->
-<section class="hero">
-  <div class="hero-bg">
-    <div class="hero-grid"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-  </div>
-  <div class="container hero-content">
-    <div class="badge">
-      <span class="badge-dot"></span>
-      Production Ready · v1.0.0
-    </div>
-    <h1 class="hero-title">
-      AI-Powered<br />
-      <span class="gradient-text">Multi-Agent</span><br />
-      Decision Engine
-    </h1>
-    <p class="hero-sub">
-      10 specialized AI agents debate every prediction.<br />
-      Fee-aware edge calculation. Kelly Criterion sizing.<br />
-      Real-time SSE streaming. No Polymarket API key needed.
-    </p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="#setup">Get Started</a>
-      <a class="btn btn-ghost" href="#architecture">See Architecture</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat">
-        <span class="stat-num" data-target="10">0</span>
-        <span class="stat-label">AI Agents</span>
+      <div class="card">
+        <div class="field">
+          <label class="lbl" for="s-api-key">OpenRouter API Key</label>
+          <input class="inp" type="password" id="s-api-key"
+                 placeholder="sk-or-v1-..."
+                 autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" />
+          <a class="field-link" href="https://openrouter.ai/keys" target="_blank" rel="noopener">
+            Get a free key at openrouter.ai →
+          </a>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="s-model">Model</label>
+          <select class="inp inp-select" id="s-model">
+            <option value="meta-llama/llama-3.3-70b-instruct:free">⭐ Llama 3.3 70B · Free · Recommended</option>
+            <option value="deepseek/deepseek-chat-v3-0324:free">DeepSeek Chat V3 · Free</option>
+            <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B · Free · Fastest</option>
+            <option value="mistralai/mistral-7b-instruct:free">Mistral 7B · Free</option>
+            <option value="anthropic/claude-3-haiku">Claude 3 Haiku (paid)</option>
+            <option value="openai/gpt-4o-mini">GPT-4o Mini (paid)</option>
+            <option value="__custom__">✏️ Custom model ID...</option>
+          </select>
+        </div>
+
+        <div class="field hidden" id="s-custom-wrap">
+          <label class="lbl" for="s-custom-model">Custom Model ID</label>
+          <input class="inp" type="text" id="s-custom-model"
+                 placeholder="e.g. mistralai/mixtral-8x7b-instruct:free"
+                 autocapitalize="none" autocorrect="off" spellcheck="false" />
+        </div>
+
+        <button class="btn btn-primary btn-full" id="btn-setup-save">
+          Start Analyzing →
+        </button>
       </div>
-      <div class="stat-divider"></div>
-      <div class="stat">
-        <span class="stat-num" data-target="28">0</span>
-        <span class="stat-label">Python Files</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat">
-        <span class="stat-num" data-target="11">0</span>
-        <span class="stat-label">Bet Types</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat">
-        <span class="stat-num" data-target="7">0</span>
-        <span class="stat-label">API Endpoints</span>
-      </div>
+
+      <p class="setup-footer">Your key is stored locally — never sent anywhere except OpenRouter.</p>
     </div>
   </div>
-  <div class="hero-terminal">
-    <div class="terminal">
-      <div class="terminal-bar">
-        <span class="dot red"></span>
-        <span class="dot yellow"></span>
-        <span class="dot green"></span>
-        <span class="terminal-title">polymarket-bot</span>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 2 — ANALYSIS FORM
+  ═════════════════════════════════════════════════════════════════════════ -->
+  <div id="screen-form" class="screen hidden">
+    <header class="topbar">
+      <div class="topbar-logo">⚡ Poly<span class="accent">Bot</span></div>
+      <button class="icon-btn" id="btn-settings" aria-label="Settings">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="screen-body">
+      <div class="field">
+        <label class="lbl" for="f-query">What do you want to analyze?</label>
+        <textarea class="inp inp-ta" id="f-query" rows="3"
+          placeholder="Will Bayern Munich beat Dortmund?&#10;Will Bitcoin reach $100k by end of 2025?&#10;Will Team A cover the -3.5 handicap?"></textarea>
       </div>
-      <div class="terminal-body" id="terminal-body">
-        <div class="term-line"><span class="term-prompt">$</span> <span class="term-cmd">python -m backend.main</span></div>
-        <div class="term-line term-info">🚀 Starting OASIS Multi-Agent Pipeline...</div>
-        <div class="term-line term-ok">✓  ScannerAgent       detected Bayern vs Dortmund</div>
-        <div class="term-line term-ok">✓  ResearchAgent      fetched 8 sources (quality: 0.82)</div>
-        <div class="term-line term-ok">✓  PredictorAgent     P(win) = 0.61 ± 0.07</div>
-        <div class="term-line term-warn">⚡ AnalystAgent  ↔  SkepticAgent  [PARALLEL]</div>
-        <div class="term-line term-ok">✓  DebateAgent        Analyst wins (0.67 probability)</div>
-        <div class="term-line term-ok">✓  ValidatorAgent     no cognitive biases detected</div>
-        <div class="term-line term-ok">✓  SynthesizerAgent   consensus reached</div>
-        <div class="term-line term-ok">✓  ScoringAgent       edge=+12.3% · kelly=0.18</div>
-        <div class="term-line term-bet">
-          <span class="decision-badge">BET</span>
-          <span>confidence=0.74 · risk=LOW · exposure=18%</span>
+
+      <div class="field">
+        <label class="lbl">Bet Type</label>
+        <div class="chip-grid" id="chip-bet-type">
+          <button class="chip active" data-value="match_winner">Match Winner</button>
+          <button class="chip" data-value="over_under">Over / Under</button>
+          <button class="chip" data-value="btts">BTTS</button>
+          <button class="chip" data-value="handicap">Handicap</button>
+          <button class="chip" data-value="yes_no">Yes / No</button>
+          <button class="chip" data-value="tournament">Tournament</button>
+          <button class="chip" data-value="player_prop">Player Prop</button>
+          <button class="chip" data-value="other">Other</button>
         </div>
       </div>
+
+      <div class="field">
+        <label class="lbl">
+          Market Odds
+          <span class="lbl-hint">optional — for edge &amp; Kelly calculation</span>
+        </label>
+        <input class="inp" type="text" id="f-odds"
+               placeholder="1.75  or  -110  or  65%  or  5/2" />
+        <span class="field-hint">Decimal · American · Percentage · Fractional</span>
+      </div>
+
+      <div class="field">
+        <label class="lbl">
+          Extra Context
+          <span class="lbl-hint">optional</span>
+        </label>
+        <textarea class="inp inp-ta" id="f-context" rows="2"
+          placeholder="Recent injuries, weather, head-to-head record..."></textarea>
+      </div>
+
+      <button class="btn btn-primary btn-full btn-run" id="btn-analyze">
+        <span>🤖</span>&nbsp; Run 10-Agent Analysis
+      </button>
     </div>
   </div>
-</section>
 
-<!-- ─── FEATURES ──────────────────────────────────────────────────────────── -->
-<section id="features" class="section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Features</span>
-      <h2>Everything you need to bet smarter</h2>
-      <p>A production-grade system combining quantitative scoring with multi-perspective AI debate.</p>
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 3 — PIPELINE (LIVE)
+  ═════════════════════════════════════════════════════════════════════════ -->
+  <div id="screen-pipeline" class="screen hidden">
+    <header class="topbar">
+      <div class="topbar-title" id="pipe-title">Analyzing…</div>
+      <button class="icon-btn" id="btn-cancel" aria-label="Cancel">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </header>
+
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
     </div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🤖</div>
-        <h3>10-Agent OASIS Pipeline</h3>
-        <p>Scanner → Parser → Researcher → Predictor → Analyst ↔ Skeptic → Debate → Scenario → Validator → Synthesizer → Scorer. Every prediction debated from multiple angles.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📊</div>
-        <h3>Kelly Criterion Sizing</h3>
-        <p>Quarter-Kelly position sizing (25%) with hard block on negative Kelly. Fee-adjusted edge calculation deducting Polymarket's 2% fee before every decision.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>Real-Time SSE Streaming</h3>
-        <p>Server-Sent Events stream each agent's progress live. Watch the debate unfold as it happens — no polling, no waiting.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🆓</div>
-        <h3>Free to Run</h3>
-        <p>No Polymarket API key needed (public Gamma API). Works with free OpenRouter models like Llama 3.3 70B. Only Tavily for research (1000 free req/month).</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🧠</div>
-        <h3>Memory & Learning</h3>
-        <p>SQLite persistence stores all decisions cross-session. Pattern detection identifies recurring event types and agent disagreements over time.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">⚽</div>
-        <h3>11 Bet Types</h3>
-        <p>Match Winner, Over/Under, BTTS, Asian Handicap, Double Chance, Clean Sheet, Correct Score, Tournament Winner, Player Props, Yes/No, and more.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🛡️</div>
-        <h3>Risk Assessment</h3>
-        <p>Multi-factor risk scoring: data quality, cognitive bias detection, thin-edge warnings, scenario variance analysis. 4 risk levels: LOW → EXTREME.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔌</div>
-        <h3>Multi-Provider LLM</h3>
-        <p>camel-ai/OASIS native with fallback chain: Anthropic → OpenAI → OpenRouter. Switch models with a single env var, no code changes.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📈</div>
-        <h3>Wisdom-of-Crowd Personas</h3>
-        <p>Analyst, Skeptic, Market Reader, Heuristic, and Synthesizer personas each vote on probability. Weighted consensus with herd-adjustment correction.</p>
-      </div>
+
+    <div class="screen-body">
+      <p class="pipe-status" id="pipe-status">Starting pipeline…</p>
+      <div class="agent-list" id="agent-list"></div>
     </div>
   </div>
-</section>
 
-<!-- ─── ARCHITECTURE ──────────────────────────────────────────────────────── -->
-<section id="architecture" class="section section-dark">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Architecture</span>
-      <h2>The 10-Agent Pipeline</h2>
-      <p>Sequential stages with parallel execution where possible. Each agent can fail independently — the pipeline always completes.</p>
-    </div>
-    <div class="pipeline">
-
-      <div class="pipeline-stage">
-        <div class="stage-label">Stage 1 — Scan & Parse</div>
-        <div class="stage-agents">
-          <div class="agent-card">
-            <span class="agent-num">01</span>
-            <span class="agent-name">ScannerAgent</span>
-            <span class="agent-desc">Extracts entities, event type, teams, sport, timeframe</span>
-          </div>
-          <div class="agent-card">
-            <span class="agent-num">02</span>
-            <span class="agent-name">InputParserAgent</span>
-            <span class="agent-desc">Canonical query normalization, parsing issues</span>
-          </div>
-        </div>
-        <div class="stage-arrow">↓</div>
-      </div>
-
-      <div class="pipeline-stage">
-        <div class="stage-label">Stage 2 — Research</div>
-        <div class="stage-agents">
-          <div class="agent-card">
-            <span class="agent-num">03</span>
-            <span class="agent-name">ResearchAgent</span>
-            <span class="agent-desc">Web research synthesis (Tavily/Serper), data quality score</span>
-          </div>
-        </div>
-        <div class="stage-arrow">↓</div>
-      </div>
-
-      <div class="pipeline-stage">
-        <div class="stage-label">Stage 3 — Prediction</div>
-        <div class="stage-agents">
-          <div class="agent-card">
-            <span class="agent-num">04</span>
-            <span class="agent-name">PredictorAgent</span>
-            <span class="agent-desc">Initial probability estimate 0.0–1.0 with uncertainty range</span>
-          </div>
-        </div>
-        <div class="stage-arrow">↓</div>
-      </div>
-
-      <div class="pipeline-stage">
-        <div class="stage-label">Stage 4 — Debate <span class="parallel-badge">PARALLEL</span></div>
-        <div class="stage-agents stage-parallel">
-          <div class="agent-card agent-bull">
-            <span class="agent-num">05</span>
-            <span class="agent-name">AnalystAgent</span>
-            <span class="agent-desc">Builds strongest bull case, argument strength score</span>
-          </div>
-          <div class="agent-card agent-bear">
-            <span class="agent-num">06</span>
-            <span class="agent-name">SkepticAgent</span>
-            <span class="agent-desc">Challenges prediction, finds flaws, bear case</span>
-          </div>
-        </div>
-        <div class="stage-agents" style="margin-top:12px">
-          <div class="agent-card agent-debate">
-            <span class="agent-num">07</span>
-            <span class="agent-name">DebateAgent</span>
-            <span class="agent-desc">Structured debate: declares winner, key disagreements, post-debate probability range</span>
-          </div>
-        </div>
-        <div class="stage-arrow">↓</div>
-      </div>
-
-      <div class="pipeline-stage">
-        <div class="stage-label">Stage 5 — Scenarios</div>
-        <div class="stage-agents">
-          <div class="agent-card">
-            <span class="agent-num">08</span>
-            <span class="agent-name">ScenarioAgent</span>
-            <span class="agent-desc">Models 4–6 alternative outcomes, tail risk, variance</span>
-          </div>
-        </div>
-        <div class="stage-arrow">↓</div>
-      </div>
-
-      <div class="pipeline-stage">
-        <div class="stage-label">Stage 6 — Validation</div>
-        <div class="stage-agents">
-          <div class="agent-card">
-            <span class="agent-num">09</span>
-            <span class="agent-name">ValidatorAgent</span>
-            <span class="agent-desc">Checks logic consistency, detects cognitive biases</span>
-          </div>
-        </div>
-        <div class="stage-arrow">↓</div>
-      </div>
-
-      <div class="pipeline-stage">
-        <div class="stage-label">Stage 7 — Synthesis & Score</div>
-        <div class="stage-agents">
-          <div class="agent-card">
-            <span class="agent-num">10</span>
-            <span class="agent-name">SynthesizerAgent</span>
-            <span class="agent-desc">Integrates all perspectives, preserves conflicts, final narrative</span>
-          </div>
-        </div>
-        <div class="stage-agents" style="margin-top:12px">
-          <div class="agent-card agent-score">
-            <span class="agent-num">★</span>
-            <span class="agent-name">ScoringAgent + DecisionEngine</span>
-            <span class="agent-desc">Weighted scoring formula → BET / WATCH / SKIP with Kelly fraction</span>
-          </div>
-        </div>
-      </div>
-
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 4 — RESULTS
+  ═════════════════════════════════════════════════════════════════════════ -->
+  <div id="screen-results" class="screen hidden">
+    <header class="topbar">
+      <div class="topbar-title" id="results-title">Analysis Complete</div>
+      <button class="icon-btn" id="btn-new" aria-label="New analysis">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </header>
+    <div class="screen-body" id="results-body">
+      <!-- populated by JS -->
     </div>
   </div>
-</section>
 
-<!-- ─── SCORING ───────────────────────────────────────────────────────────── -->
-<section id="scoring" class="section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Scoring Logic</span>
-      <h2>How decisions are made</h2>
-      <p>A weighted formula across 7 components. Decisions gated by edge, confidence, risk, and Kelly Criterion.</p>
+</div><!-- #app -->
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SETTINGS MODAL
+═══════════════════════════════════════════════════════════════════════════ -->
+<div id="modal-settings" class="modal-bg hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-title">Settings</span>
+      <button class="icon-btn" id="btn-modal-close" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
 
-    <div class="scoring-layout">
-      <div class="scoring-formula">
-        <h3>Weighted Composite Score</h3>
-        <div class="weights">
-          <div class="weight-row">
-            <span class="weight-label">Predicted Probability</span>
-            <div class="weight-bar-wrap">
-              <div class="weight-bar" style="--w: 25%"></div>
-            </div>
-            <span class="weight-pct">25%</span>
-          </div>
-          <div class="weight-row">
-            <span class="weight-label">Confidence Score</span>
-            <div class="weight-bar-wrap">
-              <div class="weight-bar" style="--w: 20%"></div>
-            </div>
-            <span class="weight-pct">20%</span>
-          </div>
-          <div class="weight-row">
-            <span class="weight-label">Data Quality</span>
-            <div class="weight-bar-wrap">
-              <div class="weight-bar" style="--w: 15%"></div>
-            </div>
-            <span class="weight-pct">15%</span>
-          </div>
-          <div class="weight-row">
-            <span class="weight-label">Argument Strength</span>
-            <div class="weight-bar-wrap">
-              <div class="weight-bar" style="--w: 15%"></div>
-            </div>
-            <span class="weight-pct">15%</span>
-          </div>
-          <div class="weight-row">
-            <span class="weight-label">Counter-Argument Impact</span>
-            <div class="weight-bar-wrap">
-              <div class="weight-bar" style="--w: 10%"></div>
-            </div>
-            <span class="weight-pct">10%</span>
-          </div>
-          <div class="weight-row">
-            <span class="weight-label">Validation Score</span>
-            <div class="weight-bar-wrap">
-              <div class="weight-bar" style="--w: 10%"></div>
-            </div>
-            <span class="weight-pct">10%</span>
-          </div>
-          <div class="weight-row">
-            <span class="weight-label">Market Signal</span>
-            <div class="weight-bar-wrap">
-              <div class="weight-bar" style="--w: 5%"></div>
-            </div>
-            <span class="weight-pct">5%</span>
-          </div>
-        </div>
-
-        <div class="formula-box">
-          <div class="formula-line">
-            <span class="formula-comment">// Kelly Criterion (quarter-Kelly)</span>
-          </div>
-          <div class="formula-line">
-            <span class="formula-var">kelly</span> = (b·p − q) / b × <span class="formula-val">0.25</span>
-          </div>
-          <div class="formula-line" style="margin-top:12px">
-            <span class="formula-comment">// Fee-adjusted edge</span>
-          </div>
-          <div class="formula-line">
-            <span class="formula-var">edge</span> = (p − implied_p) − <span class="formula-val">0.02</span>
-          </div>
-          <div class="formula-line">
-            <span class="formula-var">adj_edge</span> = edge × confidence
-          </div>
-        </div>
-      </div>
-
-      <div class="decision-gates">
-        <h3>Decision Gates</h3>
-        <div class="gate gate-bet">
-          <div class="gate-header">
-            <span class="gate-badge bet">BET</span>
-          </div>
-          <ul class="gate-conditions">
-            <li><span class="check">✓</span> adj_edge ≥ <strong>10%</strong></li>
-            <li><span class="check">✓</span> confidence ≥ <strong>65%</strong></li>
-            <li><span class="check">✓</span> risk &lt; <strong>70%</strong></li>
-            <li><span class="check">✓</span> kelly &gt; <strong>0</strong></li>
-          </ul>
-        </div>
-        <div class="gate gate-watch">
-          <div class="gate-header">
-            <span class="gate-badge watch">WATCH</span>
-          </div>
-          <ul class="gate-conditions">
-            <li><span class="check">✓</span> net_edge ≥ <strong>3%</strong></li>
-            <li><span class="check alt">OR</span> composite &gt; <strong>58%</strong></li>
-          </ul>
-        </div>
-        <div class="gate gate-skip">
-          <div class="gate-header">
-            <span class="gate-badge skip">SKIP</span>
-          </div>
-          <ul class="gate-conditions">
-            <li><span class="x">✗</span> Insufficient edge</li>
-            <li><span class="x">✗</span> High risk (≥ 70%)</li>
-            <li><span class="x">✗</span> Negative Kelly</li>
-            <li><span class="x">✗</span> EXTREME risk level</li>
-          </ul>
-        </div>
-
-        <div class="risk-levels">
-          <h4>Risk Levels</h4>
-          <div class="risk-row risk-low"><span>LOW</span><span>0–30%</span></div>
-          <div class="risk-row risk-med"><span>MEDIUM</span><span>30–55%</span></div>
-          <div class="risk-row risk-high"><span>HIGH</span><span>55–75%</span></div>
-          <div class="risk-row risk-ext"><span>EXTREME</span><span>75%+</span></div>
-        </div>
-      </div>
+    <div class="field">
+      <label class="lbl" for="m-api-key">OpenRouter API Key</label>
+      <input class="inp" type="password" id="m-api-key"
+             placeholder="sk-or-v1-..."
+             autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" />
     </div>
+
+    <div class="field">
+      <label class="lbl" for="m-model">Model</label>
+      <select class="inp inp-select" id="m-model">
+        <option value="meta-llama/llama-3.3-70b-instruct:free">⭐ Llama 3.3 70B · Free · Recommended</option>
+        <option value="deepseek/deepseek-chat-v3-0324:free">DeepSeek Chat V3 · Free</option>
+        <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B · Free · Fastest</option>
+        <option value="mistralai/mistral-7b-instruct:free">Mistral 7B · Free</option>
+        <option value="anthropic/claude-3-haiku">Claude 3 Haiku (paid)</option>
+        <option value="openai/gpt-4o-mini">GPT-4o Mini (paid)</option>
+        <option value="__custom__">✏️ Custom model ID...</option>
+      </select>
+    </div>
+
+    <div class="field hidden" id="m-custom-wrap">
+      <input class="inp" type="text" id="m-custom-model"
+             placeholder="provider/model-name"
+             autocapitalize="none" autocorrect="off" spellcheck="false" />
+    </div>
+
+    <button class="btn btn-primary btn-full" id="btn-modal-save">Save Settings</button>
+    <p class="setup-footer" style="margin-top:12px">Key stored locally — never leaves your device except to OpenRouter.</p>
   </div>
-</section>
-
-<!-- ─── API ───────────────────────────────────────────────────────────────── -->
-<section id="api" class="section section-dark">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">API Reference</span>
-      <h2>FastAPI endpoints</h2>
-      <p>Full OpenAPI docs at <code>/docs</code> when the server is running.</p>
-    </div>
-    <div class="api-table-wrap">
-      <table class="api-table">
-        <thead>
-          <tr>
-            <th>Method</th>
-            <th>Endpoint</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="method post">POST</span></td>
-            <td><code>/api/analyze</code></td>
-            <td>Start a new analysis session, returns session_id</td>
-          </tr>
-          <tr>
-            <td><span class="method get">GET</span></td>
-            <td><code>/api/analyze/{session_id}/stream</code></td>
-            <td>SSE stream of live agent progress</td>
-          </tr>
-          <tr>
-            <td><span class="method get">GET</span></td>
-            <td><code>/api/analyze/{session_id}</code></td>
-            <td>Poll for final session results</td>
-          </tr>
-          <tr>
-            <td><span class="method get">GET</span></td>
-            <td><code>/api/history</code></td>
-            <td>Paginated decision history</td>
-          </tr>
-          <tr>
-            <td><span class="method post">POST</span></td>
-            <td><code>/api/outcome/{session_id}</code></td>
-            <td>Record actual outcome for learning</td>
-          </tr>
-          <tr>
-            <td><span class="method get">GET</span></td>
-            <td><code>/api/health</code></td>
-            <td>System health check</td>
-          </tr>
-          <tr>
-            <td><span class="method get">GET</span></td>
-            <td><code>/api/stats</code></td>
-            <td>System statistics and performance</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="api-example">
-      <div class="code-block">
-        <div class="code-header">
-          <span class="code-lang">bash</span>
-          <span>Example Request</span>
-        </div>
-        <pre class="code-body"><span class="c-cmd">curl</span> -X POST http://localhost:8000/api/analyze \
-  -H <span class="c-str">"Content-Type: application/json"</span> \
-  -d <span class="c-str">'{
-    "query": "Will Bayern Munich beat Borussia Dortmund?",
-    "bet_type": "match_winner",
-    "market_odds": "1.75",
-    "context": "Champions League match on April 22"
-  }'</span></pre>
-      </div>
-      <div class="code-block">
-        <div class="code-header">
-          <span class="code-lang">json</span>
-          <span>Response</span>
-        </div>
-        <pre class="code-body">{
-  <span class="c-key">"session_id"</span>: <span class="c-str">"a3f2c8d1-..."</span>,
-  <span class="c-key">"status"</span>: <span class="c-str">"running"</span>,
-  <span class="c-key">"message"</span>: <span class="c-str">"Analysis started. Stream: /api/analyze/{id}/stream"</span>
-}</pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── SETUP ─────────────────────────────────────────────────────────────── -->
-<section id="setup" class="section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Setup</span>
-      <h2>Get running in minutes</h2>
-      <p>Works with free models. Only an OpenRouter API key is required.</p>
-    </div>
-
-    <div class="setup-steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h3>Clone & install</h3>
-          <div class="code-block">
-            <pre class="code-body"><span class="c-cmd">git</span> clone https://github.com/nikros07/polymarket-bot
-<span class="c-cmd">cd</span> polymarket-bot
-<span class="c-cmd">pip</span> install -r requirements.txt</pre>
-          </div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h3>Configure environment</h3>
-          <div class="code-block">
-            <pre class="code-body"><span class="c-cmd">cp</span> .env.example .env
-<span class="c-comment"># Edit .env:</span>
-LLM_PROVIDER=openrouter
-OPENROUTER_API_KEY=sk-or-v1-your-key
-LLM_MODEL=meta-llama/llama-3.3-70b-instruct:free</pre>
-          </div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h3>Start the backend</h3>
-          <div class="code-block">
-            <pre class="code-body"><span class="c-cmd">python</span> -m backend.main
-<span class="c-comment"># API running at http://localhost:8000</span>
-<span class="c-comment"># Swagger docs at http://localhost:8000/docs</span></pre>
-          </div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-content">
-          <h3>Launch Streamlit UI</h3>
-          <div class="code-block">
-            <pre class="code-body"><span class="c-cmd">streamlit</span> run streamlit_app.py
-<span class="c-comment"># Opens http://localhost:8501</span></pre>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="free-models">
-      <h3>Recommended Free Models (OpenRouter)</h3>
-      <div class="models-grid">
-        <div class="model-card model-best">
-          <span class="model-badge">Best</span>
-          <span class="model-name">meta-llama/llama-3.3-70b-instruct:free</span>
-          <span class="model-ctx">128K context</span>
-        </div>
-        <div class="model-card">
-          <span class="model-name">deepseek/deepseek-chat-v3-0324:free</span>
-          <span class="model-ctx">128K context</span>
-        </div>
-        <div class="model-card">
-          <span class="model-name">meta-llama/llama-3.1-8b-instruct:free</span>
-          <span class="model-ctx">128K context · Fast</span>
-        </div>
-        <div class="model-card">
-          <span class="model-name">mistralai/mistral-7b-instruct:free</span>
-          <span class="model-ctx">32K context</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── FOOTER ────────────────────────────────────────────────────────────── -->
-<footer class="footer">
-  <div class="container footer-inner">
-    <div class="footer-brand">
-      <span class="logo-icon">⚡</span>
-      <span class="logo-text">Polymarket<span class="accent">Bot</span></span>
-    </div>
-    <p class="footer-disclaimer">
-      This tool provides decision support only. Not financial advice. Always trade responsibly.
-    </p>
-    <div class="footer-links">
-      <a href="https://github.com/nikros07/polymarket-bot" target="_blank">GitHub</a>
-      <a href="https://github.com/nikros07/polymarket-bot/blob/main/README.md" target="_blank">Docs</a>
-      <a href="https://github.com/nikros07/polymarket-bot/issues" target="_blank">Issues</a>
-    </div>
-  </div>
-</footer>
+</div>
 
 <script src="js/app.js"></script>
 </body>
