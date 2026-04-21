@@ -189,24 +189,38 @@ class MemoryManager:
     async def get_similar_past_decisions(
         self, query: str, limit: int = 3
     ) -> List[Dict[str, Any]]:
-        """Find similar past analyses for context injection."""
+        """Find similar past analyses for context injection.
+
+        Results are ranked by keyword overlap count (most matching keywords
+        first), with recency as a tiebreaker.
+        """
         await self._ensure_initialized()
-        # Simple keyword overlap (could be replaced with embeddings)
         keywords = query.lower().split()[:5]
-        like_clauses = " OR ".join(["LOWER(query) LIKE ?" for _ in keywords])
-        params = [f"%{kw}%" for kw in keywords]
+        like_params = [f"%{kw}%" for kw in keywords]
+
+        # Build a relevance score column by summing per-keyword CASE expressions.
+        # This ranks rows with more matching keywords above those with fewer.
+        relevance_expr = " + ".join(
+            [f"CASE WHEN LOWER(query) LIKE ? THEN 1 ELSE 0 END" for _ in keywords]
+        )
+        filter_clause = " OR ".join(["LOWER(query) LIKE ?" for _ in keywords])
+
+        # like_params appears twice: once for the SELECT relevance column,
+        # once for the WHERE filter clause.
+        params = like_params + like_params + [limit]
 
         async with aiosqlite.connect(self.db_path) as db:
             db.row_factory = aiosqlite.Row
             async with db.execute(
                 f"""
-                SELECT session_id, query, decision, confidence, predicted_prob, created_at
+                SELECT session_id, query, decision, confidence, predicted_prob, created_at,
+                       ({relevance_expr}) AS relevance
                 FROM analysis_sessions
-                WHERE ({like_clauses}) AND status = 'completed'
-                ORDER BY created_at DESC
+                WHERE ({filter_clause}) AND status = 'completed'
+                ORDER BY relevance DESC, created_at DESC
                 LIMIT ?
                 """,
-                params + [limit],
+                params,
             ) as cursor:
                 rows = await cursor.fetchall()
                 return [dict(row) for row in rows]
