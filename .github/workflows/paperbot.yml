@@ -1,0 +1,121 @@
+# Nur Papierhandel mit Spielgeld. Kein Secret, kein Wallet, keine Orders.
+# Läuft erst, wenn das Repo auf GitHub liegt und Actions aktiviert sind.
+name: paperbot
+
+# Alle 6 Stunden, zwei Termine pro Lauf wegen unzuverlässigem GitHub-Cron.
+# Der zweite Lauf ist ein Backup; der Bot-Lauf ist idempotent.
+on:
+  schedule:
+    - cron: "23 */6 * * *"
+    - cron: "53 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "Befehl für paperbot"
+        type: choice
+        options:
+          - cycle
+          - backtest
+        default: cycle
+      source:
+        description: "Datenquelle"
+        type: choice
+        options:
+          - polymarket
+          - manifold
+        default: polymarket
+
+permissions:
+  contents: write             # Berichte in den Zweig, Zustand nach paperbot-state
+
+concurrency:
+  group: paperbot             # nie zwei Läufe gleichzeitig am selben Zustand
+  cancel-in-progress: false
+
+jobs:
+  paperbot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-paperbot.txt
+      - run: pip install -r requirements-paperbot.txt
+      - run: python -m pytest tests -q
+
+      - name: Zustand von paperbot-state holen (nur Arbeitsbaum, nie in den Index)
+        run: |
+          if git fetch -q origin paperbot-state; then
+            git restore --source=FETCH_HEAD --worktree -- data/paperbot/ || echo "Kein data/paperbot im Zweig."
+          else
+            echo "Noch kein Zustand — paperbot startet frisch."
+          fi
+
+      - name: Papierhandel ausführen
+        env:
+          PAPERBOT_ENABLED: ${{ vars.PAPERBOT_ENABLED || 'true' }}
+        run: |
+          python -m paperbot ${{ github.event.inputs.command || 'cycle' }} --source ${{ github.event.inputs.source || 'polymarket' }}
+
+      - name: Zustand an paperbot-state anhängen (nur Commits, nie force)
+        run: |
+          [ -d data/paperbot ] || exit 0
+          git config --global user.name "paperbot"
+          git config --global user.email "paperbot@users.noreply.github.com"
+          WT="$RUNNER_TEMP/paperbot-state"
+          if git ls-remote --exit-code --heads origin paperbot-state >/dev/null 2>&1; then
+            git fetch -q origin paperbot-state
+            git worktree add -q -B paperbot-state "$WT" FETCH_HEAD
+          else
+            # Zweig existiert noch nicht: als Waisen-Zweig anlegen.
+            git worktree add -q --detach "$WT"
+            git -C "$WT" checkout -q --orphan paperbot-state
+            git -C "$WT" rm -r -q --cached . || true
+            git -C "$WT" clean -fdxq
+          fi
+          rm -rf "$WT/data/paperbot"
+          mkdir -p "$WT/data"
+          cp -r data/paperbot "$WT/data/"
+          # Rohdaten-Caches gehören nicht in den Zustand (können hunderte MB groß sein)
+          rm -rf "$WT/data/paperbot/datasets" "$WT/data/paperbot/cache"
+          git -C "$WT" add -A -- data/paperbot
+          git -C "$WT" diff --cached --quiet && exit 0
+          git -C "$WT" commit -q -m "state $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          for i in 1 2 3; do
+            if git -C "$WT" ls-remote --exit-code --heads origin paperbot-state >/dev/null 2>&1; then
+              git -C "$WT" pull -q --rebase origin paperbot-state || { git -C "$WT" rebase --abort 2>/dev/null || true; sleep 5; continue; }
+            fi
+            git -C "$WT" push -q origin HEAD:refs/heads/paperbot-state && exit 0
+            sleep 5
+          done
+          exit 1
+
+      - name: Berichte in den Zweig committen (nur wenn geändert)
+        run: |
+          [ -d reports ] || [ -d results ] || exit 0
+          git config --global user.name "paperbot"
+          git config --global user.email "paperbot@users.noreply.github.com"
+          git add -A -- reports
+          [ -d results ] && git add -A -- results
+          git diff --staged --quiet && exit 0
+          git commit -q -m "report $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          BRANCH="${GITHUB_REF_NAME}"
+          for i in 1 2 3; do
+            if git pull -q --rebase --autostash origin "$BRANCH" && git push -q origin "HEAD:refs/heads/$BRANCH"; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
+          exit 1
+
+      - name: Status in die Zusammenfassung
+        if: always()
+        run: |
+          if [ -f reports/STATUS.md ]; then cat reports/STATUS.md >> "$GITHUB_STEP_SUMMARY"; fi

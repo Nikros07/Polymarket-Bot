@@ -40,6 +40,11 @@ backend/data/*.json
 backend/logs/
 *.log
 
+# paperbot: Zustand liegt auf dem Branch paperbot-state, Rohdaten nur lokal
+data/paperbot/
+data/paper_trades.csv
+.pytest_cache/
+
 # Environment files
 .env
 .env.local

@@ -1,0 +1,18 @@
+{
+  "id": 1001,
+  "question": "Will it rain in Berlin on 2026-12-01?",
+  "slug": "rain-berlin-2026-12-01",
+  "outcomes": "[\"Yes\", \"No\"]",
+  "outcomePrices": "[\"0.52\", \"0.48\"]",
+  "clobTokenIds": "[\"71321045679252212594626385532706912750332728571942532289631379312455583992563\", \"52114319501245915516055106046884209969307156257455522013234723390046398868123\"]",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "startDate": "2024-01-01T00:00:00Z",
+  "endDate": "2026-12-31T12:00:00Z",
+  "volumeNum": 125000.5,
+  "liquidityNum": 8000,
+  "category": "Weather",
+  "events": [{"category": "Weather"}],
+  "active": true,
+  "acceptingOrders": true,
+  "closed": false
+}
