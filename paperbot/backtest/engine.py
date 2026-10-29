@@ -8,7 +8,9 @@ Ablauf je Markt:
 2. Die Strategie bekommt pro Zeitpunkt eine auf diesen Zeitpunkt gekürzte
    MarketView. Das erste Signal ist der Einstieg.
 3. Gehalten bis zur Auflösung: Gewinn = (1 − c) / c pro eingesetztem Euro,
-   Verlust = −1, mit c = Preis + halber Spread + Gebühr.
+   Verlust = −1, mit c = Preis + halber Spread + Gebühr. Ist der echte
+   Briefkurs der Seite bekannt (Kalshi-Kerzen), ersetzt er Preis + halben
+   Spread; dazu kommt nur der Schlupf aus der Sensitivität.
 
 Kosten werden erst bei der Auswertung angewendet, damit dieselben Trades mit
 verschiedenen Kostenannahmen (Sensitivität) bewertet werden können.
@@ -35,12 +37,15 @@ Dataset = List[Tuple[Market, List[PricePoint]]]
 
 @dataclass(frozen=True)
 class CostModel:
-    half_spread: float = 0.01
+    half_spread: float = 0.01      # angenommen, wenn kein echter Briefkurs bekannt ist
     fee: FeeModel = FeeModel("none")
     max_price: float = 0.99
+    slippage: float = 0.0          # Aufschlag auf den echten Briefkurs (Sensitivität)
 
-    def cost_per_share(self, side_price: float, category: str = "") -> float:
-        fill = min(self.max_price, side_price + self.half_spread)
+    def cost_per_share(self, side_price: float, category: str = "",
+                       quoted: Optional[float] = None) -> float:
+        base = quoted if quoted is not None else side_price + self.half_spread
+        fill = min(self.max_price, base + self.slippage)
         return fill + self.fee.per_share(fill, category)
 
 
@@ -56,6 +61,8 @@ class BTTrade:
     side_price: float
     prob: Optional[float]
     outcome: int
+    quoted_cost: Optional[float] = None   # echter Briefkurs der Seite bei Einstieg
+    event_id: str = ""                    # für Bootstrap über Events
 
     @property
     def won(self) -> bool:
@@ -65,8 +72,12 @@ class BTTrade:
     def hold_days(self) -> float:
         return max(0.0, (self.resolved_ts - self.entry_ts) / DAY)
 
+    @property
+    def cluster(self) -> str:
+        return self.event_id or self.market_id
+
     def ret(self, cost: CostModel) -> float:
-        c = cost.cost_per_share(self.side_price, self.category)
+        c = cost.cost_per_share(self.side_price, self.category, self.quoted_cost)
         return (1.0 - c) / c if self.won else -1.0
 
 
@@ -83,7 +94,10 @@ def decision_times(market: Market, history: Sequence[PricePoint],
     return range(start, stop, grid_hours * HOUR)
 
 
-def run_strategy(dataset: Dataset, strategy: Strategy, grid_hours: int = 24) -> List[BTTrade]:
+def run_strategy(dataset: Dataset, strategy: Strategy, grid_hours: int = 24,
+                 start_offset_hours: int = 24, max_spread: Optional[float] = None) -> List[BTTrade]:
+    """max_spread: Zeitpunkte mit bekanntem Spread darüber gelten als nicht handelbar
+    (das Signal verfällt, die Strategie darf beim nächsten Rasterpunkt wieder)."""
     if getattr(strategy, "live_only", False):
         raise ValueError(f"{strategy.name} ist nur live prüfbar")
     trades: List[BTTrade] = []
@@ -93,17 +107,23 @@ def run_strategy(dataset: Dataset, strategy: Strategy, grid_hours: int = 24) -> 
         info = MarketInfo.from_market(market)
         ts = [p.t for p in history]
         resolved = market.resolved_ts or trading_end(market, history)
-        for t in decision_times(market, history, grid_hours):
+        for t in decision_times(market, history, grid_hours, start_offset_hours):
             view = MarketView.from_sorted(info, history, ts, t)
             if view.price() is None:
                 continue
             sig = strategy.evaluate(view)
             if sig is None:
                 continue
+            last = view.last_point()
+            quoted = last.side_ask(sig.side) if last is not None else None
+            if (max_spread is not None and last is not None and last.spread is not None
+                    and last.spread > max_spread):
+                continue
             trades.append(BTTrade(
                 strategy=strategy.name, market_id=market.market_id, question=market.question,
                 category=market.category, entry_ts=t, resolved_ts=max(resolved, t),
                 side=sig.side, side_price=sig.price, prob=sig.prob, outcome=int(market.outcome),
+                quoted_cost=quoted, event_id=market.event_id,
             ))
             break
     return trades
@@ -114,6 +134,8 @@ def trades_frame(trades: Iterable[BTTrade], cost: CostModel) -> pd.DataFrame:
         "strategy": t.strategy, "market_id": t.market_id, "question": t.question,
         "category": t.category, "entry_ts": t.entry_ts, "resolved_ts": t.resolved_ts,
         "side": t.side, "side_price": t.side_price,
+        "quoted_cost": float("nan") if t.quoted_cost is None else t.quoted_cost,
+        "event_id": t.event_id,
         "prob": float("nan") if t.prob is None else t.prob, "outcome": t.outcome,
         "won": t.won, "hold_days": t.hold_days, "ret": t.ret(cost),
     } for t in trades]
@@ -141,7 +163,7 @@ def simulate_bankroll(trades: Sequence[BTTrade], cost: CostModel, cfg: BotConfig
         t = trades[i]
         if kind == 1:
             equity = cash + sum(open_cost.values())
-            c = cost.cost_per_share(t.side_price, t.category)
+            c = cost.cost_per_share(t.side_price, t.category, t.quoted_cost)
             min_notional = cfg.min_order_shares * c
             cap = cfg.max_stake_frac * equity
             stake = min(cfg.stake_frac * equity, cap)

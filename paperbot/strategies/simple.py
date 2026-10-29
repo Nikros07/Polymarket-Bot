@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 from paperbot.models import Signal, side_price
 from paperbot.strategies.base import Strategy, make_signal
@@ -25,8 +25,11 @@ class FavoriteStrategy:
     name: str = "favorite"
     needs_history: bool = False
     live_only: bool = False
+    categories: Optional[Tuple[str, ...]] = None   # H6: nur diese Kategorien (klein geschrieben)
 
     def evaluate(self, view: MarketView) -> Optional[Signal]:
+        if self.categories is not None and view.info.category.lower() not in self.categories:
+            return None
         p = view.price()
         if p is None:
             return None

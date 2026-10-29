@@ -75,6 +75,124 @@ mit eigenem Datum.
 Damit sind es 9 Varianten. Die Bonferroni-Schwelle wird auf α = 0,05 / 9
 verschärft.
 
+## Kalshi-Runde (eingetragen 2026-10-27, vor dem ersten Kalshi-Backtest)
+
+Anlass: Die Manifold-Runde hat alle vier Hypothesen verworfen. Manifold ist
+Spielgeld. Kalshi ist ein regulierter Echtgeld-Markt mit öffentlicher
+Daten-API (ohne Login, nur lesend) und, anders als die Polymarket-Historie,
+mit **echten Geld- und Briefkursen** je Stunde. Damit lassen sich die Kosten
+messen statt annehmen. Bis zu diesem Eintrag wurde kein Kalshi-Ergebnis
+angesehen, nur Datenformate (Felder, Endpunkte, Datenmenge).
+
+### Regeln für alle Kalshi-Tests
+
+- **Daten:** abgerechnete binäre Kalshi-Märkte mit Ergebnis `yes` oder `no`
+  (andere fallen weg). Kerzen je Stunde (Märkte ≤ 14 Tage Laufzeit) oder je
+  Tag (länger). Ein Preispunkt liegt am **Ende** der Kerzenperiode, also erst
+  sichtbar, wenn die Periode vorbei ist.
+- **Preis für die Strategie:** Mitte aus Geld- und Briefkurs (Schluss der
+  Kerze), wenn beide gültig sind. Sonst kein Preispunkt.
+- **Kosten:** gekauft wird zum **echten Briefkurs** zur Entscheidungszeit
+  (YES: `yes_ask`, NO: `1 − yes_bid`), plus Kalshi-Taker-Gebühr
+  0,07 · P · (1 − P) pro Kontrakt (ohne Cent-Aufrundung, also für größere
+  Orders). Sensitivität: zusätzlicher Schlupf 0, 1, 2, 3 Cent. Liegt der
+  Spread über 10 Cent, gilt der Zeitpunkt als nicht handelbar.
+- **Aufteilung:** wie bisher chronologisch nach Markteröffnung 60/40 mit
+  Sperrzone.
+- **Abhängigkeit:** Märkte desselben Events (z. B. alle Temperatur-Spannen
+  eines Tages) hängen zusammen. Bootstrap-Intervall und p-Wert werden deshalb
+  **über Events** gezogen, nicht über Märkte.
+- **Mehrfachtests:** 8 Varianten in dieser Runde (H5: 3, H6: 2, H7: 1, H8: 2).
+  Bonferroni α = 0,05 / 8. Das Register `results/trials.json` zählt sie unter
+  `kalshi`.
+- **Stichprobe breit (H5–H7):** Kategorien Politics, Elections, Economics,
+  Financials, Crypto, Climate and Weather, Sports, Entertainment, Commodities,
+  Companies, Science and Technology, World, Mentions. Je Kategorie die Serien
+  in fester Reihenfolge nach SHA-256 des Serien-Tickers, je Serie höchstens 20
+  Märkte mit Volumen ≥ 1000 Kontrakten und Laufzeit ≥ 2 Tagen, höchstens 400
+  Märkte und 150 Serien je Kategorie. Bekannte Schwäche wie bisher: Volumen
+  ist Wissen vom Marktende.
+- **Kategorie-Tabelle:** Die Ergebnisse von H5 je Kategorie werden berichtet,
+  sind aber **explorativ** (kein Urteil, keine Auswahl daraus in dieser Runde).
+
+### H5: Favorite-Longshot auf Kalshi (Taker)
+
+- **Idee:** Bürgi, Deng, Whelan (2026): Kontrakte ab 70 Cent gewinnen auf
+  Kalshi etwas öfter als ihr Preis, Außenseiter deutlich seltener.
+- **Varianten:** Seite mit Mittelkurs im Band [0,70; 0,95], [0,80; 0,97],
+  [0,90; 0,98], erstes Signal je Markt.
+- **Erwartung:** vor Kosten leicht positiv, nach echtem Briefkurs und
+  Taker-Gebühr nahe null oder negativ (das Paper findet den Vorteil vor allem
+  für Maker).
+- **Abbruch:** wie H1.
+
+### H6: Unterkonfidenz in Politik-Märkten
+
+- **Idee:** Le (2026, arXiv:2602.19520): Politik-Märkte auf Kalshi und
+  Polymarket liegen dauerhaft zu nah an 50 %. Der Favorit ist zu billig.
+- **Universum:** nur Kategorien Politics und Elections.
+- **Varianten:** Kauf des Favoriten, wenn sein Mittelkurs in [0,60; 0,85]
+  bzw. [0,55; 0,80] liegt.
+- **Erwartung:** kleiner positiver Ertrag vor Kosten; nach Kosten unklar.
+- **Abbruch:** wie H1.
+
+### H7: Gegenbewegung (Nachprüfung der Manifold-Variante)
+
+- **Idee:** `reversion_25_1d` hatte auf Manifold den einzigen unkorrigierten
+  p-Wert unter 0,05. Eine Nachprüfung auf Echtgeld-Daten klärt, ob das ein
+  Spielgeld-Effekt war.
+- **Variante:** genau eine, `reversion_25_1d` (≥ 25 Punkte Bewegung in 1 Tag →
+  dagegen).
+- **Erwartung:** kein Vorteil.
+- **Abbruch:** wie H1.
+
+### H8: Wetter-Spezialisierung — Tageshöchsttemperatur mit Vorhersagemodell
+
+- **Idee:** Statt eines Preis-Musters ein echtes Informationsmodell. Kalshi
+  handelt täglich die Höchsttemperatur in US-Städten in 2-°F-Spannen.
+  Wettermodelle sagen das 1–2 Tage vorher mit wenigen Grad Fehler voraus.
+- **Daten:** Serien KXHIGHNY, KXHIGHCHI, KXHIGHMIA, KXHIGHLAX, KXHIGHAUS,
+  KXHIGHDEN, KXHIGHPHIL. Events mit Datum ab 2022-06-01; je Stadt jedes Event,
+  dessen Tag im Jahr durch 3 teilbar ist (feste Ausdünnung, spart Abrufe).
+- **Vorhersage:** Open-Meteo Previous-Runs-API, stündliche
+  `temperature_2m_previous_day2` (Lauf mindestens 48 h vor der jeweiligen
+  Stunde) an den Koordinaten der Messstation, Maximum über den lokalen Tag.
+  Alle Läufe liegen damit vor 00:00 Ortszeit des Vortags und vor jeder
+  Entscheidung. Events ohne vollständige Vorhersage fallen weg.
+- **Modell:** Höchstwert ~ Normal(μ + b, σ). Spanne „zwischen a und c“ =
+  [a − 0,5; c + 0,5], „größer als a“ = [a + 0,5; ∞), „kleiner als c“ =
+  (−∞; c − 0,5]. b und σ werden per Maximum-Likelihood nur auf
+  Trainingsmärkten geschätzt (Ablauf wie H4: erste Hälfte In-Sample lernen,
+  Variante auf zweiter Hälfte wählen, dann ganzes In-Sample lernen, einmal
+  Out-of-Sample prüfen).
+- **Entscheidung:** 24-h-Raster ab Markteröffnung + 6 h. Kauf der Seite, deren
+  Modell-Wahrscheinlichkeit den Kaufpreis (Briefkurs + Gebühr) um mindestens
+  die Mindest-Edge übersteigt.
+- **Varianten:** Mindest-Edge 5 bzw. 10 Prozentpunkte.
+- **Erwartung:** ehrlich offen. Händler auf Kalshi nutzen dieselben
+  Vorhersagen; ein Vorteil, wenn überhaupt, ist klein. Die Kontrollen
+  (Zufallsseite, immer YES) laufen wie bei allen Hypothesen mit.
+- **Abbruch:** wie H1.
+
+### Nachtrag 2026-10-29: Ergebnis des ersten Kalshi-Laufs und Datenfehler
+
+- Lauf vom 2026-10-27 (`results/BACKTEST_kalshi.md`): H5, H7, H8 verworfen,
+  H6 hatte zu wenige Trades (nur 7 Politik-Märkte In-Sample). Das Register
+  zählt den Lauf (`trials.json`).
+- **H8 ist damit nicht aussagekräftig geprüft:** Der Batch-Kerzen-Endpunkt
+  liefert für archivierte Märkte nichts. Nur 924 von ~15.300 ausgewählten
+  Wettermärkten hatten Kerzen, alle aus dem 22.08.–24.10.2026 (statt ab
+  2022-06-01). Behoben: Einzelabruf aus dem Archiv als Rückfall
+  (`KalshiClient.archived_candles`, Test in `tests/test_kalshi.py`).
+- Auch die breite Stichprobe ist klein (1.143 Märkte, 346 nach Sperrzone
+  im Training).
+- Die Wiederholung prüft **dieselben** Hypothesen mit denselben Schwellen.
+  Sie zählt als neue Runde (+8 im Register); das Urteil des ersten Laufs
+  wird nicht überschrieben, sondern danebengestellt.
+- Kalshi war am 2026-10-29 im lokalen Netz gesperrt (TLS-Fehler wie bei
+  Polymarket). Die Wiederholung läuft deshalb auf einem anderen Netz
+  (z. B. VPS per Docker), nicht durch Umgehen der Sperre.
+
 ## Nicht per Backtest prüfbar
 
 - **LLM-Prognose (bestehende 10-Agenten-Pipeline):** Ein Sprachmodell kennt

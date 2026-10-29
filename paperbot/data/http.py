@@ -28,6 +28,10 @@ except ImportError:
 DEFAULT_USER_AGENT = "paperbot/0.1 (paper-trading research)"
 
 
+class NotFoundError(DataError):
+    """HTTP 404. Eigene Klasse, damit Quellen gezielt auf ein Archiv ausweichen können."""
+
+
 def _encode_params(params: Optional[Dict[str, Any]]) -> str:
     """Query-String. None-Werte fallen weg, Booleans werden zu true/false."""
     if not params:
@@ -94,6 +98,8 @@ class HttpClient:
                 if exc.code == 429 or exc.code >= 500:
                     last_error = f"HTTP {exc.code} bei {url}"
                     continue
+                if exc.code == 404:
+                    raise NotFoundError(f"HTTP 404 bei {url}") from None
                 raise DataError(f"HTTP {exc.code} bei {url}") from None
             except (urllib.error.URLError, TimeoutError) as exc:
                 reason = getattr(exc, "reason", exc)

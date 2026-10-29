@@ -90,7 +90,8 @@ def _oos(summary: dict, key: str) -> dict:
 
 def _present_hypotheses(summary: dict) -> List[str]:
     hyps = summary.get("hypotheses") or {}
-    return [k for k in HYPOTHESES if k in hyps]
+    extra = sorted((k for k in hyps if k not in HYPOTHESES), key=lambda k: (len(k), k))
+    return [k for k in HYPOTHESES if k in hyps] + extra
 
 
 # ── Diagramme ─────────────────────────────────────────────────────────────────

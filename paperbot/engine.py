@@ -84,6 +84,8 @@ def eligible(m: Market, now_ts: int, cfg: BotConfig) -> Optional[str]:
 
 
 def build_strategies(cfg: BotConfig, source: str) -> List[Strategy]:
+    if source == "kalshi":
+        return _kalshi_strategies(cfg)
     cal = IsotonicCalibrator.load(cfg.state_dir / f"calibration_{source}.json")
     favorite = FavoriteStrategy(0.90, 0.98, max_days_to_end=cfg.max_days_to_end, name="favorite")
     available: Dict[str, Strategy] = {
@@ -96,6 +98,34 @@ def build_strategies(cfg: BotConfig, source: str) -> List[Strategy]:
     if cfg.llm_enabled:
         available["llm_blend"] = LLMBlendStrategy(max_calls=cfg.llm_max_markets_per_cycle,
                                                   weight=cfg.llm_weight, cost=cfg.default_half_spread)
+    return [available[n] for n in cfg.strategies if n in available]
+
+
+def _kalshi_strategies(cfg: BotConfig) -> List[Strategy]:
+    """Spezialisierung Kalshi-Wetter: Vorhersagemodell (H8), Favoriten (H5) und Zufallskontrolle.
+
+    Ohne gelerntes Modell (erst `python -m paperbot backtest --source kalshi`) kauft
+    `weather` nichts. Fehlt der Vorhersage-Abruf, ebenso: NO TRADE ist Standard."""
+    from datetime import date, timedelta
+
+    from paperbot.data.base import DataError
+    from paperbot.weather import STATIONS, ForecastBook, TempModel, WeatherStrategy, fetch_forecasts
+    path = cfg.state_dir / "weather_model_kalshi.json"
+    model = TempModel.load(path)
+    min_edge = 0.10
+    if path.exists():
+        min_edge = float(json.loads(path.read_text(encoding="utf-8")).get("meta", {}).get("min_edge") or 0.10)
+    try:
+        today = date.today()
+        forecasts = fetch_forecasts(tuple(STATIONS), today - timedelta(days=1), today + timedelta(days=2))
+    except DataError:
+        forecasts = ForecastBook()
+    favorite = FavoriteStrategy(0.90, 0.98, max_days_to_end=cfg.max_days_to_end, name="favorite")
+    available: Dict[str, Strategy] = {
+        "weather": WeatherStrategy(model, forecasts, min_edge=min_edge, cost=cfg.default_half_spread),
+        "favorite": favorite,
+        "random_control": RandomSideControl(favorite, name="random_control"),
+    }
     return [available[n] for n in cfg.strategies if n in available]
 
 

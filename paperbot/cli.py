@@ -1,9 +1,10 @@
 """
 Befehlszeile:
 
-  python -m paperbot cycle    --source polymarket|manifold   ein Papier-Zyklus
+  python -m paperbot cycle    --source polymarket|manifold|kalshi   ein Papier-Zyklus
+  python -m paperbot serve    --source kalshi [--interval 30]       Dauerbetrieb + Statusseite
   python -m paperbot status   --source …                     Bericht reports/STATUS.md
-  python -m paperbot backtest --source manifold|polymarket|synthetic [--limit N] [--refresh]
+  python -m paperbot backtest --source manifold|polymarket|synthetic|kalshi [--limit N] [--refresh]
   python -m paperbot gate     --source …                     Freigabe-Prüfung (nur Auskunft)
 """
 from __future__ import annotations
@@ -23,6 +24,9 @@ def _client(source: str):
     if source == "manifold":
         from paperbot.data.manifold import ManifoldClient
         return ManifoldClient()
+    if source == "kalshi":
+        from paperbot.data.kalshi import KalshiClient
+        return KalshiClient()
     raise SystemExit(f"unbekannte Quelle: {source}")
 
 
@@ -60,6 +64,8 @@ def cmd_backtest(args) -> int:
     from paperbot.fees import fee_model_for
 
     cfg = _cfg(args.source)
+    if args.source == "kalshi":
+        return _backtest_kalshi(args, cfg)
     t0 = time.time()
     ds = fetch_dataset(args.source, args.limit, BotConfig.from_env().state_dir, refresh=args.refresh)
     print(f"{len(ds)} aufgelöste Märkte geladen ({time.time() - t0:.0f} s)", file=sys.stderr)
@@ -71,6 +77,44 @@ def cmd_backtest(args) -> int:
     path = write_backtest_report(summary, out)
     print(f"Bericht: {path}")
     return 0
+
+
+def _backtest_kalshi(args, cfg) -> int:
+    from datetime import date, timedelta
+
+    from paperbot.backtest.datasets import fetch_dataset
+    from paperbot.backtest.engine import CostModel
+    from paperbot.backtest.kalshi_experiment import run_kalshi_experiment
+    from paperbot.backtest.report import write_backtest_report
+    from paperbot.data.kalshi import WEATHER_SERIES, WEATHER_START
+    from paperbot.fees import fee_model_for
+    from paperbot.weather import ForecastBook, fetch_forecasts
+
+    root = BotConfig.from_env().state_dir
+    t0 = time.time()
+    broad = fetch_dataset("kalshi", args.limit, root, refresh=args.refresh)
+    weather = fetch_dataset("kalshi_weather", 30_000, root, refresh=args.refresh)
+    fc_path = root / "datasets" / "forecasts_kalshi.json"
+    if fc_path.exists() and not args.refresh:
+        forecasts = ForecastBook.from_json(fc_path.read_text(encoding="utf-8"))
+    else:
+        forecasts = fetch_forecasts(WEATHER_SERIES, WEATHER_START, date.today() - timedelta(days=1))
+        fc_path.parent.mkdir(parents=True, exist_ok=True)
+        fc_path.write_text(forecasts.to_json(), encoding="utf-8")
+    print(f"{len(broad)} + {len(weather)} Märkte, {len(forecasts.highs)} Vorhersagetage "
+          f"({time.time() - t0:.0f} s)", file=sys.stderr)
+    cost = CostModel(half_spread=args.half_spread, fee=fee_model_for("kalshi"))
+    summary = run_kalshi_experiment(broad, weather, forecasts, cost=cost, cfg=cfg,
+                                    out_dir=ROOT / "results", register_path=ROOT / "results" / "trials.json",
+                                    progress=lambda m: print(m, file=sys.stderr))
+    path = write_backtest_report(summary, ROOT / "results")
+    print(f"Bericht: {path}")
+    return 0
+
+
+def cmd_serve(args) -> int:
+    from paperbot.serve import serve
+    return serve(args.source, interval_min=args.interval, port=args.port)
 
 
 def cmd_gate(args) -> int:
@@ -96,10 +140,15 @@ def main(argv=None) -> int:
     sub = p.add_subparsers(dest="cmd", required=True)
     for name, fn in (("cycle", cmd_cycle), ("status", cmd_status), ("gate", cmd_gate)):
         sp = sub.add_parser(name)
-        sp.add_argument("--source", default="polymarket", choices=["polymarket", "manifold"])
+        sp.add_argument("--source", default="polymarket", choices=["polymarket", "manifold", "kalshi"])
         sp.set_defaults(func=fn)
+    sv = sub.add_parser("serve", help="Dauerbetrieb: Zyklus alle N Minuten + Statusseite")
+    sv.add_argument("--source", default="kalshi", choices=["polymarket", "manifold", "kalshi"])
+    sv.add_argument("--interval", type=float, default=30.0, help="Minuten zwischen Zyklen")
+    sv.add_argument("--port", type=int, default=None, help="HTTP-Port (Standard: $PORT oder 8080)")
+    sv.set_defaults(func=cmd_serve)
     bt = sub.add_parser("backtest")
-    bt.add_argument("--source", default="manifold", choices=["polymarket", "manifold", "synthetic"])
+    bt.add_argument("--source", default="manifold", choices=["polymarket", "manifold", "synthetic", "kalshi"])
     bt.add_argument("--limit", type=int, default=3000)
     bt.add_argument("--half-spread", type=float, default=0.01)
     bt.add_argument("--refresh", action="store_true")

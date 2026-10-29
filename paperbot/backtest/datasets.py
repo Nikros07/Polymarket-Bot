@@ -19,7 +19,7 @@ Dataset = List[Tuple[Market, List[PricePoint]]]
 
 def save_dataset(ds: Dataset, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    rows = [{"market": asdict(m), "history": [[p.t, p.p] for p in h]} for m, h in ds]
+    rows = [{"market": asdict(m), "history": [_point_row(p) for p in h]} for m, h in ds]
     tmp = path.with_suffix(path.suffix + ".tmp")
     with gzip.open(tmp, "wt", encoding="utf-8") as f:
         json.dump(rows, f)
@@ -37,9 +37,20 @@ def load_dataset(path: Path, bucket_s: int = 3_600) -> Optional[Dataset]:
         rows = json.load(f)
     out = []
     for r in rows:
-        hist = [PricePoint(int(t), float(p)) for t, p in r["history"]]
+        hist = [_point(row) for row in r["history"]]
         out.append((Market(**r["market"]), downsample(hist, bucket_s) if bucket_s else hist))
     return out
+
+
+def _point_row(p: PricePoint) -> list:
+    """[t, p] oder [t, p, bid, ask], wenn echte Kurse bekannt sind."""
+    return [p.t, p.p] if p.bid is None or p.ask is None else [p.t, p.p, p.bid, p.ask]
+
+
+def _point(row: list) -> PricePoint:
+    if len(row) >= 4:
+        return PricePoint(int(row[0]), float(row[1]), float(row[2]), float(row[3]))
+    return PricePoint(int(row[0]), float(row[1]))
 
 
 def downsample(hist: List[PricePoint], bucket_s: int) -> List[PricePoint]:
@@ -65,6 +76,12 @@ def fetch_dataset(source: str, limit: int, cache_root: Path, refresh: bool = Fal
     elif source == "polymarket":
         from paperbot.data.polymarket import PolymarketClient
         ds = PolymarketClient().resolved_markets(limit)
+    elif source == "kalshi":
+        from paperbot.data.kalshi import KalshiClient
+        ds = KalshiClient().resolved_markets(limit)
+    elif source == "kalshi_weather":
+        from paperbot.data.kalshi import KalshiClient
+        ds = KalshiClient().resolved_weather_markets(limit)
     elif source == "synthetic":
         from paperbot.backtest.synthetic import make_dataset
         ds = make_dataset(limit, bias=0.0)

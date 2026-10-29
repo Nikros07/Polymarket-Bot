@@ -1,0 +1,14 @@
+.git
+.venv
+.env
+.env.*
+.claude
+.pytest_cache
+__pycache__
+*.pyc
+data/
+backend/
+frontend/
+pages/
+streamlit_app.py
+reports/

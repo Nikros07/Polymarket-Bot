@@ -83,17 +83,30 @@ class Evaluation:
     brier_strategy: Optional[float]
     brier_market: Optional[float]
     by_cost: Dict[str, float] = field(default_factory=dict)
+    n_clusters: Optional[int] = None     # Anzahl Events beim Event-Bootstrap
 
     def as_dict(self) -> dict:
         return self.__dict__.copy()
 
 
-def evaluate(name: str, trades: List[BTTrade], cost: CostModel, seed: int = 0) -> Evaluation:
+def grid_cost(cost: CostModel, step: float, quoted: bool) -> CostModel:
+    """Kostenstufe der Sensitivität: ohne echten Kurs ist `step` der angenommene halbe
+    Spread, mit echtem Briefkurs ist `step` zusätzlicher Schlupf darauf."""
+    if quoted:
+        return CostModel(half_spread=cost.half_spread, fee=cost.fee, max_price=cost.max_price,
+                         slippage=step)
+    return CostModel(half_spread=step, fee=cost.fee, max_price=cost.max_price)
+
+
+def evaluate(name: str, trades: List[BTTrade], cost: CostModel, seed: int = 0,
+             clustered: bool = False) -> Evaluation:
+    """clustered=True: Bootstrap über Events (Kalshi), sonst über Trades."""
     if not trades:
         nan = float("nan")
         return Evaluation(name, 0, nan, nan, nan, nan, nan, nan, nan, nan, nan, None, None, {})
     rets = np.array([t.ret(cost) for t in trades])
-    st = metrics.roi_stats(rets, seed=seed)
+    st = metrics.roi_stats(rets, seed=seed,
+                           clusters=[t.cluster for t in trades] if clustered else None)
     holds = np.array([t.hold_days for t in trades])
     wins = np.array([1 if t.won else 0 for t in trades])
     prices = np.array([t.side_price for t in trades])
@@ -101,8 +114,8 @@ def evaluate(name: str, trades: List[BTTrade], cost: CostModel, seed: int = 0) -
     has_prob = any(t.prob is not None for t in trades)
     by_cost = {}
     for hs in COST_GRID:
-        c = CostModel(half_spread=hs, fee=cost.fee, max_price=cost.max_price)
-        by_cost[f"{hs:.2f}"] = float(np.mean([t.ret(c) for t in trades]))
+        by_cost[f"{hs:.2f}"] = float(np.mean(
+            [t.ret(grid_cost(cost, hs, t.quoted_cost is not None)) for t in trades]))
     mean_hold = float(holds.mean())
     return Evaluation(
         name=name, n=st["n"], mean=st["mean"], ci_lo=st["ci_lo"], ci_hi=st["ci_hi"],
@@ -112,6 +125,7 @@ def evaluate(name: str, trades: List[BTTrade], cost: CostModel, seed: int = 0) -
         brier_strategy=metrics.brier(probs, wins) if has_prob else None,
         brier_market=metrics.brier(prices, wins),
         by_cost=by_cost,
+        n_clusters=st.get("n_clusters"),
     )
 
 

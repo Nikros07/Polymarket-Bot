@@ -9,7 +9,7 @@ Konventionen:
 from __future__ import annotations
 
 import math
-from typing import Dict, Mapping, Sequence, Union
+from typing import Dict, Mapping, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -83,12 +83,19 @@ def roi_stats(
     n_boot: int = 5000,
     seed: int = 0,
     alpha: float = 0.05,
+    clusters: Optional[Sequence[str]] = None,
 ) -> dict:
-    """Rendite-Kennzahlen mit Bootstrap-CI des Mittelwerts und einseitigem p-Wert (H0: mean <= 0)."""
+    """Rendite-Kennzahlen mit Bootstrap-CI des Mittelwerts und einseitigem p-Wert (H0: mean <= 0).
+
+    clusters: Gruppen-Schlüssel je Rendite (z. B. Kalshi-Event). Dann werden ganze
+    Gruppen gezogen, nicht einzelne Trades; zusammenhängende Märkte zählen so nicht
+    als unabhängige Beobachtungen und das Intervall wird ehrlich breiter."""
     r = np.asarray(returns, dtype=float).ravel()
     if not np.all(np.isfinite(r)):
         raise ValueError("returns enthalten NaN oder Inf")
     n = int(r.size)
+    if clusters is not None and len(clusters) != n:
+        raise ValueError(f"Längen passen nicht: {n} returns vs. {len(clusters)} clusters")
     keys = ("mean", "median", "hit_rate", "total", "worst", "best", "ci_lo", "ci_hi", "p_value")
     if n == 0:
         out: dict = {"n": 0}
@@ -111,8 +118,18 @@ def roi_stats(
     }
 
     rng = np.random.default_rng(seed)
-    idx = rng.integers(0, n, size=(n_boot, n))
-    boot_means = r[idx].mean(axis=1)
+    if clusters is None:
+        idx = rng.integers(0, n, size=(n_boot, n))
+        boot_means = r[idx].mean(axis=1)
+    else:
+        # Summe und Anzahl je Gruppe; Mittel der Stichprobe = Σ Summen / Σ Anzahlen
+        _, inv = np.unique(np.asarray(clusters, dtype=object).astype(str), return_inverse=True)
+        sums = np.bincount(inv, weights=r)
+        counts = np.bincount(inv).astype(float)
+        g = sums.size
+        idx = rng.integers(0, g, size=(n_boot, g))
+        boot_means = sums[idx].sum(axis=1) / counts[idx].sum(axis=1)
+        out["n_clusters"] = int(g)
     out["ci_lo"] = float(np.percentile(boot_means, 100.0 * alpha / 2.0))
     out["ci_hi"] = float(np.percentile(boot_means, 100.0 * (1.0 - alpha / 2.0)))
     out["p_value"] = float((np.sum(boot_means <= 0.0) + 1) / (n_boot + 1))

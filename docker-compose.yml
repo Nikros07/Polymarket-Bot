@@ -1,0 +1,17 @@
+# docker compose up -d   → Statusseite auf http://localhost:8080
+# Nur Papiergeld. Keine API-Schlüssel nötig (Kalshi- und Open-Meteo-Daten sind öffentlich).
+services:
+  paperbot:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PAPERBOT_ENABLED: "true"         # Notaus: "false"
+      PAPERBOT_BANKROLL: "50"
+    volumes:
+      - paperbot-data:/app/data
+    command: ["python", "-m", "paperbot", "serve", "--source", "kalshi", "--interval", "30"]
+
+volumes:
+  paperbot-data:

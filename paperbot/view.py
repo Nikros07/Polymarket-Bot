@@ -31,6 +31,11 @@ class MarketInfo:
     category: str
     created_ts: Optional[int]
     end_ts: Optional[int]          # None, wenn das Ende nicht vorher feststand
+    event_id: str = ""
+    series: str = ""
+    strike_type: str = ""
+    floor_strike: Optional[float] = None
+    cap_strike: Optional[float] = None
 
     @classmethod
     def from_market(cls, m: Market, live: bool = False) -> "MarketInfo":
@@ -42,6 +47,11 @@ class MarketInfo:
             category=m.category,
             created_ts=m.created_ts,
             end_ts=m.end_ts if (live or m.end_known_in_advance) else None,
+            event_id=m.event_id,
+            series=m.series,
+            strike_type=m.strike_type,
+            floor_strike=m.floor_strike,
+            cap_strike=m.cap_strike,
         )
 
 
@@ -85,6 +95,10 @@ class MarketView:
 
     def history(self) -> Tuple[PricePoint, ...]:
         return tuple(self._pts[:self._cut])
+
+    def last_point(self) -> Optional[PricePoint]:
+        """Letzter Punkt <= now_ts, inklusive Geld-/Briefkurs, falls bekannt."""
+        return self._pts[self._cut - 1] if self._cut else None
 
     # ── Zeit ──────────────────────────────────────────────────────────────
 

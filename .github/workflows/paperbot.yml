@@ -23,6 +23,7 @@ on:
         options:
           - polymarket
           - manifold
+          - kalshi
         default: polymarket
 
 permissions:
@@ -62,6 +63,12 @@ jobs:
           PAPERBOT_ENABLED: ${{ vars.PAPERBOT_ENABLED || 'true' }}
         run: |
           python -m paperbot ${{ github.event.inputs.command || 'cycle' }} --source ${{ github.event.inputs.source || 'polymarket' }}
+
+      - name: Kalshi-Wetter-Zyklus (Spezialisierung, nur bei geplanten Läufen)
+        if: github.event_name == 'schedule'
+        env:
+          PAPERBOT_ENABLED: ${{ vars.PAPERBOT_ENABLED || 'true' }}
+        run: python -m paperbot cycle --source kalshi
 
       - name: Zustand an paperbot-state anhängen (nur Commits, nie force)
         run: |

@@ -36,6 +36,22 @@ def side_won(outcome: int, side: str) -> bool:
 class PricePoint:
     t: int      # Unix-Sekunden UTC
     p: float    # YES-Wahrscheinlichkeit 0..1
+    # Echter Geld-/Briefkurs für YES zum Zeitpunkt t (Kalshi-Kerzen). None = unbekannt,
+    # dann rechnet der Backtest mit angenommenem halbem Spread.
+    bid: Optional[float] = None
+    ask: Optional[float] = None
+
+    def side_ask(self, side: str) -> Optional[float]:
+        """Kaufpreis einer Seite: YES zum Brief, NO zu 1 − Geld (Kalshi-Orderbuch)."""
+        if self.bid is None or self.ask is None:
+            return None
+        return self.ask if side == "YES" else 1.0 - self.bid
+
+    @property
+    def spread(self) -> Optional[float]:
+        if self.bid is None or self.ask is None:
+            return None
+        return self.ask - self.bid
 
 
 @dataclass(frozen=True)
@@ -59,6 +75,13 @@ class Market:
     no_token_id: str = ""            # Polymarket CLOB-Token für NO
     active: bool = True
     accepting_orders: bool = True
+    # Kalshi: Event (mehrere Märkte, z. B. alle Temperatur-Spannen eines Tages),
+    # Serie und Schwellen. Stehen vorher fest, Strategien dürfen sie sehen.
+    event_id: str = ""
+    series: str = ""
+    strike_type: str = ""            # "between" | "greater" | "less" | ""
+    floor_strike: Optional[float] = None
+    cap_strike: Optional[float] = None
     # ── Erst am Marktende bekannt ─────────────────────────────────────────
     closed: bool = False
     outcome: Optional[int] = None    # 1 = YES, 0 = NO, None = offen/annulliert

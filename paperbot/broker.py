@@ -26,7 +26,9 @@ def simulate_buy(book: Book, budget: float, *, side: str, market_id: str, ts: in
                  max_price: float = 0.98) -> FillResult:
     if budget <= 0:
         return FillResult(None, "Budget 0")
-    remaining = budget
+    # Kalshi rundet die Gebühr je Order auf den Cent auf: diesen Cent vorher zurücklegen,
+    # sonst können die Kosten das Budget (und damit das Bargeld) knapp übersteigen.
+    remaining = budget - (0.01 if fee.kind == "kalshi" else 0.0)
     shares = notional = fee_total = 0.0
     for level in book.asks:
         if level.price > max_price:
@@ -56,7 +58,7 @@ def simulate_buy(book: Book, budget: float, *, side: str, market_id: str, ts: in
         side=side,
         shares=rounded,
         avg_price=notional / shares,
-        fee=fee_total * scale,
+        fee=fee.round_total(fee_total * scale),
         ts=ts,
         synthetic_book=book.synthetic,
     ))

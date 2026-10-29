@@ -10,6 +10,9 @@ Wallet-Code auftaucht.
 ```bash
 python -m paperbot cycle --source polymarket     # ein Zyklus: abrechnen, scannen, Papier-Käufe
 python -m paperbot cycle --source manifold       # dasselbe auf Manifold (Spielgeld, als Ersatz)
+python -m paperbot cycle --source kalshi         # Spezialisierung: Kalshi-Tageshöchsttemperatur
+python -m paperbot serve --source kalshi         # Dauerbetrieb + Statusseite (siehe docs/HOSTING.md)
+python -m paperbot backtest --source kalshi --limit 6000   # H5–H8 mit echten Geld-/Briefkursen
 python -m paperbot status --source polymarket    # schreibt reports/STATUS_<quelle>.md
 python -m paperbot backtest --source manifold    # Versuchsprotokoll aus docs/HYPOTHESEN.md
 python -m paperbot gate --source polymarket      # Freigabe-Prüfung (nur Auskunft)

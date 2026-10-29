@@ -60,7 +60,7 @@ class BotConfig:
 
     # ── Schalter ──────────────────────────────────────────────────────────
     enabled: bool = True               # Notaus: False → Zyklus tut nichts
-    strategies: Tuple[str, ...] = ("favorite", "calibration", "momentum",
+    strategies: Tuple[str, ...] = ("weather", "favorite", "calibration", "momentum",
                                    "reversion", "random_control", "llm_blend")
     llm_enabled: bool = False          # LLM-Pipeline kostet API-Aufrufe → aus
     llm_max_markets_per_cycle: int = 2
