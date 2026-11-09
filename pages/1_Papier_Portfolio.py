@@ -25,7 +25,7 @@ from paperbot.config import ROOT, BotConfig  # noqa: E402
 from paperbot.gate import DISCLAIMER, backtest_verdicts, evaluate_gate  # noqa: E402
 from paperbot.ledger import LedgerStore  # noqa: E402
 
-SOURCES = ("polymarket", "manifold")
+SOURCES = ("kalshi", "polymarket", "manifold")
 
 
 def _de(value: float, digits: int = 2) -> str:
@@ -51,10 +51,10 @@ def _render_backtest(source: str) -> None:
         for img in sorted(results.glob(f"bt_{source}_*.png")):
             st.image(str(img), caption=img.stem)
     else:
-        st.info(
-            "Noch kein Backtest-Bericht vorhanden. Starte einen Backtest mit: "
-            f"python -m paperbot backtest --source {source}"
-        )
+        befehl = f"python -m paperbot backtest --source {source}"
+        if source == "kalshi":
+            befehl += " --limit 6000"
+        st.info("Noch kein Backtest-Bericht vorhanden. Starte einen Backtest mit: " + befehl)
 
 
 def _render_strategy_overview(ledgers: dict) -> None:

@@ -1,0 +1,123 @@
+# Langer Backtest (Daten-Download bis zu einigen Stunden) – nur von Hand gestartet.
+# Läuft auf GitHub, also ohne die lokale Firewall-Sperre für Prognosemärkte.
+# Nur Papier/Forschung: kein Secret, kein Wallet, keine Orders.
+#
+# Ergebnis:
+# - results/BACKTEST_<quelle>.md und Begleitdateien → Commit in den Zweig
+# - gelerntes Modell (z. B. data/paperbot/kalshi/weather_model_kalshi.json)
+#   → Zweig paperbot-state, damit der geplante Zyklus es findet
+name: paperbot-backtest
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Datenquelle"
+        type: choice
+        options:
+          - kalshi
+          - polymarket
+          - manifold
+        default: kalshi
+      limit:
+        description: "Anzahl Märkte (breite Stichprobe)"
+        type: string
+        default: "6000"
+      refresh:
+        description: "Daten neu laden statt Cache"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: paperbot             # gleiche Gruppe wie der Zyklus: nie zwei Läufe am selben Zustand
+  cancel-in-progress: false
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-paperbot.txt
+      - run: pip install -r requirements-paperbot.txt
+      - run: python -m pytest tests -q
+
+      - name: Zustand von paperbot-state holen (nur Arbeitsbaum)
+        run: |
+          if git fetch -q origin paperbot-state; then
+            git restore --source=FETCH_HEAD --worktree -- data/paperbot/ || echo "Kein data/paperbot im Zweig."
+          fi
+
+      - name: Datensatz-Cache
+        uses: actions/cache@v4
+        with:
+          path: data/paperbot/datasets
+          key: paperbot-datasets-${{ inputs.source }}-${{ inputs.limit }}-${{ github.run_id }}
+          restore-keys: |
+            paperbot-datasets-${{ inputs.source }}-${{ inputs.limit }}-
+
+      - name: Backtest
+        run: |
+          python -m paperbot backtest --source "${{ inputs.source }}" --limit "${{ inputs.limit }}" \
+            ${{ inputs.refresh && '--refresh' || '' }} 2>&1 | tee backtest.log
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          tail -n 40 backtest.log >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Modell und Zustand an paperbot-state anhängen (nur Commits, nie force)
+        run: |
+          [ -d data/paperbot ] || exit 0
+          git config --global user.name "paperbot"
+          git config --global user.email "paperbot@users.noreply.github.com"
+          WT="$RUNNER_TEMP/paperbot-state"
+          if git ls-remote --exit-code --heads origin paperbot-state >/dev/null 2>&1; then
+            git fetch -q origin paperbot-state
+            git worktree add -q -B paperbot-state "$WT" FETCH_HEAD
+          else
+            git worktree add -q --detach "$WT"
+            git -C "$WT" checkout -q --orphan paperbot-state
+            git -C "$WT" rm -r -q --cached . || true
+            git -C "$WT" clean -fdxq
+          fi
+          rm -rf "$WT/data/paperbot"
+          mkdir -p "$WT/data"
+          cp -r data/paperbot "$WT/data/"
+          rm -rf "$WT/data/paperbot/datasets" "$WT/data/paperbot/cache"
+          git -C "$WT" add -A -- data/paperbot
+          git -C "$WT" diff --cached --quiet && exit 0
+          git -C "$WT" commit -q -m "backtest-state ${{ inputs.source }} $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          for i in 1 2 3; do
+            if git -C "$WT" ls-remote --exit-code --heads origin paperbot-state >/dev/null 2>&1; then
+              git -C "$WT" pull -q --rebase origin paperbot-state || { git -C "$WT" rebase --abort 2>/dev/null || true; sleep 5; continue; }
+            fi
+            git -C "$WT" push -q origin HEAD:refs/heads/paperbot-state && exit 0
+            sleep 5
+          done
+          exit 1
+
+      - name: Ergebnisse in den Zweig committen
+        run: |
+          git config --global user.name "paperbot"
+          git config --global user.email "paperbot@users.noreply.github.com"
+          git add -A -- results
+          git diff --staged --quiet && exit 0
+          git commit -q -m "backtest ${{ inputs.source }} $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          BRANCH="${GITHUB_REF_NAME}"
+          for i in 1 2 3; do
+            if git pull -q --rebase --autostash origin "$BRANCH" && git push -q origin "HEAD:refs/heads/$BRANCH"; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
+          exit 1

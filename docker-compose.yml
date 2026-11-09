@@ -4,6 +4,7 @@ services:
   paperbot:
     build: .
     restart: unless-stopped
+    stop_grace_period: 10m            # laufenden Zyklus zu Ende rechnen lassen (SIGTERM)
     ports:
       - "8080:8080"
     environment:

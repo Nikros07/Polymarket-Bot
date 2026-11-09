@@ -15,7 +15,7 @@ from __future__ import annotations
 import hashlib
 import math
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
@@ -30,6 +30,7 @@ MAX_CANDLES_PER_CALL = 5_000    # Grenze der API je Abruf
 MAX_VALID_SPREAD = 0.5          # breiter = kein echter Kurs (z. B. 0 Geld / 1 Brief)
 # "closed" heißt nur: Handel beendet, Ergebnis noch offen. Abgerechnet wird erst danach.
 CLOSED_STATUSES = {"determined", "settled", "finalized"}
+VOID_RESULTS = {"void", "voided", "cancelled", "canceled"}   # Einsatz zurück
 
 # Spezialisierung: Tageshöchsttemperatur (siehe docs/HYPOTHESEN.md, H8)
 WEATHER_SERIES: Tuple[str, ...] = ("KXHIGHNY", "KXHIGHCHI", "KXHIGHMIA", "KXHIGHLAX",
@@ -121,6 +122,8 @@ def _parse(raw: dict, category: str, series: str) -> Optional[Market]:
     closed = status in CLOSED_STATUSES
     result = str(raw.get("result") or "").lower()
     outcome = {"yes": 1, "no": 0}.get(result) if closed else None
+    if closed and outcome is None and result not in VOID_RESULTS:
+        closed = False          # Ergebnis unbekannt: warten statt raten (kein Abrechnen)
     bid, ask = _dollars(raw, "yes_bid"), _dollars(raw, "yes_ask")
     last = quote_mid(bid, ask)
     if last is None:
@@ -155,6 +158,8 @@ def _parse(raw: dict, category: str, series: str) -> Optional[Market]:
         strike_type=str(raw.get("strike_type") or ""),
         floor_strike=_strike(raw.get("floor_strike")),
         cap_strike=_strike(raw.get("cap_strike")),
+        yes_bid=bid if quote_mid(bid, ask) is not None else None,
+        yes_ask=ask if quote_mid(bid, ask) is not None else None,
         closed=closed,
         outcome=outcome,
         resolved_ts=(settled or close) if closed else None,
@@ -232,6 +237,10 @@ class KalshiClient:
         self.http = http
         self.series = tuple(series)       # Serien für den Live-Betrieb (Spezialisierung)
         self.skipped = 0
+        # Datenqualität: wie viele Märkte gewählt, mit Preisen, verworfen (nach Grund).
+        # Landet neben dem Datensatz (datasets.fetch_dataset) und im Backtest-Bericht.
+        self.stats: Counter = Counter()
+        self.last_scan_errors: List[str] = []
         self._categories: Optional[Dict[str, str]] = None
 
     # ── Serien ───────────────────────────────────────────────────────────
@@ -247,6 +256,9 @@ class KalshiClient:
         return self._categories
 
     def _category(self, series: str) -> str:
+        if series in WEATHER_SERIES:
+            # Fest, damit ein Ausfall von /series die 40-%-Kategoriegrenze nicht teilt.
+            return "Climate and Weather"
         try:
             return self.categories().get(series, "")
         except DataError:
@@ -256,15 +268,24 @@ class KalshiClient:
 
     def list_open_markets(self, limit: int = 200) -> List[Market]:
         out: List[Market] = []
+        failed = []
         for s in self.series:
-            resp = self.http.get_json("markets", params={"series_ticker": s, "status": "open",
-                                                         "limit": 200})
-            for raw in _rows(resp, "markets"):
+            try:
+                resp = self.http.get_json("markets", params={"series_ticker": s, "status": "open",
+                                                             "limit": 200})
+                rows = _rows(resp, "markets")
+            except DataError as exc:
+                failed.append(f"{s}: {exc}")
+                continue
+            for raw in rows:
                 m = parse_market(raw, self._category(s), s)
                 if m is None:
                     self.skipped += 1
                 elif m.active and not m.closed:
                     out.append(m)
+        if failed and len(failed) == len(self.series):
+            raise DataError("alle Serien fehlgeschlagen: " + "; ".join(failed)[:300])
+        self.last_scan_errors = failed      # engine schreibt sie in den Zyklusbericht
         out.sort(key=lambda m: m.volume, reverse=True)
         return out[:limit]
 
@@ -315,12 +336,20 @@ class KalshiClient:
     def archived_candles(self, ticker: str, start_ts: int, end_ts: int,
                          period_min: int) -> List[PricePoint]:
         """Kerzen eines archivierten Marktes (/historical/markets/{ticker}/candlesticks).
-        Unbekannt oder defekt -> leere Liste (der Markt fällt dann weg)."""
+        Im Archiv unbekannt (404) -> leere Liste. Andere Fehler (Drosselung, Netz,
+        kaputte Daten) ebenfalls leere Liste, aber gezählt: Sie verzerren die
+        Stichprobe und lassen den Backtest über die Qualitätsprüfung abbrechen."""
+        from paperbot.data.http import NotFoundError
         try:
             resp = self.http.get_json(f"historical/markets/{ticker}/candlesticks", params={
                 "start_ts": int(start_ts), "end_ts": int(end_ts), "period_interval": int(period_min)})
             return parse_candles(_rows(resp, "candlesticks"))
-        except DataError:
+        except NotFoundError:
+            return []
+        except DataError as exc:
+            self.stats["Abruffehler"] += 1
+            if self.stats["Abruffehler"] <= 3:
+                print(f"[kalshi] Archiv-Kerzen {ticker}: {exc}", file=sys.stderr)
             return []
 
     # ── Historische Märkte ───────────────────────────────────────────────
@@ -357,15 +386,17 @@ class KalshiClient:
             period = 60 if days <= HOURLY_MAX_DAYS else 1440
             by_event[(m.event_id or m.market_id, period)].append(m)
         out: List[Tuple[Market, List[PricePoint]]] = []
+        self.stats["ausgewählt"] += len(markets)
         for k, ((_, period), group) in enumerate(sorted(by_event.items())):
             start = min(m.created_ts for m in group)
             end = max(m.resolved_ts or m.end_ts for m in group) + period * 60
             try:
                 hist = self.candles([m.market_id for m in group], start, end, period)
             except DataError as exc:
-                print(f"[kalshi] Kerzen fehlgeschlagen für {group[0].event_id}: {exc}", file=sys.stderr)
-                self.skipped += len(group)
-                continue
+                # Nicht still verwerfen: einzeln über das Archiv weiterversuchen und zählen.
+                print(f"[kalshi] Batch-Kerzen fehlgeschlagen für {group[0].event_id}: {exc}", file=sys.stderr)
+                self.stats["Batch-Fehler (Events)"] += 1
+                hist = {}
             for m in group:
                 h = hist.get(m.market_id) or []
                 if len(h) < 2:
@@ -373,10 +404,14 @@ class KalshiClient:
                     # Ältere Märkte einzeln aus dem Archiv holen (Lauf 2026-10-27 fehlte das:
                     # nur 924 von ~15.300 Wettermärkten hatten Kerzen).
                     h = self.archived_candles(m.market_id, start, end, period)
+                    if len(h) >= 2:
+                        self.stats["aus Archiv nachgeladen"] += 1
                 if len(h) >= 2:
                     out.append((m, h))
+                    self.stats["mit Preisen"] += 1
                 else:
                     self.skipped += 1
+                    self.stats["ohne Preise verworfen"] += 1
             if (k + 1) % 100 == 0:
                 print(f"[kalshi] Kerzen für {k + 1}/{len(by_event)} Events, {len(out)} Märkte",
                       file=sys.stderr)
@@ -398,10 +433,13 @@ class KalshiClient:
                     rows = self.settled_in_series(s, max_markets=200)
                 except DataError as exc:
                     print(f"[kalshi] Serie {s}: {exc}", file=sys.stderr)
+                    self.stats["Serie fehlgeschlagen"] += 1
                     continue
                 keep = []
                 for raw in rows:
                     m = parse_market(raw, cat, s)
+                    if m is None:
+                        self.stats["nicht lesbar"] += 1
                     if (m is None or m.outcome not in (0, 1) or m.volume < BROAD_MIN_VOLUME
                             or m.created_ts is None or m.end_ts is None
                             or (m.end_ts - m.created_ts) / DAY < BROAD_MIN_DAYS):
@@ -424,6 +462,8 @@ class KalshiClient:
                 if d is None or d < start or d.timetuple().tm_yday % 3 != 0:
                     continue
                 m = parse_market(raw, "Climate and Weather", s)
+                if m is None:
+                    self.stats["nicht lesbar"] += 1
                 if m is None or m.outcome not in (0, 1) or m.created_ts is None or m.end_ts is None:
                     continue
                 chosen.append(m)

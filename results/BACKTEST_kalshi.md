@@ -1,6 +1,6 @@
 # Backtest: kalshi
 
-Märkte insgesamt: 1143, Training (In-Sample): 346, Test (Out-of-Sample): 458. Kosten-Annahmen: halber Spread – je Seite, Gebühren-Modell: kalshi. Alle Schwellen wurden vor dem Test in docs/HYPOTHESEN.md festgelegt.
+Märkte insgesamt: 1143, Training (In-Sample): 346, Test (Out-of-Sample): 458. Kosten: echter Briefkurs der Kerze vor der Entscheidung plus Gebühr (kalshi); Spread über 10 ct gilt als nicht handelbar. Alle Schwellen wurden vor dem Test in docs/HYPOTHESEN.md festgelegt. Wetter-Datensatz (H8): 924 Märkte, Training 546, Test 370.
 
 ## Ergebnis auf ungesehenen Daten (Out-of-Sample)
 
@@ -24,6 +24,24 @@ Signifikanzschwelle nach Bonferroni: p ≤ 0.0063
 | zufall@wetter_10 | 263 | -31.81 % | [-42.95 %, -18.36 %] | 48.7 % |
 | immer_yes@wetter_10 | 263 | -43.36 % | [-57.08 %, -25.82 %] | 22.1 % |
 
+## H5 je Kategorie (explorativ)
+
+Keine Auswahl, kein Urteil – nur zur Orientierung.
+
+| Kategorie | Trades | Ø Ertrag pro € | 95 %-Intervall | Trefferquote | Ø Kaufpreis inkl. Gebühr |
+|---|---|---|---|---|---|
+| commodities | 53 | -4.04 % | [-12.12 %, 2.57 %] | 92.5 % | 96.3 % |
+| science and technology | 48 | -3.27 % | [-11.50 %, 2.96 %] | 93.8 % | 96.7 % |
+| sports | 18 | 4.72 % | [3.67 %, 5.74 %] | 100.0 % | 95.5 % |
+| financials | 14 | 2.64 % | [1.52 %, 4.34 %] | 100.0 % | 97.5 % |
+| economics | 12 | 3.91 % | [2.66 %, 5.29 %] | 100.0 % | 96.3 % |
+| mentions | 11 | 5.11 % | [3.92 %, 6.47 %] | 100.0 % | 95.2 % |
+| politics | 7 | -25.79 % | [-30.57 %, 2.88 %] | 71.4 % | 95.9 % |
+| elections | 6 | -12.56 % | [-12.56 %, -12.56 %] | 83.3 % | 95.5 % |
+| climate and weather | 3 | 0.94 % | [0.94 %, 0.94 %] | 100.0 % | 99.1 % |
+| entertainment | 1 | 2.88 % | [2.88 %, 2.88 %] | 100.0 % | 97.2 % |
+| crypto | 1 | 0.94 % | [0.94 %, 0.94 %] | 100.0 % | 99.1 % |
+
 ## Kosten-Sensitivität
 
 | Hypothese | 0 ct | 1 ct | 2 ct | 3 ct |
@@ -33,7 +51,7 @@ Signifikanzschwelle nach Bonferroni: p ≤ 0.0063
 | H7 (kreversion_25_1d) | -25.19 % | -28.18 % | -30.88 % | -33.34 % |
 | H8 (wetter_10) | -50.99 % | -53.67 % | -55.79 % | -57.55 % |
 
-Ø Ertrag pro € je Kostenstufe (halber Spread):
+Ø Ertrag pro € je Kostenstufe (zusätzlicher Schlupf auf den echten Briefkurs):
 
 ![Kosten je Hypothese](bt_kalshi_costs.png)
 
@@ -111,7 +129,8 @@ Gewählt: wetter_10
 ## Grenzen dieses Tests
 
 - Die Märkte wurden nach Endvolumen bzw. Teilnehmerzahl ausgewählt. Das ist Wissen vom Marktende (leichte Auswahlverzerrung).
-- Preise aus der Historie sind Mittel- oder Letztkurse. Der echte Kaufpreis liegt um den halben Spread höher; das ist als Kosten angesetzt, Markttiefe aber nicht.
-- Manifold ist ein Spielgeld-Markt. Ergebnisse dort sind ein Hinweis, kein Beweis für Polymarket.
 - Ein bestätigtes Ergebnis heißt nur: auf diesen Daten nicht durch Zufall erklärbar. Es garantiert keine Gewinne in der Zukunft.
 - Die LLM-Strategie ist hier nicht enthalten, weil ein Sprachmodell vergangene Ergebnisse kennen kann.
+- Kaufpreis ist der echte Briefkurs der letzten Kerze vor der Entscheidung (bis 1 h alt bei Stunden-, bis 24 h bei Tageskerzen); Markttiefe ist nicht abgebildet.
+- Intervalle und p-Werte sind über Events gezogen, weil Märkte eines Events zusammenhängen.
+- Die Kategorie-Tabelle zu H5 ist explorativ: kein Urteil, keine Auswahl daraus.

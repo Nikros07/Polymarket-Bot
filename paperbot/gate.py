@@ -70,10 +70,17 @@ def evaluate_gate(led: Ledger, control: Optional[Ledger] = None,
 
 
 def backtest_verdicts(results_dir: Path, source: str) -> Dict[str, str]:
-    """Ordnet Strategie-Familien (favorite, calibration, …) ihr Backtest-Urteil zu."""
+    """Ordnet Strategie-Familien (favorite, calibration, weather, …) ihr Backtest-Urteil zu.
+
+    Hypothesen-Schlüssel H1–H4 gehören zu Manifold/Polymarket, H5–H8 zu Kalshi.
+    Pro Quelle kommt nur eine der beiden Runden vor, Überschneidungen gibt es also nicht.
+    H6 und H7 haben keine Live-Strategie und fallen deshalb weg.
+    """
     path = results_dir / f"backtest_{source}_summary.json"
     if not path.exists():
         return {}
     data = json.loads(path.read_text(encoding="utf-8"))
-    family = {"H1": "favorite", "H2": "momentum", "H3": "reversion", "H4": "calibration"}
+    # Manifold/Polymarket: H1–H4. Kalshi: H5 (favorite) und H8 (weather).
+    family = {"H1": "favorite", "H2": "momentum", "H3": "reversion", "H4": "calibration",
+              "H5": "favorite", "H8": "weather"}
     return {family[k]: v.get("verdict", "") for k, v in data.get("hypotheses", {}).items() if k in family}

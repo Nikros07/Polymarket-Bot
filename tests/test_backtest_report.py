@@ -20,7 +20,7 @@ SECTIONS = [
 BULLETS = [
     "Die Märkte wurden nach Endvolumen bzw. Teilnehmerzahl ausgewählt. Das ist Wissen vom Marktende (leichte Auswahlverzerrung).",
     "Preise aus der Historie sind Mittel- oder Letztkurse. Der echte Kaufpreis liegt um den halben Spread höher; das ist als Kosten angesetzt, Markttiefe aber nicht.",
-    "Manifold ist ein Spielgeld-Markt. Ergebnisse dort sind ein Hinweis, kein Beweis für Polymarket.",
+    # Manifold-Satz steht nur bei Quelle "manifold" (siehe test_manifold_* unten)
     "Ein bestätigtes Ergebnis heißt nur: auf diesen Daten nicht durch Zufall erklärbar. Es garantiert keine Gewinne in der Zukunft.",
     "Die LLM-Strategie ist hier nicht enthalten, weil ein Sprachmodell vergangene Ergebnisse kennen kann.",
 ]
@@ -125,6 +125,79 @@ def _write_equity_csv(out_dir):
         lines.append(f"{base + i * 86400},{eq:.2f}")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return path
+
+
+def _kalshi_summary() -> dict:
+    """Kleines Kalshi-Summary nach dem Muster von results/backtest_kalshi_summary.json."""
+    h5_oos = _ev("kfav_90_98", 174, -0.0227, -0.0626, 0.0116, 0.889, 0.94, -1.0, 0.945,
+                 {"0.00": -0.0227, "0.01": -0.0299, "0.02": -0.0357, "0.03": -0.0402})
+    h5_in = [_ev("kfav_90_98", 231, -0.0496, -0.097, -0.012, 0.998, 0.92, -1.0, 0.94, {})]
+    h5_controls = [_ev("zufall@kfav_90_98", 174, -0.2909, -0.4877, -0.0507, 0.989, 0.51, -1.0, 0.53, {})]
+    categories = [
+        {"category": "commodities", "n": 53, "mean": -0.0404, "ci_lo": -0.1212, "ci_hi": 0.0257,
+         "hit_rate": 0.9245, "mean_cost": 0.9634},
+        {"category": "sports", "n": 18, "mean": 0.0472, "ci_lo": 0.0367, "ci_hi": 0.0574,
+         "hit_rate": 1.0, "mean_cost": 0.9554},
+    ]
+    return {
+        "source": "kalshi",
+        "n_markets": 1143,
+        "n_weather": 924,
+        "n_weather_train": 546,
+        "n_weather_test": 370,
+        "n_train": 346,
+        "n_test": 458,
+        "cost": {"half_spread": "echter Briefkurs", "fee": "kalshi", "max_spread": 0.1},
+        "hypotheses": {
+            "H5": {"chosen": "kfav_90_98", "verdict": "verworfen", "in_sample": h5_in,
+                   "out_of_sample": h5_oos, "controls": h5_controls},
+            "H6": {"chosen": None, "verdict": "zu wenige Trades In-Sample", "in_sample": []},
+        },
+        "h5_by_category": categories,
+        "market_reliability": [{"bin_lo": 0.0, "bin_hi": 0.1, "n": 10, "mean_prob": 0.04, "hit_rate": 0.02}],
+        "market_brier_test": 0.125,
+        "bankroll": {},
+        "bonferroni_threshold": 0.00625,
+    }
+
+
+def test_kalshi_report_uses_real_bid_wording_and_event_limits(tmp_path):
+    md_path = write_backtest_report(_kalshi_summary(), tmp_path)
+    text = md_path.read_text(encoding="utf-8")
+
+    # Kosten: echter Briefkurs statt "halber Spread je Seite"
+    assert "echter Briefkurs" in text
+    assert "Spread über 10 ct gilt als nicht handelbar." in text
+    assert "Kosten-Annahmen" not in text
+    assert "(halber Spread)" not in text
+    assert "zusätzlicher Schlupf auf den echten Briefkurs" in text
+
+    # Wetter-Datensatz in der Einleitung
+    assert "Wetter-Datensatz (H8): 924 Märkte, Training 546, Test 370." in text
+
+    # Kategorie-Abschnitt nach den Kontrollen
+    assert "## H5 je Kategorie (explorativ)" in text
+    assert text.index("## Kontrollen") < text.index("## H5 je Kategorie (explorativ)") < text.index("## Kosten-Sensitivität")
+    assert "| commodities | 53 |" in text
+
+    # Kalshi-Grenzen: Events, Briefkurs, Kategorien; Manifold-Satz fehlt
+    assert "Intervalle und p-Werte sind über Events gezogen" in text
+    assert "Kaufpreis ist der echte Briefkurs der letzten Kerze vor der Entscheidung" in text
+    assert "Die Kategorie-Tabelle zu H5 ist explorativ" in text
+    assert "Manifold ist ein Spielgeld-Markt" not in text
+
+
+def test_manifold_report_keeps_play_money_limit_and_half_spread(tmp_path):
+    summary = _fake_summary()
+    summary["source"] = "manifold"
+    md_path = write_backtest_report(summary, tmp_path)
+    text = md_path.read_text(encoding="utf-8")
+
+    assert "Manifold ist ein Spielgeld-Markt. Ergebnisse dort sind ein Hinweis, kein Beweis für Polymarket." in text
+    assert "halber Spread 1 ct je Seite" in text
+    assert "echter Briefkurs" not in text
+    assert "## H5 je Kategorie (explorativ)" not in text
+    assert "Ø Ertrag pro € je Kostenstufe (halber Spread):" in text
 
 
 def test_markdown_has_sections_verdicts_and_placeholders(tmp_path):

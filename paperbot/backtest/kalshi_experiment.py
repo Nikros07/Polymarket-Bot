@@ -29,6 +29,8 @@ from paperbot.weather import ForecastBook, TempModel, WeatherStrategy, training_
 
 N_VARIANTS_KALSHI = 8       # H5: 3, H6: 2, H7: 1, H8: 2
 MAX_SPREAD = 0.10
+MIN_FORECAST_COVERAGE = 0.90   # weniger Testmärkte mit Vorhersage → H8 nicht prüfbar
+MAX_QUOTE_PERIODS = 2      # Kurs älter als 2 Kerzenperioden = kein gültiger Kurs (Review 2026-11-03)
 WEATHER_OFFSET_H = 6
 POLITICS = ("politics", "elections")
 
@@ -51,17 +53,19 @@ def h7_variants():
 def run_kalshi_experiment(broad: Dataset, weather: Dataset, forecasts: ForecastBook, *,
                           cost: CostModel, cfg: BotConfig, out_dir: Path,
                           register_path: Optional[Path] = None,
-                          progress: Callable[[str], None] = print) -> dict:
+                          progress: Callable[[str], None] = print,
+                          data_quality: Optional[dict] = None) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
     log: List[str] = []
     summary: dict = {"source": "kalshi", "n_markets": len(broad), "n_weather": len(weather),
                      "cost": {"half_spread": "echter Briefkurs", "fee": cost.fee.kind,
                               "max_spread": MAX_SPREAD},
-                     "hypotheses": {}}
+                     "hypotheses": {}, "data_quality": data_quality or {}}
     all_test: Dict[str, List[BTTrade]] = {}
 
     def run(ds, strat, offset=24):
-        return run_strategy(ds, strat, start_offset_hours=offset, max_spread=MAX_SPREAD)
+        return run_strategy(ds, strat, start_offset_hours=offset, max_spread=MAX_SPREAD,
+                            max_quote_periods=MAX_QUOTE_PERIODS)
 
     def ev(name, trades):
         return evaluate(name, trades, cost, clustered=True)
@@ -104,9 +108,27 @@ def run_kalshi_experiment(broad: Dataset, weather: Dataset, forecasts: ForecastB
     w_train, w_test = split_by_created(weather)
     w_a, w_b = split_by_created(w_train, 0.5)
     summary.update(n_weather_train=len(w_train), n_weather_test=len(w_test))
+    # Vorhersage-Abdeckung je Teil: fehlende Vorhersagen verkleinern die Stichprobe still
+    coverage = {name: {"märkte": len(ds), "mit_vorhersage": len(training_rows(ds, forecasts))}
+                for name, ds in (("train_a", w_a), ("train_b", w_b), ("test", w_test))}
+    summary["weather_forecast_coverage"] = coverage
+    model_path = cfg.state_dir / "weather_model_kalshi.json"
+    test_cov = coverage["test"]["mit_vorhersage"] / max(1, coverage["test"]["märkte"])
     try:
+        # Nur das Lernen darf „zu wenige Daten“ melden; Fehler danach sind Bugs und fliegen hoch.
         model_a = TempModel.fit(training_rows(w_a, forecasts))
         model_full = TempModel.fit(training_rows(w_train, forecasts))
+        live = TempModel.fit(training_rows(weather, forecasts))
+    except ValueError as exc:
+        model_a = None
+        entry = {"chosen": None, "verdict": f"nicht prüfbar: {exc}"}
+    if model_a is not None and test_cov < MIN_FORECAST_COVERAGE:
+        entry = {"chosen": None, "verdict": f"nicht prüfbar: nur {test_cov:.0%} der Testmärkte mit Vorhersage"}
+        model_a = None
+    if model_a is None:
+        if model_path.exists():                 # altes Modell nicht still weiterbenutzen
+            model_path.unlink()
+    else:
         log.append(f"  H8 Modell A: b={model_a.bias}, σ={model_a.sigma}, n={model_a.n}; "
                    f"ganzes In-Sample: b={model_full.bias}, σ={model_full.sigma}, n={model_full.n}")
         variants = [WeatherStrategy(model_a, forecasts, min_edge=e, name=f"wetter_{int(e * 100):02d}")
@@ -115,12 +137,10 @@ def run_kalshi_experiment(broad: Dataset, weather: Dataset, forecasts: ForecastB
                                 final=lambda b: WeatherStrategy(model_full, forecasts,
                                                                 min_edge=b.min_edge, name=b.name))
         entry["model_in_sample"] = {"bias": model_full.bias, "sigma": model_full.sigma, "n": model_full.n}
-        # Für den Live-Betrieb: Modell auf ALLEN Wetterdaten
-        live = TempModel.fit(training_rows(weather, forecasts))
-        live.save(cfg.state_dir / "weather_model_kalshi.json", n_markets=len(weather),
-                  min_edge=(chosen.min_edge if chosen is not None else None))
-    except ValueError as exc:
-        entry = {"chosen": None, "verdict": f"nicht prüfbar: {exc}"}
+        # Für den Live-Betrieb: Modell auf ALLEN Wetterdaten, mit Urteil (Live zeigt es an)
+        live.save(model_path, n_markets=len(weather),
+                  min_edge=(chosen.min_edge if chosen is not None else None),
+                  verdict=entry.get("verdict"))
     summary["hypotheses"]["H8"] = entry
 
     # ── Kalibrierung, Bankroll, Dateien ───────────────────────────────────

@@ -116,7 +116,8 @@ def test_get_market_falls_back_to_archive():
                      "historical/markets/X": {"market": _raw(ticker="X")}})
     m = KalshiClient(http).get_market("X")
     assert m.market_id == "X" and m.outcome == 1 and m.category == "climate and weather"
-    assert [c[0] for c in http.calls] == ["markets/X", "historical/markets/X", "series"]
+    # Wetter-Serie: Kategorie steht fest, kein /series-Abruf nötig
+    assert [c[0] for c in http.calls] == ["markets/X", "historical/markets/X"]
 
 
 def test_list_open_markets_only_active():
@@ -236,3 +237,34 @@ def test_archived_markets_fall_back_to_single_archive_candles():
     out = KalshiClient(http)._with_history(ms)
     assert [m.market_id for m, _ in out] == ["OLD-1"]
     assert out[0][1][0].bid == pytest.approx(0.2)
+
+
+# ── Datenqualität (Lehre aus dem Lauf vom 2026-10-27) ─────────────────────
+
+def test_history_counts_kept_and_dropped_markets():
+    candle = {"end_period_ts": T0 + 3600, "yes_bid": {"close": "0.2"}, "yes_ask": {"close": "0.3"}}
+    http = FakeHttp({
+        "markets/candlesticks": DataError("HTTP 429 nach 7 Versuchen"),      # Batch fällt aus
+        "historical/markets/A/candlesticks": {"candlesticks": [candle, {**candle, "end_period_ts": T0 + 7200}]},
+        "historical/markets/B/candlesticks": {"candlesticks": []},
+    })
+    c = KalshiClient(http)
+    ms = [_bt_market(market_id=t, event_id="E", created_ts=T0, end_ts=T0 + DAY, resolved_ts=T0 + DAY)
+          for t in ("A", "B")]
+    out = c._with_history(ms)
+    assert [m.market_id for m, _ in out] == ["A"]          # Batch-Fehler verwirft nicht still
+    assert c.stats["ausgewählt"] == 2 and c.stats["mit Preisen"] == 1
+    assert c.stats["ohne Preise verworfen"] == 1 and c.stats["Batch-Fehler (Events)"] == 1
+
+
+def test_quality_check_blocks_biased_samples(tmp_path):
+    from paperbot.backtest.datasets import check_quality, load_quality, save_quality
+    ds_path = tmp_path / "kalshi_weather_30000.json.gz"
+    m = _bt_market()
+    q = save_quality(ds_path, {"ausgewählt": 15300, "mit Preisen": 924, "ohne Preise verworfen": 14376},
+                     [(m, [])])
+    assert load_quality(ds_path) == q and q["erster_markt_ts"] == T0
+    msg = check_quality(q, "kalshi_weather")
+    assert msg is not None and "14376 von 15300" in msg
+    assert check_quality({"ausgewählt": 100, "ohne Preise verworfen": 10}, "x") is None
+    assert "keine Qualitätsdatei" in check_quality(None, "x")

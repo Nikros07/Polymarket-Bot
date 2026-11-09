@@ -193,6 +193,24 @@ angesehen, nur Datenformate (Felder, Endpunkte, Datenmenge).
   Polymarket). Die Wiederholung läuft deshalb auf einem anderen Netz
   (z. B. VPS per Docker), nicht durch Umgehen der Sperre.
 
+### Nachtrag 2026-11-09: Korrekturen vor der Wiederholung (Code-Review)
+
+Gefunden durch zwei unabhängige Prüfungen, **vor** jedem neuen Lauf behoben.
+Hypothesen, Varianten und Schwellen bleiben unverändert; geändert ist nur,
+was als ausführbarer Kauf zählt:
+
+- **Briefkurs 1,00 = kein Angebot.** Bisher wurde er auf 0,99 gedeckelt und
+  als Kauf verbucht (26 von 174 H5-Trades im ersten Lauf, alle gewonnen,
+  Mittel −2,83 % statt −2,27 %). Jetzt: nicht handelbar, echter Briefkurs
+  wird nie gedeckelt.
+- **Veraltete Kurse:** Ist der letzte gültige Kurs älter als 2
+  Kerzenperioden, ist der Zeitpunkt nicht handelbar.
+- **Datenqualität:** Bricht ab, wenn > 20 % der Märkte ohne Preise oder
+  > 1 % mit Abruffehlern wegfallen oder eine Serie ausfällt; H8 ist „nicht
+  prüfbar“, wenn < 90 % der Testmärkte eine Vorhersage haben.
+- Ein verworfenes oder nicht prüfbares H8-Modell wird live nur als
+  Papier-Vorwärtstest mit Warnung genutzt bzw. gelöscht.
+
 ## Nicht per Backtest prüfbar
 
 - **LLM-Prognose (bestehende 10-Agenten-Pipeline):** Ein Sprachmodell kennt

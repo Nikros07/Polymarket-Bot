@@ -23,16 +23,30 @@ DASH = "–"
 HYPOTHESES = ("H1", "H2", "H3", "H4")
 COST_CENTS = (0, 1, 2, 3)
 
-LIMITS = (
+LIMITS_COMMON = (
     "Die Märkte wurden nach Endvolumen bzw. Teilnehmerzahl ausgewählt. "
     "Das ist Wissen vom Marktende (leichte Auswahlverzerrung).",
-    "Preise aus der Historie sind Mittel- oder Letztkurse. Der echte Kaufpreis liegt um den "
-    "halben Spread höher; das ist als Kosten angesetzt, Markttiefe aber nicht.",
-    "Manifold ist ein Spielgeld-Markt. Ergebnisse dort sind ein Hinweis, kein Beweis für Polymarket.",
     "Ein bestätigtes Ergebnis heißt nur: auf diesen Daten nicht durch Zufall erklärbar. "
     "Es garantiert keine Gewinne in der Zukunft.",
     "Die LLM-Strategie ist hier nicht enthalten, weil ein Sprachmodell vergangene Ergebnisse kennen kann.",
 )
+MID_LAST_LIMIT = (
+    "Preise aus der Historie sind Mittel- oder Letztkurse. Der echte Kaufpreis liegt um den "
+    "halben Spread höher; das ist als Kosten angesetzt, Markttiefe aber nicht."
+)
+LIMITS_BY_SOURCE = {
+    "manifold": (
+        "Manifold ist ein Spielgeld-Markt. Ergebnisse dort sind ein Hinweis, kein Beweis für Polymarket.",
+    ),
+    "polymarket": (MID_LAST_LIMIT,),
+    "kalshi": (
+        "Kaufpreis ist der echte Briefkurs der letzten Kerze vor der Entscheidung (bis 1 h alt bei "
+        "Stunden-, bis 24 h bei Tageskerzen); Markttiefe ist nicht abgebildet.",
+        "Intervalle und p-Werte sind über Events gezogen, weil Märkte eines Events zusammenhängen.",
+        "Die Kategorie-Tabelle zu H5 ist explorativ: kein Urteil, keine Auswahl daraus.",
+    ),
+}
+LIMITS_UNKNOWN = (MID_LAST_LIMIT,)  # unbekannte Quellen (z. B. synthetic): wie Polymarket
 
 
 # ── Formatierung ──────────────────────────────────────────────────────────────
@@ -211,21 +225,64 @@ def _chart_costs(summary: dict, out_dir: Path, source: str) -> str:
 
 # ── Markdown ──────────────────────────────────────────────────────────────────
 
+def _ct(x: Any) -> str:
+    """Spread 0..1 als Cent."""
+    v = _f(x)
+    return DASH if v is None else f"{v * 100:g} ct"
+
+
+def _real_bid(summary: dict) -> bool:
+    """True, wenn der Kaufpreis der echte Briefkurs ist (cost["half_spread"] ist dann Text, keine Zahl)."""
+    return isinstance((summary.get("cost") or {}).get("half_spread"), str)
+
+
 def _section_intro(summary: dict, source: str) -> List[str]:
     cost = summary.get("cost") or {}
-    hs = _f(cost.get("half_spread"))
-    spread = DASH if hs is None else f"{hs * 100:g} ct"
     fee = cost.get("fee")
     fee_txt = DASH if fee in (None, "") else str(fee)
-    return [
-        f"# Backtest: {source}",
-        "",
-        f"Märkte insgesamt: {_num(summary.get('n_markets'), 0)}, Training (In-Sample): "
-        f"{_num(summary.get('n_train'), 0)}, Test (Out-of-Sample): {_num(summary.get('n_test'), 0)}. "
-        f"Kosten-Annahmen: halber Spread {spread} je Seite, Gebühren-Modell: {fee_txt}. "
-        "Alle Schwellen wurden vor dem Test in docs/HYPOTHESEN.md festgelegt.",
-        "",
-    ]
+    if _real_bid(summary):
+        cost_txt = (f"Kosten: echter Briefkurs der Kerze vor der Entscheidung plus Gebühr ({fee_txt}); "
+                    f"Spread über {_ct(cost.get('max_spread'))} gilt als nicht handelbar.")
+    else:
+        cost_txt = f"Kosten-Annahmen: halber Spread {_ct(cost.get('half_spread'))} je Seite, Gebühren-Modell: {fee_txt}."
+    text = (f"Märkte insgesamt: {_num(summary.get('n_markets'), 0)}, Training (In-Sample): "
+            f"{_num(summary.get('n_train'), 0)}, Test (Out-of-Sample): {_num(summary.get('n_test'), 0)}. "
+            f"{cost_txt} "
+            "Alle Schwellen wurden vor dem Test in docs/HYPOTHESEN.md festgelegt.")
+    if _f(summary.get("n_weather")) is not None:
+        text += (f" Wetter-Datensatz (H8): {_num(summary.get('n_weather'), 0)} Märkte, "
+                 f"Training {_num(summary.get('n_weather_train'), 0)}, "
+                 f"Test {_num(summary.get('n_weather_test'), 0)}.")
+    return [f"# Backtest: {source}", "", text, ""]
+
+
+def _section_data_quality(summary: dict) -> List[str]:
+    """Wie viele Märkte gewählt, mit Preisen, verworfen; Vorhersage-Abdeckung (H8).
+    Steht oben, weil eine still geschrumpfte Stichprobe jedes Ergebnis entwertet."""
+    dq = summary.get("data_quality") or {}
+    cov = summary.get("weather_forecast_coverage") or {}
+    sets = dq.get("datensätze") or {}
+    if not sets and not cov:
+        return []
+    keys = ("ausgewählt", "mit Preisen", "aus Archiv nachgeladen", "ohne Preise verworfen",
+            "Abruffehler", "nicht lesbar", "Serie fehlgeschlagen")
+    out = ["## Datenqualität", ""]
+    if sets:
+        rows = [[name] + [_num((q or {}).get(k), 0) for k in keys] for name, q in sets.items()]
+        out += _table(["Datensatz", *keys], rows)
+        out.append("")
+    if cov:
+        rows = [[part, _num(c.get("märkte"), 0), _num(c.get("mit_vorhersage"), 0),
+                 _pct((c.get("mit_vorhersage") or 0) / c["märkte"], 1) if c.get("märkte") else DASH]
+                for part, c in cov.items()]
+        out += ["Vorhersage-Abdeckung (H8):", ""]
+        out += _table(["Teil", "Wettermärkte", "mit Vorhersage", "Anteil"], rows)
+        out.append("")
+    for problem in dq.get("probleme") or []:
+        out.append(f"> **Achtung:** {problem}")
+    if dq.get("probleme"):
+        out.append("")
+    return out
 
 
 def _section_oos(summary: dict) -> List[str]:
@@ -282,7 +339,9 @@ def _section_costs(summary: dict, source: str, chart: str) -> List[str]:
         rows.append([label] + [_pct(by_cost.get(f"{c / 100:.2f}")) for c in COST_CENTS])
     out = ["## Kosten-Sensitivität", ""]
     out += _table(["Hypothese", "0 ct", "1 ct", "2 ct", "3 ct"], rows)
-    out += ["", "Ø Ertrag pro € je Kostenstufe (halber Spread):", "", f"![Kosten je Hypothese]({chart})", ""]
+    caption = ("Ø Ertrag pro € je Kostenstufe (zusätzlicher Schlupf auf den echten Briefkurs):"
+               if _real_bid(summary) else "Ø Ertrag pro € je Kostenstufe (halber Spread):")
+    out += ["", caption, "", f"![Kosten je Hypothese]({chart})", ""]
     return out
 
 
@@ -358,9 +417,29 @@ def _section_in_sample(summary: dict) -> List[str]:
     return out
 
 
-def _section_limits() -> List[str]:
+def _section_by_category(summary: dict) -> List[str]:
+    rows = []
+    for c in summary.get("h5_by_category") or []:
+        c = c if isinstance(c, dict) else {}
+        rows.append([
+            c.get("category") or DASH,
+            _num(c.get("n"), 0),
+            _pct(c.get("mean")),
+            _ci(c.get("ci_lo"), c.get("ci_hi")),
+            _pct(c.get("hit_rate"), 1),
+            _pct(c.get("mean_cost"), 1),
+        ])
+    out = ["## H5 je Kategorie (explorativ)", "", "Keine Auswahl, kein Urteil – nur zur Orientierung.", ""]
+    out += _table(["Kategorie", "Trades", "Ø Ertrag pro €", "95 %-Intervall", "Trefferquote",
+                   "Ø Kaufpreis inkl. Gebühr"], rows)
+    out.append("")
+    return out
+
+
+def _section_limits(source: str) -> List[str]:
     out = ["## Grenzen dieses Tests", ""]
-    out += [f"- {text}" for text in LIMITS]
+    texts = LIMITS_COMMON + LIMITS_BY_SOURCE.get(source, LIMITS_UNKNOWN)
+    out += [f"- {text}" for text in texts]
     out.append("")
     return out
 
@@ -377,13 +456,16 @@ def write_backtest_report(summary: dict, out_dir: Path) -> Path:
 
     lines: List[str] = []
     lines += _section_intro(summary, source)
+    lines += _section_data_quality(summary)
     lines += _section_oos(summary)
     lines += _section_controls(summary)
+    if summary.get("h5_by_category"):
+        lines += _section_by_category(summary)
     lines += _section_costs(summary, source, costs)
     lines += _section_bankroll(summary, equity)
     lines += _section_calibration(summary, cal)
     lines += _section_in_sample(summary)
-    lines += _section_limits()
+    lines += _section_limits(source)
 
     path = out_dir / f"BACKTEST_{source}.md"
     path.write_text("\n".join(lines), encoding="utf-8")

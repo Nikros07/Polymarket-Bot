@@ -22,7 +22,8 @@ from typing import Optional
 
 from paperbot.config import BotConfig
 
-STALE_FACTOR = 3        # /health meldet Fehler, wenn der letzte Zyklus > 3 Intervalle her ist
+STALE_FACTOR = 3        # /health meldet Fehler, wenn der letzte gute Zyklus > 3 Intervalle her ist
+MAX_BAD_CYCLES = 2      # … oder so viele Zyklen in Folge nichts sehen konnten (z. B. Quelle gesperrt)
 
 
 class _State:
@@ -33,16 +34,38 @@ class _State:
         self.started = int(time.time())
         self.last_ok: Optional[int] = None
         self.last_error: Optional[str] = None
+        self.warnings: list = []
         self.cycles = 0
+        self.attempts = 0
+        self.bad_in_row = 0
         self.lock = threading.Lock()
 
     def health(self) -> dict:
         with self.lock:
             now = int(time.time())
             ref = self.last_ok or self.started
-            ok = now - ref <= STALE_FACTOR * self.interval_s + 300
+            ok = now - ref <= STALE_FACTOR * self.interval_s + 300 and self.bad_in_row < MAX_BAD_CYCLES
             return {"ok": ok, "source": self.source, "cycles": self.cycles, "last_ok": self.last_ok,
-                    "last_error": self.last_error, "uptime_s": now - self.started, "paper_only": True}
+                    "bad_cycles_in_row": self.bad_in_row, "last_error": self.last_error,
+                    "warnings": self.warnings, "uptime_s": now - self.started, "paper_only": True}
+
+    def record(self, rep: dict) -> None:
+        """Ein Zyklus ist nur „gut“, wenn er Märkte gesehen hat. Einer, der wegen Sperre oder
+        API-Änderung 0 Märkte scannt, kehrt normal zurück – das darf /health nicht verdecken."""
+        errors = rep.get("errors") or []
+        good = rep.get("enabled", True) and rep.get("scanned", 0) > 0
+        with self.lock:
+            self.cycles += 1
+            self.last_error = "; ".join(errors)[:500] or None
+            self.warnings = list(rep.get("warnings") or [])[:10]
+            if good:
+                self.last_ok = int(time.time())
+                self.bad_in_row = 0
+            else:
+                self.bad_in_row += 1
+                if not errors:
+                    self.last_error = ("Notaus aktiv" if not rep.get("enabled", True)
+                                       else "0 Märkte gescannt")
 
 
 def _handler(state: _State):
@@ -109,20 +132,20 @@ def serve(source: str, interval_min: float = 30.0, port: Optional[int] = None,
             pass
     while not stop.is_set():
         t0 = time.time()
+        state.attempts += 1
+        attempts = state.attempts
         try:
             rep = run_one(source)
-            with state.lock:
-                state.cycles += 1
-                state.last_ok = int(time.time())
-                state.last_error = "; ".join(rep.get("errors") or [])[:500] or None
+            state.record(rep)
             print(f"[serve] Zyklus {state.cycles}: {len(rep.get('opened', []))} gekauft, "
                   f"{len(rep.get('settled', []))} abgerechnet, {len(rep.get('errors', []))} Fehler",
                   flush=True)
         except Exception as exc:    # Dienst läuft weiter, Fehler sichtbar in /health
             with state.lock:
                 state.last_error = f"{exc!r}"[:500]
+                state.bad_in_row += 1
             traceback.print_exc(file=sys.stderr)
-        if max_cycles is not None and state.cycles >= max_cycles:
+        if max_cycles is not None and attempts >= max_cycles:   # alle Versuche zählen
             break
         stop.wait(max(5.0, interval_min * 60 - (time.time() - t0)))
     httpd.shutdown()

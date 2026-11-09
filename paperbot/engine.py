@@ -49,6 +49,7 @@ class CycleReport:
     waiting: List[str] = field(default_factory=list)
     skipped: Counter = field(default_factory=Counter)
     errors: List[str] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)   # betriebsbereit, aber eingeschränkt
     paused: List[str] = field(default_factory=list)
     arb_checked: int = 0
     arb_found: List[str] = field(default_factory=list)
@@ -110,19 +111,36 @@ def _kalshi_strategies(cfg: BotConfig) -> List[Strategy]:
 
     from paperbot.data.base import DataError
     from paperbot.weather import STATIONS, ForecastBook, TempModel, WeatherStrategy, fetch_forecasts
+    warnings: List[str] = []
     path = cfg.state_dir / "weather_model_kalshi.json"
-    model = TempModel.load(path)
-    min_edge = 0.10
-    if path.exists():
-        min_edge = float(json.loads(path.read_text(encoding="utf-8")).get("meta", {}).get("min_edge") or 0.10)
+    model, min_edge = None, 0.10
     try:
-        today = date.today()
+        model = TempModel.load(path)
+        meta = json.loads(path.read_text(encoding="utf-8")).get("meta", {}) if model else {}
+        min_edge = float(meta.get("min_edge") or 0.10)
+        verdict = meta.get("verdict")
+        if model is None:
+            warnings.append("weather: kein Wettermodell – erst `backtest --source kalshi` (kauft nichts)")
+        elif verdict != "bestätigt":
+            warnings.append(f"weather: Modell aus H8 mit Urteil „{verdict or 'unbekannt'}“ – "
+                            "nur Papier-Vorwärtstest, kein belegter Vorteil")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        model = None
+        warnings.append(f"weather: Wettermodell unlesbar ({exc!r})"[:200])
+    today = date.today()
+    try:
         forecasts = fetch_forecasts(tuple(STATIONS), today - timedelta(days=1), today + timedelta(days=2))
-    except DataError:
+    except (DataError, AttributeError, TypeError, ValueError) as exc:
         forecasts = ForecastBook()
+        warnings.append(f"weather: Vorhersage-Abruf fehlgeschlagen ({exc})"[:200])
+    missing = [s for s in STATIONS if (s, (today + timedelta(days=1)).isoformat()) not in forecasts.highs]
+    if forecasts.highs and missing:
+        warnings.append(f"weather: keine Vorhersage für morgen in {', '.join(missing)}")
     favorite = FavoriteStrategy(0.90, 0.98, max_days_to_end=cfg.max_days_to_end, name="favorite")
+    weather = WeatherStrategy(model, forecasts, min_edge=min_edge, cost=cfg.default_half_spread)
+    weather.warnings = warnings
     available: Dict[str, Strategy] = {
-        "weather": WeatherStrategy(model, forecasts, min_edge=min_edge, cost=cfg.default_half_spread),
+        "weather": weather,
         "favorite": favorite,
         "random_control": RandomSideControl(favorite, name="random_control"),
     }
@@ -144,11 +162,14 @@ def run_cycle(client: MarketDataClient, cfg: BotConfig, now_ts: Optional[int] = 
 
     _settle(client, ledgers, now, report)
 
+    for s in strategies:
+        report.warnings.extend(getattr(s, "warnings", None) or [])
     try:
         markets = client.list_open_markets(cfg.scan_limit)
     except DataError as exc:
         report.errors.append(f"Marktabruf fehlgeschlagen: {exc}")
         markets = []
+    report.errors.extend(f"Serie {e}" for e in getattr(client, "last_scan_errors", None) or [])
     report.scanned = len(markets)
 
     for led in ledgers.values():
@@ -166,7 +187,7 @@ def run_cycle(client: MarketDataClient, cfg: BotConfig, now_ts: Optional[int] = 
         report.eligible += 1
         for led in ledgers.values():
             led.mark(m.market_id, m.last_price)
-        history = [PricePoint(now, float(m.last_price))]
+        history = [PricePoint(now, float(m.last_price), m.yes_bid, m.yes_ask)]
         if need_history:
             try:
                 history = client.price_history(m, now - 8 * DAY, now) + history
@@ -242,8 +263,8 @@ def _settle(client: MarketDataClient, ledgers: Dict[str, Ledger], now: int, repo
             outcome = m.outcome
         elif m.resolution_price is not None:
             yes_payout = m.resolution_price          # Manifold MKT: Teil-Auszahlung
-        elif m.source == "manifold":
-            pass                                     # CANCEL → Einsatz zurück
+        elif m.source in ("manifold", "kalshi"):
+            pass                                     # CANCEL / void → Einsatz zurück
         else:
             # Polymarket: geschlossen, aber kein klares Ergebnis. Erst warten (UMA-Prüfung),
             # nach der Frist zum letzten Preis abrechnen (deckt 50/50-Auflösungen ab).

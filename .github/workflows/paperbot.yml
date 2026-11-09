@@ -66,6 +66,9 @@ jobs:
 
       - name: Kalshi-Wetter-Zyklus (Spezialisierung, nur bei geplanten Läufen)
         if: github.event_name == 'schedule'
+        # Ein Kalshi-Fehler darf den schon erzeugten Polymarket-Zustand nicht verwerfen:
+        # die Speicher-Schritte danach laufen trotzdem, der Fehler steht im Log.
+        continue-on-error: true
         env:
           PAPERBOT_ENABLED: ${{ vars.PAPERBOT_ENABLED || 'true' }}
         run: python -m paperbot cycle --source kalshi

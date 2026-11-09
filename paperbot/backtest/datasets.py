@@ -76,12 +76,12 @@ def fetch_dataset(source: str, limit: int, cache_root: Path, refresh: bool = Fal
     elif source == "polymarket":
         from paperbot.data.polymarket import PolymarketClient
         ds = PolymarketClient().resolved_markets(limit)
-    elif source == "kalshi":
+    elif source in ("kalshi", "kalshi_weather"):
         from paperbot.data.kalshi import KalshiClient
-        ds = KalshiClient().resolved_markets(limit)
-    elif source == "kalshi_weather":
-        from paperbot.data.kalshi import KalshiClient
-        ds = KalshiClient().resolved_weather_markets(limit)
+        client = KalshiClient()
+        ds = (client.resolved_markets(limit) if source == "kalshi"
+              else client.resolved_weather_markets(limit))
+        save_quality(path, dict(client.stats), ds)
     elif source == "synthetic":
         from paperbot.backtest.synthetic import make_dataset
         ds = make_dataset(limit, bias=0.0)
@@ -89,3 +89,53 @@ def fetch_dataset(source: str, limit: int, cache_root: Path, refresh: bool = Fal
         raise ValueError(f"unbekannte Quelle: {source}")
     save_dataset(ds, path)
     return ds
+
+
+# ── Datenqualität ─────────────────────────────────────────────────────────────
+# Lehre aus dem Kalshi-Lauf vom 2026-10-27: 14.400 von 15.300 Wettermärkten fielen
+# still weg, der Bericht sah trotzdem normal aus. Deshalb liegt neben jedem
+# Datensatz eine Qualitätsdatei, und der Backtest bricht bei zu großem Verlust ab.
+
+MAX_DROP_SHARE = 0.20          # mehr ohne Preise verworfen → Abbruch
+MAX_FETCH_ERROR_SHARE = 0.01   # Abruffehler (nicht 404) sind nie zufällig verteilt
+
+
+def quality_path(dataset_path: Path) -> Path:
+    return dataset_path.with_name(dataset_path.name.replace(".json.gz", "") + ".quality.json")
+
+
+def save_quality(dataset_path: Path, stats: dict, ds: Dataset) -> dict:
+    ts = sorted(m.created_ts for m, _ in ds if m.created_ts is not None)
+    q = {**{str(k): int(v) for k, v in stats.items()},
+         "erster_markt_ts": ts[0] if ts else None, "letzter_markt_ts": ts[-1] if ts else None}
+    p = quality_path(dataset_path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(q, ensure_ascii=False, indent=1), encoding="utf-8")
+    return q
+
+
+def load_quality(dataset_path: Path) -> Optional[dict]:
+    p = quality_path(dataset_path)
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
+def check_quality(q: Optional[dict], name: str, max_drop: float = MAX_DROP_SHARE) -> Optional[str]:
+    """None = in Ordnung, sonst Fehlermeldung. Ohne Qualitätsdatei: Meldung (unbekannt ≠ gut)."""
+    if q is None:
+        return f"{name}: keine Qualitätsdatei – Datensatz mit --refresh neu laden"
+    chosen = int(q.get("ausgewählt", 0))
+    dropped = int(q.get("ohne Preise verworfen", 0))
+    if chosen == 0:
+        return f"{name}: keine Märkte ausgewählt"
+    share = dropped / chosen
+    if share > max_drop:
+        return (f"{name}: {dropped} von {chosen} Märkten ohne Preise verworfen "
+                f"({share:.0%} > {max_drop:.0%}). Stichprobe wäre verzerrt.")
+    failed = int(q.get("Abruffehler", 0))
+    if failed > MAX_FETCH_ERROR_SHARE * chosen:
+        return (f"{name}: {failed} Abruffehler bei {chosen} Märkten (Drosselung/Netz). "
+                "Fehlende Märkte wären zeitlich gehäuft. Neu laden.")
+    if int(q.get("Serie fehlgeschlagen", 0)):
+        return (f"{name}: {q['Serie fehlgeschlagen']} Serien nicht abrufbar; die vorab "
+                "festgelegte Serienauswahl wäre verschoben. Neu laden.")
+    return None

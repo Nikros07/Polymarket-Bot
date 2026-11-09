@@ -82,11 +82,11 @@ def cmd_backtest(args) -> int:
 def _backtest_kalshi(args, cfg) -> int:
     from datetime import date, timedelta
 
-    from paperbot.backtest.datasets import fetch_dataset
+    from paperbot.backtest.datasets import check_quality, fetch_dataset, load_quality
     from paperbot.backtest.engine import CostModel
     from paperbot.backtest.kalshi_experiment import run_kalshi_experiment
     from paperbot.backtest.report import write_backtest_report
-    from paperbot.data.kalshi import WEATHER_SERIES, WEATHER_START
+    from paperbot.data.kalshi import WEATHER_SERIES, WEATHER_START, event_date
     from paperbot.fees import fee_model_for
     from paperbot.weather import ForecastBook, fetch_forecasts
 
@@ -94,10 +94,25 @@ def _backtest_kalshi(args, cfg) -> int:
     t0 = time.time()
     broad = fetch_dataset("kalshi", args.limit, root, refresh=args.refresh)
     weather = fetch_dataset("kalshi_weather", 30_000, root, refresh=args.refresh)
+    quality = {name: load_quality(root / "datasets" / f"{name}_{n}.json.gz")
+               for name, n in (("kalshi", args.limit), ("kalshi_weather", 30_000))}
+    problems = [p for p in (check_quality(q, name) for name, q in quality.items()) if p]
+    for p in problems:
+        print(f"Datenqualität: {p}", file=sys.stderr)
+    if problems and not args.allow_data_loss:
+        print("Abbruch. Mit --refresh neu laden oder bewusst mit --allow-data-loss weiter "
+              "(wird im Bericht vermerkt).", file=sys.stderr)
+        return 2
     fc_path = root / "datasets" / "forecasts_kalshi.json"
+    forecasts = None
     if fc_path.exists() and not args.refresh:
         forecasts = ForecastBook.from_json(fc_path.read_text(encoding="utf-8"))
-    else:
+        last_fc = max((d for _, d in forecasts.highs), default="")
+        last_ev = max((str(event_date(m.event_id)) for m, _ in weather if event_date(m.event_id)), default="")
+        if last_fc < last_ev:          # Cache älter als die neuesten Märkte → Testteil ohne Vorhersage
+            print(f"Vorhersage-Cache endet {last_fc}, Märkte bis {last_ev}: neu laden", file=sys.stderr)
+            forecasts = None
+    if forecasts is None:
         forecasts = fetch_forecasts(WEATHER_SERIES, WEATHER_START, date.today() - timedelta(days=1))
         fc_path.parent.mkdir(parents=True, exist_ok=True)
         fc_path.write_text(forecasts.to_json(), encoding="utf-8")
@@ -106,7 +121,9 @@ def _backtest_kalshi(args, cfg) -> int:
     cost = CostModel(half_spread=args.half_spread, fee=fee_model_for("kalshi"))
     summary = run_kalshi_experiment(broad, weather, forecasts, cost=cost, cfg=cfg,
                                     out_dir=ROOT / "results", register_path=ROOT / "results" / "trials.json",
-                                    progress=lambda m: print(m, file=sys.stderr))
+                                    progress=lambda m: print(m, file=sys.stderr),
+                                    data_quality={"datensätze": quality, "probleme": problems,
+                                                  "vorhersagetage": len(forecasts.highs)})
     path = write_backtest_report(summary, ROOT / "results")
     print(f"Bericht: {path}")
     return 0
@@ -152,6 +169,8 @@ def main(argv=None) -> int:
     bt.add_argument("--limit", type=int, default=3000)
     bt.add_argument("--half-spread", type=float, default=0.01)
     bt.add_argument("--refresh", action="store_true")
+    bt.add_argument("--allow-data-loss", action="store_true",
+                    help="trotz > 20 %% verworfener Märkte rechnen (wird im Bericht vermerkt)")
     bt.set_defaults(func=cmd_backtest)
     args = p.parse_args(argv)
     return args.func(args)

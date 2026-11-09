@@ -57,6 +57,7 @@ def test_page_renders_title_and_metrics_with_ledgers(state_root):
 
     at = AppTest.from_file(str(PAGE), default_timeout=30)
     at.run()
+    at.selectbox[0].set_value("polymarket").run()   # Standard ist jetzt "kalshi"
 
     assert not at.exception
     assert at.title[0].value == "Papier-Portfolio"

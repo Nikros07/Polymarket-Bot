@@ -31,6 +31,7 @@ from paperbot.view import MarketInfo, MarketView
 
 HOUR = 3_600
 DAY = 86_400
+MAX_TRADABLE = 0.99      # Kalshi-Höchstpreis; Brief darüber (1,00) = kein Angebot
 
 Dataset = List[Tuple[Market, List[PricePoint]]]
 
@@ -44,8 +45,13 @@ class CostModel:
 
     def cost_per_share(self, side_price: float, category: str = "",
                        quoted: Optional[float] = None) -> float:
-        base = quoted if quoted is not None else side_price + self.half_spread
-        fill = min(self.max_price, base + self.slippage)
+        if quoted is not None:
+            # Echter Briefkurs: NICHT deckeln. Ein Deckel machte aus „kein Angebot“ (1,00)
+            # einen Kauf zu 0,99 (Review 2026-11-03). Nicht kaufbare Fälle filtert
+            # run_strategy; Schlupf darüber hinaus macht den Trade nur teurer.
+            fill = quoted + self.slippage
+            return fill + self.fee.per_share(min(fill, 0.999), category)
+        fill = min(self.max_price, side_price + self.half_spread + self.slippage)
         return fill + self.fee.per_share(fill, category)
 
 
@@ -95,9 +101,13 @@ def decision_times(market: Market, history: Sequence[PricePoint],
 
 
 def run_strategy(dataset: Dataset, strategy: Strategy, grid_hours: int = 24,
-                 start_offset_hours: int = 24, max_spread: Optional[float] = None) -> List[BTTrade]:
-    """max_spread: Zeitpunkte mit bekanntem Spread darüber gelten als nicht handelbar
-    (das Signal verfällt, die Strategie darf beim nächsten Rasterpunkt wieder)."""
+                 start_offset_hours: int = 24, max_spread: Optional[float] = None,
+                 max_quote_periods: Optional[float] = None) -> List[BTTrade]:
+    """Nur bei bekanntem Geld/Brief (Kalshi) gilt ein Zeitpunkt als nicht handelbar, wenn
+    - der Spread über max_spread liegt,
+    - die Seite kein Angebot hat (Briefkurs über MAX_TRADABLE, z. B. 1,00),
+    - der letzte gültige Kurs älter ist als max_quote_periods Kerzenperioden.
+    Das Signal verfällt dann, die Strategie darf beim nächsten Rasterpunkt wieder."""
     if getattr(strategy, "live_only", False):
         raise ValueError(f"{strategy.name} ist nur live prüfbar")
     trades: List[BTTrade] = []
@@ -107,6 +117,7 @@ def run_strategy(dataset: Dataset, strategy: Strategy, grid_hours: int = 24,
         info = MarketInfo.from_market(market)
         ts = [p.t for p in history]
         resolved = market.resolved_ts or trading_end(market, history)
+        period = _period(ts)
         for t in decision_times(market, history, grid_hours, start_offset_hours):
             view = MarketView.from_sorted(info, history, ts, t)
             if view.price() is None:
@@ -116,9 +127,14 @@ def run_strategy(dataset: Dataset, strategy: Strategy, grid_hours: int = 24,
                 continue
             last = view.last_point()
             quoted = last.side_ask(sig.side) if last is not None else None
-            if (max_spread is not None and last is not None and last.spread is not None
-                    and last.spread > max_spread):
-                continue
+            if quoted is not None:
+                if quoted > MAX_TRADABLE + 1e-9:
+                    continue                           # kein Angebot auf dieser Seite
+                if max_spread is not None and last.spread > max_spread:
+                    continue
+                if (max_quote_periods is not None and period
+                        and t - last.t > max_quote_periods * period):
+                    continue                           # Kurs veraltet
             trades.append(BTTrade(
                 strategy=strategy.name, market_id=market.market_id, question=market.question,
                 category=market.category, entry_ts=t, resolved_ts=max(resolved, t),
@@ -127,6 +143,12 @@ def run_strategy(dataset: Dataset, strategy: Strategy, grid_hours: int = 24,
             ))
             break
     return trades
+
+
+def _period(ts: Sequence[int]) -> Optional[int]:
+    """Kerzenperiode eines Marktes = kleinster Abstand zweier Punkte (None bei < 2 Punkten)."""
+    gaps = [b - a for a, b in zip(ts, ts[1:]) if b > a]
+    return min(gaps) if gaps else None
 
 
 def trades_frame(trades: Iterable[BTTrade], cost: CostModel) -> pd.DataFrame:

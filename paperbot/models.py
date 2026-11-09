@@ -82,6 +82,10 @@ class Market:
     strike_type: str = ""            # "between" | "greater" | "less" | ""
     floor_strike: Optional[float] = None
     cap_strike: Optional[float] = None
+    # Aktueller Geld-/Briefkurs für YES (Kalshi live). Damit rechnen Strategien den
+    # Vorteil gegen den echten Kaufpreis statt gegen Mitte + angenommenen Aufschlag.
+    yes_bid: Optional[float] = None
+    yes_ask: Optional[float] = None
     # ── Erst am Marktende bekannt ─────────────────────────────────────────
     closed: bool = False
     outcome: Optional[int] = None    # 1 = YES, 0 = NO, None = offen/annulliert

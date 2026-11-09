@@ -195,6 +195,7 @@ class WeatherStrategy:
     name: str = "weather"
     needs_history: bool = False
     live_only: bool = False
+    warnings: List[str] = field(default_factory=list)   # vom Live-Aufbau, landen im Zyklusbericht
 
     def evaluate(self, view: MarketView) -> Optional[Signal]:
         info = view.info
