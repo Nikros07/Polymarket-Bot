@@ -1,25 +1,34 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1794297097,
+   "ts": 1794340502,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 54,
-   "eligible": 4,
-   "signals": 0,
-   "opened": [],
-   "settled": [],
+   "scanned": 84,
+   "eligible": 23,
+   "signals": 14,
+   "opened": [
+    "random_control:KXHIGHLAX-26NOV10-B86.5:YES@0.060",
+    "random_control:KXHIGHMIA-26NOV10-B84.5:NO@0.051",
+    "random_control:KXHIGHPHIL-26NOV10-B64.5:NO@0.089",
+    "random_control:KXHIGHAUS-26NOV10-B72.5:YES@0.080"
+   ],
+   "settled": [
+    "random_control:KXHIGHAUS-26NOV09-B66.5"
+   ],
    "waiting": [],
    "skipped": {
-    "zu kurz vor Ende": 11,
-    "zu wenig Volumen": 39
+    "nur 4.98 Anteile ≤ 0.98 erreichbar": 7,
+    "nur 4.94 Anteile ≤ 0.98 erreichbar": 2,
+    "Kategorie-Grenze erreicht (climate and weather)": 1,
+    "zu wenig Volumen": 61
    },
    "errors": [],
    "warnings": [
     "weather: kein Wettermodell – erst `backtest --source kalshi` (kauft nichts)"
    ],
    "paused": [],
-   "arb_checked": 4,
+   "arb_checked": 23,
    "arb_found": []
   }
  },
@@ -45,6 +54,10 @@
     [
      1794297097,
      50.0
+    ],
+    [
+     1794340502,
+     50.0
     ]
    ],
    "marks": {
@@ -77,10 +90,29 @@
     "KXHIGHAUS-26NOV09-B68.5": 0.005,
     "KXHIGHDEN-26NOV09-B66.5": 0.005,
     "KXHIGHLAX-26NOV09-B80.5": 0.005,
-    "KXHIGHLAX-26NOV10-B82.5": 0.135,
-    "KXHIGHCHI-26NOV10-T65": 0.485,
-    "KXHIGHLAX-26NOV10-B86.5": 0.315,
-    "KXHIGHNY-26NOV10-T61": 0.22499999999999998
+    "KXHIGHLAX-26NOV10-B82.5": 0.2,
+    "KXHIGHCHI-26NOV10-T65": 0.995,
+    "KXHIGHLAX-26NOV10-B86.5": 0.05,
+    "KXHIGHNY-26NOV10-T61": 0.005,
+    "KXHIGHLAX-26NOV10-B84.5": 0.74,
+    "KXHIGHNY-26NOV10-B63.5": 0.21000000000000002,
+    "KXHIGHCHI-26NOV10-B62.5": 0.005,
+    "KXHIGHLAX-26NOV10-T82": 0.005,
+    "KXHIGHNY-26NOV10-B61.5": 0.815,
+    "KXHIGHMIA-26NOV10-B84.5": 0.975,
+    "KXHIGHLAX-26NOV10-B88.5": 0.005,
+    "KXHIGHMIA-26NOV10-B86.5": 0.03,
+    "KXHIGHCHI-26NOV10-B64.5": 0.005,
+    "KXHIGHCHI-26NOV10-B60.5": 0.005,
+    "KXHIGHAUS-26NOV10-T70": 0.175,
+    "KXHIGHMIA-26NOV10-T87": 0.005,
+    "KXHIGHPHIL-26NOV10-B64.5": 0.9299999999999999,
+    "KXHIGHMIA-26NOV10-B82.5": 0.005,
+    "KXHIGHLAX-26NOV10-T89": 0.005,
+    "KXHIGHAUS-26NOV10-B70.5": 0.755,
+    "KXHIGHPHIL-26NOV10-B66.5": 0.07500000000000001,
+    "KXHIGHAUS-26NOV10-B72.5": 0.07500000000000001,
+    "KXHIGHDEN-26NOV10-T67": 0.025
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -106,6 +138,10 @@
     [
      1794297097,
      50.0
+    ],
+    [
+     1794340502,
+     50.0
     ]
    ],
    "marks": {
@@ -138,10 +174,29 @@
     "KXHIGHAUS-26NOV09-B68.5": 0.005,
     "KXHIGHDEN-26NOV09-B66.5": 0.005,
     "KXHIGHLAX-26NOV09-B80.5": 0.005,
-    "KXHIGHLAX-26NOV10-B82.5": 0.135,
-    "KXHIGHCHI-26NOV10-T65": 0.485,
-    "KXHIGHLAX-26NOV10-B86.5": 0.315,
-    "KXHIGHNY-26NOV10-T61": 0.22499999999999998
+    "KXHIGHLAX-26NOV10-B82.5": 0.2,
+    "KXHIGHCHI-26NOV10-T65": 0.995,
+    "KXHIGHLAX-26NOV10-B86.5": 0.05,
+    "KXHIGHNY-26NOV10-T61": 0.005,
+    "KXHIGHLAX-26NOV10-B84.5": 0.74,
+    "KXHIGHNY-26NOV10-B63.5": 0.21000000000000002,
+    "KXHIGHCHI-26NOV10-B62.5": 0.005,
+    "KXHIGHLAX-26NOV10-T82": 0.005,
+    "KXHIGHNY-26NOV10-B61.5": 0.815,
+    "KXHIGHMIA-26NOV10-B84.5": 0.975,
+    "KXHIGHLAX-26NOV10-B88.5": 0.005,
+    "KXHIGHMIA-26NOV10-B86.5": 0.03,
+    "KXHIGHCHI-26NOV10-B64.5": 0.005,
+    "KXHIGHCHI-26NOV10-B60.5": 0.005,
+    "KXHIGHAUS-26NOV10-T70": 0.175,
+    "KXHIGHMIA-26NOV10-T87": 0.005,
+    "KXHIGHPHIL-26NOV10-B64.5": 0.9299999999999999,
+    "KXHIGHMIA-26NOV10-B82.5": 0.005,
+    "KXHIGHLAX-26NOV10-T89": 0.005,
+    "KXHIGHAUS-26NOV10-B70.5": 0.755,
+    "KXHIGHPHIL-26NOV10-B66.5": 0.07500000000000001,
+    "KXHIGHAUS-26NOV10-B72.5": 0.07500000000000001,
+    "KXHIGHDEN-26NOV10-T67": 0.025
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -149,7 +204,7 @@
   "random_control": {
    "strategy": "random_control",
    "start_bankroll": 50.0,
-   "cash": 46.0089986162691,
+   "cash": 31.890140944766394,
    "positions": [
     {
      "strategy": "random_control",
@@ -162,6 +217,86 @@
      "fee": 0.25,
      "opened_ts": 1794263592,
      "signal_price": 0.02,
+     "signal_prob": null,
+     "reason": "Zufallsseite (Zeitpunkt von favorite)",
+     "closed_ts": 1794340502,
+     "outcome": 0,
+     "payout": 0.0,
+     "extra": {
+      "synthetic_book": false
+     }
+    },
+    {
+     "strategy": "random_control",
+     "market_id": "KXHIGHLAX-26NOV10-B86.5",
+     "question": "Will the maximum temperature be 86-87° on Nov 10, 2026? — 86° to 87°",
+     "category": "climate and weather",
+     "side": "YES",
+     "shares": 57.4,
+     "avg_price": 0.06,
+     "fee": 0.23,
+     "opened_ts": 1794340502,
+     "signal_price": 0.05,
+     "signal_prob": null,
+     "reason": "Zufallsseite (Zeitpunkt von favorite)",
+     "closed_ts": null,
+     "outcome": null,
+     "payout": null,
+     "extra": {
+      "synthetic_book": false
+     }
+    },
+    {
+     "strategy": "random_control",
+     "market_id": "KXHIGHMIA-26NOV10-B84.5",
+     "question": "Will the maximum temperature be 84-85° on Nov 10, 2026? — 84° to 85°",
+     "category": "climate and weather",
+     "side": "NO",
+     "shares": 65.81,
+     "avg_price": 0.051383612806786425,
+     "fee": 0.23,
+     "opened_ts": 1794340502,
+     "signal_price": 0.025000000000000022,
+     "signal_prob": null,
+     "reason": "Zufallsseite (Zeitpunkt von favorite)",
+     "closed_ts": null,
+     "outcome": null,
+     "payout": null,
+     "extra": {
+      "synthetic_book": false
+     }
+    },
+    {
+     "strategy": "random_control",
+     "market_id": "KXHIGHPHIL-26NOV10-B64.5",
+     "question": "Will the maximum temperature be 64-65° on Nov 10, 2026? — 64° to 65°",
+     "category": "climate and weather",
+     "side": "NO",
+     "shares": 36.25,
+     "avg_price": 0.08943729966036126,
+     "fee": 0.21,
+     "opened_ts": 1794340502,
+     "signal_price": 0.07000000000000006,
+     "signal_prob": null,
+     "reason": "Zufallsseite (Zeitpunkt von favorite)",
+     "closed_ts": null,
+     "outcome": null,
+     "payout": null,
+     "extra": {
+      "synthetic_book": false
+     }
+    },
+    {
+     "strategy": "random_control",
+     "market_id": "KXHIGHAUS-26NOV10-B72.5",
+     "question": "Will the maximum temperature be 72-73° on Nov 10, 2026? — 72° to 73°",
+     "category": "climate and weather",
+     "side": "YES",
+     "shares": 39.64,
+     "avg_price": 0.08,
+     "fee": 0.21,
+     "opened_ts": 1794340502,
+     "signal_price": 0.07500000000000001,
      "signal_prob": null,
      "reason": "Zufallsseite (Zeitpunkt von favorite)",
      "closed_ts": null,
@@ -188,6 +323,10 @@
     [
      1794297097,
      46.7651986162691
+    ],
+    [
+     1794340502,
+     41.915890944766396
     ]
    ],
    "marks": {
@@ -215,15 +354,33 @@
     "KXHIGHAUS-26NOV09-B64.5": 0.965,
     "KXHIGHMIA-26NOV09-T88": 0.005,
     "KXHIGHDEN-26NOV09-B68.5": 0.005,
-    "KXHIGHAUS-26NOV09-B66.5": 0.01,
     "KXHIGHMIA-26NOV09-B81.5": 0.005,
     "KXHIGHAUS-26NOV09-B68.5": 0.005,
     "KXHIGHDEN-26NOV09-B66.5": 0.005,
     "KXHIGHLAX-26NOV09-B80.5": 0.005,
-    "KXHIGHLAX-26NOV10-B82.5": 0.135,
-    "KXHIGHCHI-26NOV10-T65": 0.485,
-    "KXHIGHLAX-26NOV10-B86.5": 0.315,
-    "KXHIGHNY-26NOV10-T61": 0.22499999999999998
+    "KXHIGHLAX-26NOV10-B82.5": 0.2,
+    "KXHIGHCHI-26NOV10-T65": 0.995,
+    "KXHIGHLAX-26NOV10-B86.5": 0.05,
+    "KXHIGHNY-26NOV10-T61": 0.005,
+    "KXHIGHLAX-26NOV10-B84.5": 0.74,
+    "KXHIGHNY-26NOV10-B63.5": 0.21000000000000002,
+    "KXHIGHCHI-26NOV10-B62.5": 0.005,
+    "KXHIGHLAX-26NOV10-T82": 0.005,
+    "KXHIGHNY-26NOV10-B61.5": 0.815,
+    "KXHIGHMIA-26NOV10-B84.5": 0.975,
+    "KXHIGHLAX-26NOV10-B88.5": 0.005,
+    "KXHIGHMIA-26NOV10-B86.5": 0.03,
+    "KXHIGHCHI-26NOV10-B64.5": 0.005,
+    "KXHIGHCHI-26NOV10-B60.5": 0.005,
+    "KXHIGHAUS-26NOV10-T70": 0.175,
+    "KXHIGHMIA-26NOV10-T87": 0.005,
+    "KXHIGHPHIL-26NOV10-B64.5": 0.9299999999999999,
+    "KXHIGHMIA-26NOV10-B82.5": 0.005,
+    "KXHIGHLAX-26NOV10-T89": 0.005,
+    "KXHIGHAUS-26NOV10-B70.5": 0.755,
+    "KXHIGHPHIL-26NOV10-B66.5": 0.07500000000000001,
+    "KXHIGHAUS-26NOV10-B72.5": 0.07500000000000001,
+    "KXHIGHDEN-26NOV10-T67": 0.025
    },
    "paused_until": null,
    "kill_reset_ts": null
