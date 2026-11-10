@@ -1,7 +1,7 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1794295947,
+   "ts": 1794297097,
    "source": "kalshi",
    "enabled": true,
    "scanned": 54,
@@ -41,6 +41,10 @@
     [
      1794295947,
      50.0
+    ],
+    [
+     1794297097,
+     50.0
     ]
    ],
    "marks": {
@@ -74,9 +78,9 @@
     "KXHIGHDEN-26NOV09-B66.5": 0.005,
     "KXHIGHLAX-26NOV09-B80.5": 0.005,
     "KXHIGHLAX-26NOV10-B82.5": 0.135,
-    "KXHIGHCHI-26NOV10-T65": 0.475,
-    "KXHIGHLAX-26NOV10-B86.5": 0.295,
-    "KXHIGHNY-26NOV10-T61": 0.265
+    "KXHIGHCHI-26NOV10-T65": 0.485,
+    "KXHIGHLAX-26NOV10-B86.5": 0.315,
+    "KXHIGHNY-26NOV10-T61": 0.22499999999999998
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -98,6 +102,10 @@
     [
      1794295947,
      50.0
+    ],
+    [
+     1794297097,
+     50.0
     ]
    ],
    "marks": {
@@ -131,9 +139,9 @@
     "KXHIGHDEN-26NOV09-B66.5": 0.005,
     "KXHIGHLAX-26NOV09-B80.5": 0.005,
     "KXHIGHLAX-26NOV10-B82.5": 0.135,
-    "KXHIGHCHI-26NOV10-T65": 0.475,
-    "KXHIGHLAX-26NOV10-B86.5": 0.295,
-    "KXHIGHNY-26NOV10-T61": 0.265
+    "KXHIGHCHI-26NOV10-T65": 0.485,
+    "KXHIGHLAX-26NOV10-B86.5": 0.315,
+    "KXHIGHNY-26NOV10-T61": 0.22499999999999998
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -176,6 +184,10 @@
     [
      1794295947,
      46.7651986162691
+    ],
+    [
+     1794297097,
+     46.7651986162691
     ]
    ],
    "marks": {
@@ -209,9 +221,9 @@
     "KXHIGHDEN-26NOV09-B66.5": 0.005,
     "KXHIGHLAX-26NOV09-B80.5": 0.005,
     "KXHIGHLAX-26NOV10-B82.5": 0.135,
-    "KXHIGHCHI-26NOV10-T65": 0.475,
-    "KXHIGHLAX-26NOV10-B86.5": 0.295,
-    "KXHIGHNY-26NOV10-T61": 0.265
+    "KXHIGHCHI-26NOV10-T65": 0.485,
+    "KXHIGHLAX-26NOV10-B86.5": 0.315,
+    "KXHIGHNY-26NOV10-T61": 0.22499999999999998
    },
    "paused_until": null,
    "kill_reset_ts": null
