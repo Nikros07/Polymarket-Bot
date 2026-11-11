@@ -4,3 +4,4 @@
 {"ts": 1794340502, "strategy": "random_control", "event": "open", "market_id": "KXHIGHMIA-26NOV10-B84.5", "side": "NO", "shares": 65.81, "avg_price": 0.051383612806786425, "fee": 0.23, "signal_price": 0.025000000000000022, "signal_prob": null, "reason": "Zufallsseite (Zeitpunkt von favorite)"}
 {"ts": 1794340502, "strategy": "random_control", "event": "open", "market_id": "KXHIGHPHIL-26NOV10-B64.5", "side": "NO", "shares": 36.25, "avg_price": 0.08943729966036126, "fee": 0.21, "signal_price": 0.07000000000000006, "signal_prob": null, "reason": "Zufallsseite (Zeitpunkt von favorite)"}
 {"ts": 1794340502, "strategy": "random_control", "event": "open", "market_id": "KXHIGHAUS-26NOV10-B72.5", "side": "YES", "shares": 39.64, "avg_price": 0.08, "fee": 0.21, "signal_price": 0.07500000000000001, "signal_prob": null, "reason": "Zufallsseite (Zeitpunkt von favorite)"}
+{"ts": 1794379677, "strategy": "random_control", "event": "pause", "until": 1794984477}
