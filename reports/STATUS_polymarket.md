@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-12 07:27 UTC
+Stand: 2026-11-12 07:49 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -13,8 +13,8 @@ Stand: 2026-11-12 07:27 UTC
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 47.98 | -4.0 % | 31.65 | 18.35 | 4 | 0 | – | 4.6 % | – |
-| reversion | 38.97 | -22.1 % | 27.18 | 10.96 | 3 | 3 | 0.0 % | 25.6 % | – |
+| random_control | 48.02 | -4.0 % | 31.65 | 18.35 | 4 | 0 | – | 4.6 % | – |
+| reversion | 38.87 | -22.3 % | 27.18 | 10.96 | 3 | 3 | 0.0 % | 25.6 % | – |
 
 ## Offene Positionen
 
@@ -48,11 +48,11 @@ Stand: 2026-11-12 07:27 UTC
 
 - gescannt: 200
 - handelbar: 54
-- Signale: 35
+- Signale: 32
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Ende zu weit weg (114); Kategorie-Grenze erreicht (unbekannt) (35); zu kurz vor Ende (16); unklare Auflösung (Stichwort) (13); zu wenig Liquidität (3)
+- häufigste Ablehnungsgründe: Ende zu weit weg (113); Kategorie-Grenze erreicht (unbekannt) (32); zu kurz vor Ende (17); unklare Auflösung (Stichwort) (13); zu wenig Liquidität (3)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
