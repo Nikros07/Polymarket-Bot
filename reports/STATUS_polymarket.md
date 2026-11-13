@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-13 07:27 UTC
+Stand: 2026-11-13 19:55 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-13 07:27 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| favorite | 50.50 | +1.0 % | 30.89 | 19.11 | 4 | 0 | – | 0.4 % | – |
-| momentum | 50.16 | +0.3 % | 33.22 | 16.78 | 4 | 0 | – | 2.4 % | – |
+| favorite | 50.46 | +0.9 % | 30.89 | 19.11 | 4 | 0 | – | 0.4 % | – |
+| momentum | 50.17 | +0.3 % | 33.22 | 16.78 | 4 | 0 | – | 2.4 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 48.26 | -3.5 % | 31.65 | 18.35 | 4 | 0 | – | 6.5 % | – |
-| reversion | 35.16 | -29.7 % | 25.01 | 12.91 | 4 | 6 | 16.7 % | 31.2 % | – |
+| random_control | 49.11 | -1.8 % | 31.65 | 18.35 | 4 | 0 | – | 6.5 % | – |
+| reversion | 31.92 | -36.2 % | 25.01 | 10.12 | 3 | 7 | 14.3 % | 36.4 % | bis 2026-11-20 |
 
 ## Offene Positionen
 
@@ -31,7 +31,6 @@ Stand: 2026-11-13 07:27 UTC
 | reversion | Will Bilibili Gaming win Worlds 2026? | NO | 6.31 | 0.626 | 4.00 | 2026-11-09 |
 | reversion | Will Ethereum reach $2,200 November 9-15? | YES | 36.36 | 0.090 | 3.29 | 2026-11-12 |
 | reversion | Will Bitcoin dip to $67,500 in November? | NO | 10.02 | 0.280 | 2.83 | 2026-11-13 |
-| reversion | Will the price of Bitcoin be above $70,000 on November 13? | YES | 10.91 | 0.254 | 2.80 | 2026-11-13 |
 | random_control | Israel x Iran ceasefire continues through November 15? | NO | 66.47 | 0.060 | 4.00 | 2026-11-09 |
 | random_control | Strait of Hormuz traffic returns to normal by November 30? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
 | random_control | US-Iran Final Nuclear Deal by November 30, 2026? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
@@ -41,6 +40,7 @@ Stand: 2026-11-13 07:27 UTC
 
 | Strategie | Markt | Seite | Ergebnis | Gewinn (€) |
 |---|---|---|---|---|
+| reversion | Will the price of Bitcoin be above $70,000 on November 13? | YES | NO | -2.80 |
 | reversion | Will SCU Torreense vs. Sparta Prague end in a draw? | YES | NO | -3.00 |
 | reversion | Will Bitcoin dip to $70,000 in November? | NO | YES | -3.29 |
 | reversion | Will Bitcoin dip to $72,000 November 9-15? | YES | YES | +6.08 |
@@ -51,12 +51,12 @@ Stand: 2026-11-13 07:27 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 66
-- Signale: 71
+- handelbar: 55
+- Signale: 42
 - gekauft: 0 (–)
-- abgerechnet: 0
+- abgerechnet: 1
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Ende zu weit weg (115); Kategorie-Grenze erreicht (unbekannt) (71); unklare Auflösung (Stichwort) (10); zu kurz vor Ende (9)
+- häufigste Ablehnungsgründe: Ende zu weit weg (103); Kategorie-Grenze erreicht (unbekannt) (40); zu kurz vor Ende (33); unklare Auflösung (Stichwort) (9); Preis über Höchstpreis (2)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
