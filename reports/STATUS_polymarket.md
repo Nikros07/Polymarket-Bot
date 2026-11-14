@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-14 22:37 UTC
+Stand: 2026-11-14 22:49 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,12 +8,12 @@ Stand: 2026-11-14 22:37 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 50.68 | +1.4 % | 33.22 | 16.78 | 4 | 0 | – | 2.4 % | – |
-| favorite | 50.61 | +1.2 % | 30.89 | 19.11 | 4 | 0 | – | 0.4 % | – |
+| momentum | 50.66 | +1.3 % | 33.22 | 16.78 | 4 | 0 | – | 2.4 % | – |
+| favorite | 50.59 | +1.2 % | 30.89 | 19.11 | 4 | 0 | – | 0.4 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 47.51 | -5.0 % | 31.65 | 18.35 | 4 | 0 | – | 8.0 % | – |
+| random_control | 47.68 | -4.6 % | 31.65 | 18.35 | 4 | 0 | – | 8.0 % | – |
 | reversion | 29.14 | -41.7 % | 25.01 | 7.28 | 2 | 8 | 12.5 % | 42.0 % | bis 2026-11-20 |
 
 ## Offene Positionen
@@ -51,12 +51,12 @@ Stand: 2026-11-14 22:37 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 80
-- Signale: 54
+- handelbar: 76
+- Signale: 57
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Ende zu weit weg (85); Kategorie-Grenze erreicht (unbekannt) (52); zu kurz vor Ende (27); unklare Auflösung (Stichwort) (8); Spread zu groß (1); Preis über Höchstpreis (1)
+- häufigste Ablehnungsgründe: Ende zu weit weg (85); Kategorie-Grenze erreicht (unbekannt) (53); zu kurz vor Ende (31); unklare Auflösung (Stichwort) (8); Spread zu groß (3); Preis über Höchstpreis (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
