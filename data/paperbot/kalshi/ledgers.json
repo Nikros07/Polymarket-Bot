@@ -1,19 +1,19 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1794638783,
+   "ts": 1794640131,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 66,
+   "scanned": 54,
    "eligible": 4,
    "signals": 1,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "zu kurz vor Ende": 15,
+    "zu kurz vor Ende": 7,
     "nur 4.98 Anteile ≤ 0.98 erreichbar": 1,
-    "zu wenig Volumen": 47
+    "zu wenig Volumen": 43
    },
    "errors": [],
    "warnings": [
@@ -108,6 +108,10 @@
     [
      1794638783,
      50.0
+    ],
+    [
+     1794640131,
+     50.0
     ]
    ],
    "marks": {
@@ -239,9 +243,9 @@
     "KXHIGHAUS-26NOV13-T82": 0.015,
     "KXHIGHDEN-26NOV13-B66.5": 0.05,
     "KXHIGHMIA-26NOV13-B76.5": 0.005,
-    "KXHIGHLAX-26NOV14-B69.5": 0.26,
-    "KXHIGHNY-26NOV14-B48.5": 0.19,
-    "KXHIGHNY-26NOV14-T46": 0.175,
+    "KXHIGHLAX-26NOV14-B69.5": 0.245,
+    "KXHIGHNY-26NOV14-B48.5": 0.16,
+    "KXHIGHNY-26NOV14-T46": 0.26,
     "KXHIGHLAX-26NOV14-T69": 0.025
    },
    "paused_until": null,
@@ -328,6 +332,10 @@
     [
      1794638783,
      50.0
+    ],
+    [
+     1794640131,
+     50.0
     ]
    ],
    "marks": {
@@ -459,9 +467,9 @@
     "KXHIGHAUS-26NOV13-T82": 0.015,
     "KXHIGHDEN-26NOV13-B66.5": 0.05,
     "KXHIGHMIA-26NOV13-B76.5": 0.005,
-    "KXHIGHLAX-26NOV14-B69.5": 0.26,
-    "KXHIGHNY-26NOV14-B48.5": 0.19,
-    "KXHIGHNY-26NOV14-T46": 0.175,
+    "KXHIGHLAX-26NOV14-B69.5": 0.245,
+    "KXHIGHNY-26NOV14-B48.5": 0.16,
+    "KXHIGHNY-26NOV14-T46": 0.26,
     "KXHIGHLAX-26NOV14-T69": 0.025
    },
    "paused_until": null,
@@ -649,6 +657,10 @@
     [
      1794638783,
      31.890140944766394
+    ],
+    [
+     1794640131,
+     31.890140944766394
     ]
    ],
    "marks": {
@@ -775,9 +787,9 @@
     "KXHIGHAUS-26NOV13-T82": 0.015,
     "KXHIGHDEN-26NOV13-B66.5": 0.05,
     "KXHIGHMIA-26NOV13-B76.5": 0.005,
-    "KXHIGHLAX-26NOV14-B69.5": 0.26,
-    "KXHIGHNY-26NOV14-B48.5": 0.19,
-    "KXHIGHNY-26NOV14-T46": 0.175,
+    "KXHIGHLAX-26NOV14-B69.5": 0.245,
+    "KXHIGHNY-26NOV14-B48.5": 0.16,
+    "KXHIGHNY-26NOV14-T46": 0.26,
     "KXHIGHLAX-26NOV14-T69": 0.025
    },
    "paused_until": 1794984477,
