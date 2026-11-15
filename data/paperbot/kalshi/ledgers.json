@@ -1,19 +1,19 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1794725540,
+   "ts": 1794727193,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 66,
+   "scanned": 54,
    "eligible": 1,
    "signals": 1,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "zu kurz vor Ende": 15,
-    "nur 4.98 Anteile ≤ 0.98 erreichbar": 1,
-    "zu wenig Volumen": 50
+    "zu kurz vor Ende": 8,
+    "nur 4.97 Anteile ≤ 0.98 erreichbar": 1,
+    "zu wenig Volumen": 45
    },
    "errors": [],
    "warnings": [
@@ -132,6 +132,10 @@
     [
      1794725540,
      50.0
+    ],
+    [
+     1794727193,
+     50.0
     ]
    ],
    "marks": {
@@ -289,7 +293,7 @@
     "KXHIGHDEN-26NOV14-B54.5": 0.02,
     "KXHIGHAUS-26NOV14-B71.5": 0.005,
     "KXHIGHDEN-26NOV14-B50.5": 0.005,
-    "KXHIGHLAX-26NOV15-B69.5": 0.065
+    "KXHIGHLAX-26NOV15-B69.5": 0.045
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -399,6 +403,10 @@
     [
      1794725540,
      50.0
+    ],
+    [
+     1794727193,
+     50.0
     ]
    ],
    "marks": {
@@ -556,7 +564,7 @@
     "KXHIGHDEN-26NOV14-B54.5": 0.02,
     "KXHIGHAUS-26NOV14-B71.5": 0.005,
     "KXHIGHDEN-26NOV14-B50.5": 0.005,
-    "KXHIGHLAX-26NOV15-B69.5": 0.065
+    "KXHIGHLAX-26NOV15-B69.5": 0.045
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -767,6 +775,10 @@
     [
      1794725540,
      31.890140944766394
+    ],
+    [
+     1794727193,
+     31.890140944766394
     ]
    ],
    "marks": {
@@ -919,7 +931,7 @@
     "KXHIGHDEN-26NOV14-B54.5": 0.02,
     "KXHIGHAUS-26NOV14-B71.5": 0.005,
     "KXHIGHDEN-26NOV14-B50.5": 0.005,
-    "KXHIGHLAX-26NOV15-B69.5": 0.065
+    "KXHIGHLAX-26NOV15-B69.5": 0.045
    },
    "paused_until": 1794984477,
    "kill_reset_ts": null
