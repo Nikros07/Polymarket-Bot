@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-15 19:00 UTC
+Stand: 2026-11-15 19:12 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,7 +8,7 @@ Stand: 2026-11-15 19:00 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 54.25 | +8.5 % | 34.69 | 21.85 | 5 | 1 | 100.0 % | 4.3 % | – |
+| momentum | 53.99 | +8.0 % | 34.69 | 21.85 | 5 | 1 | 100.0 % | 4.8 % | – |
 | favorite | 50.66 | +1.3 % | 30.89 | 19.11 | 4 | 0 | – | 0.4 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
@@ -53,12 +53,12 @@ Stand: 2026-11-15 19:00 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 77
-- Signale: 61
+- handelbar: 76
+- Signale: 60
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Ende zu weit weg (81); Kategorie-Grenze erreicht (unbekannt) (60); zu kurz vor Ende (32); unklare Auflösung (Stichwort) (9); Preis über Höchstpreis (1); zu wenig Liquidität (1)
+- häufigste Ablehnungsgründe: Ende zu weit weg (82); Kategorie-Grenze erreicht (unbekannt) (58); zu kurz vor Ende (32); unklare Auflösung (Stichwort) (9); Preis über Höchstpreis (2); zu wenig Liquidität (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
