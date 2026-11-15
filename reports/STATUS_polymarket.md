@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-15 07:19 UTC
+Stand: 2026-11-15 19:00 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-15 07:19 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 56.71 | +13.4 % | 34.69 | 21.85 | 5 | 1 | 100.0 % | 2.4 % | – |
-| favorite | 50.64 | +1.3 % | 30.89 | 19.11 | 4 | 0 | – | 0.4 % | – |
+| momentum | 54.25 | +8.5 % | 34.69 | 21.85 | 5 | 1 | 100.0 % | 4.3 % | – |
+| favorite | 50.66 | +1.3 % | 30.89 | 19.11 | 4 | 0 | – | 0.4 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 47.15 | -5.7 % | 31.65 | 18.35 | 4 | 0 | – | 8.6 % | – |
-| reversion | 25.19 | -49.6 % | 25.01 | 3.29 | 1 | 9 | 11.1 % | 49.8 % | bis 2026-11-20 |
+| random_control | 46.92 | -6.2 % | 31.65 | 18.35 | 4 | 0 | – | 9.1 % | – |
+| reversion | 25.06 | -49.9 % | 25.01 | 3.29 | 1 | 9 | 11.1 % | 50.1 % | bis 2026-11-20 |
 
 ## Offene Positionen
 
@@ -53,12 +53,12 @@ Stand: 2026-11-15 07:19 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 84
-- Signale: 73
+- handelbar: 77
+- Signale: 61
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Ende zu weit weg (87); Kategorie-Grenze erreicht (unbekannt) (69); zu kurz vor Ende (19); unklare Auflösung (Stichwort) (9); Preis über Höchstpreis (2); Spread zu groß (2); zu wenig Liquidität (1)
+- häufigste Ablehnungsgründe: Ende zu weit weg (81); Kategorie-Grenze erreicht (unbekannt) (60); zu kurz vor Ende (32); unklare Auflösung (Stichwort) (9); Preis über Höchstpreis (1); zu wenig Liquidität (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
