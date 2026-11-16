@@ -1,19 +1,19 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1794811843,
+   "ts": 1794813872,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 66,
+   "scanned": 54,
    "eligible": 2,
    "signals": 1,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "zu kurz vor Ende": 15,
+    "zu kurz vor Ende": 9,
     "nur 4.98 Anteile ≤ 0.98 erreichbar": 1,
-    "zu wenig Volumen": 49
+    "zu wenig Volumen": 43
    },
    "errors": [],
    "warnings": [
@@ -147,6 +147,10 @@
     ],
     [
      1794811843,
+     50.0
+    ],
+    [
+     1794813872,
      50.0
     ]
    ],
@@ -450,6 +454,10 @@
     ],
     [
      1794811843,
+     50.0
+    ],
+    [
+     1794813872,
      50.0
     ]
    ],
@@ -854,6 +862,10 @@
     ],
     [
      1794811843,
+     31.890140944766394
+    ],
+    [
+     1794813872,
      31.890140944766394
     ]
    ],
