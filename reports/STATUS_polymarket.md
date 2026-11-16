@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-15 19:12 UTC
+Stand: 2026-11-16 06:50 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-15 19:12 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 53.99 | +8.0 % | 34.69 | 21.85 | 5 | 1 | 100.0 % | 4.8 % | – |
-| favorite | 50.66 | +1.3 % | 30.89 | 19.11 | 4 | 0 | – | 0.4 % | – |
+| momentum | 52.02 | +4.0 % | 34.69 | 17.30 | 4 | 2 | 50.0 % | 8.3 % | – |
+| favorite | 50.68 | +1.4 % | 30.89 | 19.11 | 4 | 0 | – | 0.4 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 46.92 | -6.2 % | 31.65 | 18.35 | 4 | 0 | – | 9.1 % | – |
-| reversion | 25.06 | -49.9 % | 25.01 | 3.29 | 1 | 9 | 11.1 % | 50.1 % | bis 2026-11-20 |
+| random_control | 46.69 | -6.6 % | 31.65 | 18.35 | 4 | 0 | – | 9.5 % | – |
+| reversion | 25.01 | -50.0 % | 25.01 | 0.00 | 0 | 10 | 10.0 % | 50.2 % | bis 2026-11-20 |
 
 ## Offene Positionen
 
@@ -27,9 +27,7 @@ Stand: 2026-11-15 19:12 UTC
 | momentum | Israel x Iran ceasefire continues through November 15? | YES | 5.00 | 0.950 | 4.76 | 2026-11-09 |
 | momentum | Israel x Iran ceasefire continues through November 30? | YES | 5.00 | 0.800 | 4.03 | 2026-11-09 |
 | momentum | Israel x Iran ceasefire continues through December 15? | YES | 5.48 | 0.720 | 3.99 | 2026-11-09 |
-| momentum | Will Bitcoin dip to $62,000 November 9-15? | YES | 16.46 | 0.274 | 4.55 | 2026-11-15 |
 | momentum | Will Bitcoin dip to $60,000 in November? | YES | 9.51 | 0.470 | 4.53 | 2026-11-15 |
-| reversion | Will Ethereum reach $2,200 November 9-15? | YES | 36.36 | 0.090 | 3.29 | 2026-11-12 |
 | random_control | Israel x Iran ceasefire continues through November 15? | NO | 66.47 | 0.060 | 4.00 | 2026-11-09 |
 | random_control | Strait of Hormuz traffic returns to normal by November 30? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
 | random_control | US-Iran Final Nuclear Deal by November 30, 2026? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
@@ -39,6 +37,8 @@ Stand: 2026-11-15 19:12 UTC
 
 | Strategie | Markt | Seite | Ergebnis | Gewinn (€) |
 |---|---|---|---|---|
+| momentum | Will Bitcoin dip to $62,000 November 9-15? | YES | NO | -4.55 |
+| reversion | Will Ethereum reach $2,200 November 9-15? | YES | NO | -3.29 |
 | momentum | Will Bilibili Gaming win Worlds 2026? | YES | YES | +6.54 |
 | reversion | Will Bilibili Gaming win Worlds 2026? | NO | YES | -4.00 |
 | reversion | Will Bitcoin dip to $67,500 in November? | NO | YES | -2.83 |
@@ -53,12 +53,12 @@ Stand: 2026-11-15 19:12 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 76
-- Signale: 60
+- handelbar: 53
+- Signale: 50
 - gekauft: 0 (–)
-- abgerechnet: 0
+- abgerechnet: 2
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Ende zu weit weg (82); Kategorie-Grenze erreicht (unbekannt) (58); zu kurz vor Ende (32); unklare Auflösung (Stichwort) (9); Preis über Höchstpreis (2); zu wenig Liquidität (1)
+- häufigste Ablehnungsgründe: Ende zu weit weg (108); Kategorie-Grenze erreicht (unbekannt) (49); zu kurz vor Ende (21); unklare Auflösung (Stichwort) (18); Preis über Höchstpreis (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
