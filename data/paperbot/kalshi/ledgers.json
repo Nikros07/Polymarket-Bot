@@ -1,7 +1,7 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1794867730,
+   "ts": 1794868642,
    "source": "kalshi",
    "enabled": true,
    "scanned": 84,
@@ -154,6 +154,10 @@
     [
      1794867730,
      50.0
+    ],
+    [
+     1794868642,
+     50.0
     ]
    ],
    "marks": {
@@ -344,7 +348,7 @@
     "KXHIGHLAX-26NOV16-B74.5": 0.005,
     "KXHIGHNY-26NOV16-T52": 0.005,
     "KXHIGHAUS-26NOV16-T57": 0.995,
-    "KXHIGHDEN-26NOV16-B64.5": 0.985,
+    "KXHIGHDEN-26NOV16-B64.5": 0.995,
     "KXHIGHCHI-26NOV16-B53.5": 0.995,
     "KXHIGHDEN-26NOV16-B62.5": 0.005,
     "KXHIGHCHI-26NOV16-B51.5": 0.005,
@@ -491,6 +495,10 @@
     [
      1794867730,
      50.0
+    ],
+    [
+     1794868642,
+     50.0
     ]
    ],
    "marks": {
@@ -681,7 +689,7 @@
     "KXHIGHLAX-26NOV16-B74.5": 0.005,
     "KXHIGHNY-26NOV16-T52": 0.005,
     "KXHIGHAUS-26NOV16-T57": 0.995,
-    "KXHIGHDEN-26NOV16-B64.5": 0.985,
+    "KXHIGHDEN-26NOV16-B64.5": 0.995,
     "KXHIGHCHI-26NOV16-B53.5": 0.995,
     "KXHIGHDEN-26NOV16-B62.5": 0.005,
     "KXHIGHCHI-26NOV16-B51.5": 0.005,
@@ -929,6 +937,10 @@
     [
      1794867730,
      31.890140944766394
+    ],
+    [
+     1794868642,
+     31.890140944766394
     ]
    ],
    "marks": {
@@ -1114,7 +1126,7 @@
     "KXHIGHLAX-26NOV16-B74.5": 0.005,
     "KXHIGHNY-26NOV16-T52": 0.005,
     "KXHIGHAUS-26NOV16-T57": 0.995,
-    "KXHIGHDEN-26NOV16-B64.5": 0.985,
+    "KXHIGHDEN-26NOV16-B64.5": 0.995,
     "KXHIGHCHI-26NOV16-B53.5": 0.995,
     "KXHIGHDEN-26NOV16-B62.5": 0.005,
     "KXHIGHCHI-26NOV16-B51.5": 0.005,
