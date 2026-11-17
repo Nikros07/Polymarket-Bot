@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-17 08:11 UTC
+Stand: 2026-11-17 08:37 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -53,12 +53,12 @@ Stand: 2026-11-17 08:11 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 95
-- Signale: 70
+- handelbar: 97
+- Signale: 76
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Ende zu weit weg (75); Kategorie-Grenze erreicht (unbekannt) (67); zu kurz vor Ende (16); unklare Auflösung (Stichwort) (14); Preis über Höchstpreis (2); Spread zu groß (1)
+- häufigste Ablehnungsgründe: Ende zu weit weg (74); Kategorie-Grenze erreicht (unbekannt) (74); zu kurz vor Ende (15); unklare Auflösung (Stichwort) (14); Spread zu groß (1); Preis über Höchstpreis (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
