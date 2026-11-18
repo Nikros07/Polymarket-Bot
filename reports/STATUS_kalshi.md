@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (kalshi)
 
-Stand: 2026-11-18 20:45 UTC
+Stand: 2026-11-18 20:59 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -14,7 +14,7 @@ Stand: 2026-11-18 20:45 UTC
 | momentum | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | reversion | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 29.11 | -41.8 % | 22.00 | 9.89 | 4 | 5 | 0.0 % | 39.7 % | – |
+| random_control | 36.63 | -26.7 % | 19.02 | 12.87 | 5 | 5 | 0.0 % | 39.7 % | – |
 
 ## Offene Positionen
 
@@ -24,6 +24,7 @@ Stand: 2026-11-18 20:45 UTC
 | random_control | Will the maximum temperature be 68-69° on Nov 18, 2026? — 68° to 69° | NO | 30.98 | 0.075 | 2.49 | 2026-11-18 |
 | random_control | Will the maximum temperature be 70-71° on Nov 18, 2026? — 70° to 71° | YES | 19.51 | 0.118 | 2.45 | 2026-11-18 |
 | random_control | Will the maximum temperature be 66-67° on Nov 18, 2026? — 66° to 67° | NO | 40.67 | 0.055 | 2.40 | 2026-11-18 |
+| random_control | Will the maximum temperature be 58-59° on Nov 18, 2026? — 58° to 59° | NO | 86.90 | 0.032 | 2.99 | 2026-11-18 |
 
 ## Zuletzt aufgelöst
 
@@ -39,11 +40,11 @@ Stand: 2026-11-18 20:45 UTC
 
 - gescannt: 84
 - handelbar: 26
-- Signale: 8
-- gekauft: 4 (random_control:KXHIGHLAX-26NOV18-B70.5:YES@0.079, random_control:KXHIGHLAX-26NOV18-B68.5:NO@0.075, random_control:KXHIGHAUS-26NOV18-B70.5:YES@0.118, random_control:KXHIGHPHIL-26NOV18-B66.5:NO@0.055)
+- Signale: 4
+- gekauft: 1 (random_control:KXHIGHDEN-26NOV18-B58.5:NO@0.032)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: zu wenig Volumen (58); nur 4.98 Anteile ≤ 0.98 erreichbar (4)
+- häufigste Ablehnungsgründe: zu wenig Volumen (58); nur 4.98 Anteile ≤ 0.98 erreichbar (1); Preis über Höchstpreis (1); Kategorie-Grenze erreicht (climate and weather) (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
