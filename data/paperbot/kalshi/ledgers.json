@@ -1,18 +1,18 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1794987960,
+   "ts": 1794988950,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 54,
+   "scanned": 48,
    "eligible": 1,
    "signals": 0,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "zu kurz vor Ende": 9,
-    "zu wenig Volumen": 44
+    "zu kurz vor Ende": 5,
+    "zu wenig Volumen": 42
    },
    "errors": [],
    "warnings": [
@@ -176,6 +176,10 @@
     ],
     [
      1794987960,
+     50.0
+    ],
+    [
+     1794988950,
      50.0
     ]
    ],
@@ -565,6 +569,10 @@
     ],
     [
      1794987960,
+     50.0
+    ],
+    [
+     1794988950,
      50.0
     ]
    ],
@@ -1055,6 +1063,10 @@
     ],
     [
      1794987960,
+     31.890140944766394
+    ],
+    [
+     1794988950,
      31.890140944766394
     ]
    ],
