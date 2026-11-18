@@ -1,25 +1,30 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1794988950,
+   "ts": 1795034716,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 48,
-   "eligible": 1,
-   "signals": 0,
-   "opened": [],
+   "scanned": 84,
+   "eligible": 26,
+   "signals": 8,
+   "opened": [
+    "random_control:KXHIGHLAX-26NOV18-B70.5:YES@0.079",
+    "random_control:KXHIGHLAX-26NOV18-B68.5:NO@0.075",
+    "random_control:KXHIGHAUS-26NOV18-B70.5:YES@0.118",
+    "random_control:KXHIGHPHIL-26NOV18-B66.5:NO@0.055"
+   ],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "zu kurz vor Ende": 5,
-    "zu wenig Volumen": 42
+    "nur 4.98 Anteile ≤ 0.98 erreichbar": 4,
+    "zu wenig Volumen": 58
    },
    "errors": [],
    "warnings": [
     "weather: kein Wettermodell – erst `backtest --source kalshi` (kauft nichts)"
    ],
    "paused": [],
-   "arb_checked": 1,
+   "arb_checked": 26,
    "arb_found": []
   }
  },
@@ -181,6 +186,10 @@
     [
      1794988950,
      50.0
+    ],
+    [
+     1795034716,
+     50.0
     ]
    ],
    "marks": {
@@ -412,7 +421,32 @@
     "KXHIGHDEN-26NOV17-B64.5": 0.235,
     "KXHIGHDEN-26NOV17-B62.5": 0.775,
     "KXHIGHDEN-26NOV17-B66.5": 0.02,
-    "KXHIGHMIA-26NOV18-T78": 0.005
+    "KXHIGHMIA-26NOV18-T78": 0.005,
+    "KXHIGHNY-26NOV18-T65": 0.005,
+    "KXHIGHNY-26NOV18-B62.5": 0.005,
+    "KXHIGHNY-26NOV18-B64.5": 0.995,
+    "KXHIGHLAX-26NOV18-B66.5": 0.005,
+    "KXHIGHNY-26NOV18-B60.5": 0.005,
+    "KXHIGHLAX-26NOV18-B70.5": 0.060000000000000005,
+    "KXHIGHCHI-26NOV18-B60.5": 0.005,
+    "KXHIGHLAX-26NOV18-B68.5": 0.935,
+    "KXHIGHMIA-26NOV18-B78.5": 0.995,
+    "KXHIGHCHI-26NOV18-B62.5": 0.995,
+    "KXHIGHAUS-26NOV18-B72.5": 0.895,
+    "KXHIGHPHIL-26NOV18-B64.5": 0.005,
+    "KXHIGHLAX-26NOV18-T71": 0.005,
+    "KXHIGHCHI-26NOV18-B58.5": 0.005,
+    "KXHIGHMIA-26NOV18-B80.5": 0.005,
+    "KXHIGHAUS-26NOV18-B70.5": 0.095,
+    "KXHIGHDEN-26NOV18-B58.5": 0.6799999999999999,
+    "KXHIGHCHI-26NOV18-T58": 0.005,
+    "KXHIGHPHIL-26NOV18-B66.5": 0.965,
+    "KXHIGHAUS-26NOV18-B68.5": 0.005,
+    "KXHIGHCHI-26NOV18-B64.5": 0.005,
+    "KXHIGHLAX-26NOV18-B64.5": 0.005,
+    "KXHIGHAUS-26NOV18-T73": 0.015,
+    "KXHIGHDEN-26NOV18-B54.5": 0.005,
+    "KXHIGHDEN-26NOV18-B56.5": 0.255
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -574,6 +608,10 @@
     [
      1794988950,
      50.0
+    ],
+    [
+     1795034716,
+     50.0
     ]
    ],
    "marks": {
@@ -805,7 +843,32 @@
     "KXHIGHDEN-26NOV17-B64.5": 0.235,
     "KXHIGHDEN-26NOV17-B62.5": 0.775,
     "KXHIGHDEN-26NOV17-B66.5": 0.02,
-    "KXHIGHMIA-26NOV18-T78": 0.005
+    "KXHIGHMIA-26NOV18-T78": 0.005,
+    "KXHIGHNY-26NOV18-T65": 0.005,
+    "KXHIGHNY-26NOV18-B62.5": 0.005,
+    "KXHIGHNY-26NOV18-B64.5": 0.995,
+    "KXHIGHLAX-26NOV18-B66.5": 0.005,
+    "KXHIGHNY-26NOV18-B60.5": 0.005,
+    "KXHIGHLAX-26NOV18-B70.5": 0.060000000000000005,
+    "KXHIGHCHI-26NOV18-B60.5": 0.005,
+    "KXHIGHLAX-26NOV18-B68.5": 0.935,
+    "KXHIGHMIA-26NOV18-B78.5": 0.995,
+    "KXHIGHCHI-26NOV18-B62.5": 0.995,
+    "KXHIGHAUS-26NOV18-B72.5": 0.895,
+    "KXHIGHPHIL-26NOV18-B64.5": 0.005,
+    "KXHIGHLAX-26NOV18-T71": 0.005,
+    "KXHIGHCHI-26NOV18-B58.5": 0.005,
+    "KXHIGHMIA-26NOV18-B80.5": 0.005,
+    "KXHIGHAUS-26NOV18-B70.5": 0.095,
+    "KXHIGHDEN-26NOV18-B58.5": 0.6799999999999999,
+    "KXHIGHCHI-26NOV18-T58": 0.005,
+    "KXHIGHPHIL-26NOV18-B66.5": 0.965,
+    "KXHIGHAUS-26NOV18-B68.5": 0.005,
+    "KXHIGHCHI-26NOV18-B64.5": 0.005,
+    "KXHIGHLAX-26NOV18-B64.5": 0.005,
+    "KXHIGHAUS-26NOV18-T73": 0.015,
+    "KXHIGHDEN-26NOV18-B54.5": 0.005,
+    "KXHIGHDEN-26NOV18-B56.5": 0.255
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -813,7 +876,7 @@
   "random_control": {
    "strategy": "random_control",
    "start_bankroll": 50.0,
-   "cash": 31.890140944766394,
+   "cash": 22.00364590850647,
    "positions": [
     {
      "strategy": "random_control",
@@ -911,6 +974,86 @@
      "closed_ts": 1794426346,
      "outcome": 0,
      "payout": 0.0,
+     "extra": {
+      "synthetic_book": false
+     }
+    },
+    {
+     "strategy": "random_control",
+     "market_id": "KXHIGHLAX-26NOV18-B70.5",
+     "question": "Will the maximum temperature be 70-71° on Nov 18, 2026? — 70° to 71°",
+     "category": "climate and weather",
+     "side": "YES",
+     "shares": 30.21,
+     "avg_price": 0.0790071652943132,
+     "fee": 0.16,
+     "opened_ts": 1795034716,
+     "signal_price": 0.060000000000000005,
+     "signal_prob": null,
+     "reason": "Zufallsseite (Zeitpunkt von favorite)",
+     "closed_ts": null,
+     "outcome": null,
+     "payout": null,
+     "extra": {
+      "synthetic_book": false
+     }
+    },
+    {
+     "strategy": "random_control",
+     "market_id": "KXHIGHLAX-26NOV18-B68.5",
+     "question": "Will the maximum temperature be 68-69° on Nov 18, 2026? — 68° to 69°",
+     "category": "climate and weather",
+     "side": "NO",
+     "shares": 30.98,
+     "avg_price": 0.07523716692580651,
+     "fee": 0.16,
+     "opened_ts": 1795034716,
+     "signal_price": 0.06499999999999995,
+     "signal_prob": null,
+     "reason": "Zufallsseite (Zeitpunkt von favorite)",
+     "closed_ts": null,
+     "outcome": null,
+     "payout": null,
+     "extra": {
+      "synthetic_book": false
+     }
+    },
+    {
+     "strategy": "random_control",
+     "market_id": "KXHIGHAUS-26NOV18-B70.5",
+     "question": "Will the maximum temperature be 70-71° on Nov 18, 2026? — 70° to 71°",
+     "category": "climate and weather",
+     "side": "YES",
+     "shares": 19.51,
+     "avg_price": 0.1179506277506286,
+     "fee": 0.15,
+     "opened_ts": 1795034716,
+     "signal_price": 0.095,
+     "signal_prob": null,
+     "reason": "Zufallsseite (Zeitpunkt von favorite)",
+     "closed_ts": null,
+     "outcome": null,
+     "payout": null,
+     "extra": {
+      "synthetic_book": false
+     }
+    },
+    {
+     "strategy": "random_control",
+     "market_id": "KXHIGHPHIL-26NOV18-B66.5",
+     "question": "Will the maximum temperature be 66-67° on Nov 18, 2026? — 66° to 67°",
+     "category": "climate and weather",
+     "side": "NO",
+     "shares": 40.67,
+     "avg_price": 0.05526492239838873,
+     "fee": 0.15,
+     "opened_ts": 1795034716,
+     "signal_price": 0.03500000000000003,
+     "signal_prob": null,
+     "reason": "Zufallsseite (Zeitpunkt von favorite)",
+     "closed_ts": null,
+     "outcome": null,
+     "payout": null,
      "extra": {
       "synthetic_book": false
      }
@@ -1068,6 +1211,10 @@
     [
      1794988950,
      31.890140944766394
+    ],
+    [
+     1795034716,
+     29.106845908506468
     ]
    ],
    "marks": {
@@ -1294,7 +1441,32 @@
     "KXHIGHDEN-26NOV17-B64.5": 0.235,
     "KXHIGHDEN-26NOV17-B62.5": 0.775,
     "KXHIGHDEN-26NOV17-B66.5": 0.02,
-    "KXHIGHMIA-26NOV18-T78": 0.005
+    "KXHIGHMIA-26NOV18-T78": 0.005,
+    "KXHIGHNY-26NOV18-T65": 0.005,
+    "KXHIGHNY-26NOV18-B62.5": 0.005,
+    "KXHIGHNY-26NOV18-B64.5": 0.995,
+    "KXHIGHLAX-26NOV18-B66.5": 0.005,
+    "KXHIGHNY-26NOV18-B60.5": 0.005,
+    "KXHIGHLAX-26NOV18-B70.5": 0.060000000000000005,
+    "KXHIGHCHI-26NOV18-B60.5": 0.005,
+    "KXHIGHLAX-26NOV18-B68.5": 0.935,
+    "KXHIGHMIA-26NOV18-B78.5": 0.995,
+    "KXHIGHCHI-26NOV18-B62.5": 0.995,
+    "KXHIGHAUS-26NOV18-B72.5": 0.895,
+    "KXHIGHPHIL-26NOV18-B64.5": 0.005,
+    "KXHIGHLAX-26NOV18-T71": 0.005,
+    "KXHIGHCHI-26NOV18-B58.5": 0.005,
+    "KXHIGHMIA-26NOV18-B80.5": 0.005,
+    "KXHIGHAUS-26NOV18-B70.5": 0.095,
+    "KXHIGHDEN-26NOV18-B58.5": 0.6799999999999999,
+    "KXHIGHCHI-26NOV18-T58": 0.005,
+    "KXHIGHPHIL-26NOV18-B66.5": 0.965,
+    "KXHIGHAUS-26NOV18-B68.5": 0.005,
+    "KXHIGHCHI-26NOV18-B64.5": 0.005,
+    "KXHIGHLAX-26NOV18-B64.5": 0.005,
+    "KXHIGHAUS-26NOV18-T73": 0.015,
+    "KXHIGHDEN-26NOV18-B54.5": 0.005,
+    "KXHIGHDEN-26NOV18-B56.5": 0.255
    },
    "paused_until": null,
    "kill_reset_ts": 1794987960

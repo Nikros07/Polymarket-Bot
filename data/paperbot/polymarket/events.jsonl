@@ -35,3 +35,10 @@
 {"ts": 1794725385, "strategy": "reversion", "event": "settle", "market_id": "4397033", "outcome": 1, "payout": 0.0, "pnl": -3.9963001923719994}
 {"ts": 1794811730, "strategy": "momentum", "event": "settle", "market_id": "6891215", "outcome": 0, "payout": 0.0, "pnl": -4.549818272699827}
 {"ts": 1794811730, "strategy": "reversion", "event": "settle", "market_id": "6891261", "outcome": 0, "payout": 0.0, "pnl": -3.2858004779999996}
+{"ts": 1795034544, "strategy": "favorite", "event": "settle", "market_id": "5339986", "outcome": 1, "payout": 5.0, "pnl": 0.2387187500000003}
+{"ts": 1795034544, "strategy": "favorite", "event": "open", "market_id": "3215007", "side": "NO", "shares": 5.0, "avg_price": 0.9789999999999999, "fee": 0.005031815250000071, "signal_price": 0.979, "signal_prob": null, "reason": "Favorit NO zu 0.979"}
+{"ts": 1795034544, "strategy": "momentum", "event": "settle", "market_id": "5339986", "outcome": 1, "payout": 5.0, "pnl": 0.2387187500000003}
+{"ts": 1795034544, "strategy": "momentum", "event": "open", "market_id": "6998285", "side": "NO", "shares": 5.0, "avg_price": 0.923, "fee": 0.016399633249999934, "signal_price": 0.921, "signal_prob": null, "reason": "Momentum -0.12 in 3 Tagen"}
+{"ts": 1795034544, "strategy": "momentum", "event": "open", "market_id": "3013350", "side": "YES", "shares": 5.9, "avg_price": 0.7199999999999999, "fee": 0.04281983999999985, "signal_price": 0.715, "signal_prob": null, "reason": "Momentum +0.12 in 3 Tagen"}
+{"ts": 1795034544, "strategy": "random_control", "event": "settle", "market_id": "5339986", "outcome": 1, "payout": 0.0, "pnl": -3.9994467240000002}
+{"ts": 1795034544, "strategy": "random_control", "event": "open", "market_id": "3215007", "side": "YES", "shares": 169.13, "avg_price": 0.022, "fee": 0.0040029011879998515, "signal_price": 0.021, "signal_prob": null, "reason": "Zufallsseite (Zeitpunkt von favorite)"}
