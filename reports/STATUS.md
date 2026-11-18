@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (kalshi)
 
-Stand: 2026-11-17 21:27 UTC
+Stand: 2026-11-18 07:46 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -14,7 +14,7 @@ Stand: 2026-11-17 21:27 UTC
 | momentum | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | reversion | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 31.89 | -36.2 % | 31.89 | 0.00 | 0 | 5 | 0.0 % | 33.9 % | bis 2026-11-18 |
+| random_control | 31.89 | -36.2 % | 31.89 | 0.00 | 0 | 5 | 0.0 % | 33.9 % | – |
 
 ## Offene Positionen
 
@@ -32,13 +32,13 @@ Keine offenen Positionen.
 
 ## Letzter Zyklus
 
-- gescannt: 84
-- handelbar: 27
-- Signale: 3
+- gescannt: 54
+- handelbar: 1
+- Signale: 0
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: zu wenig Volumen (57); nur 4.98 Anteile ≤ 0.98 erreichbar (2); Preis über Höchstpreis (1)
+- häufigste Ablehnungsgründe: zu wenig Volumen (44); zu kurz vor Ende (9)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
