@@ -1,28 +1,25 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1794950843,
+   "ts": 1794987960,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 84,
-   "eligible": 27,
-   "signals": 3,
+   "scanned": 54,
+   "eligible": 1,
+   "signals": 0,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "nur 4.98 Anteile ≤ 0.98 erreichbar": 2,
-    "Preis über Höchstpreis": 1,
-    "zu wenig Volumen": 57
+    "zu kurz vor Ende": 9,
+    "zu wenig Volumen": 44
    },
    "errors": [],
    "warnings": [
     "weather: kein Wettermodell – erst `backtest --source kalshi` (kauft nichts)"
    ],
-   "paused": [
-    "random_control"
-   ],
-   "arb_checked": 27,
+   "paused": [],
+   "arb_checked": 1,
    "arb_found": []
   }
  },
@@ -176,6 +173,10 @@
     [
      1794950843,
      50.0
+    ],
+    [
+     1794987960,
+     50.0
     ]
    ],
    "marks": {
@@ -406,7 +407,8 @@
     "KXHIGHPHIL-26NOV17-B58.5": 0.995,
     "KXHIGHDEN-26NOV17-B64.5": 0.235,
     "KXHIGHDEN-26NOV17-B62.5": 0.775,
-    "KXHIGHDEN-26NOV17-B66.5": 0.02
+    "KXHIGHDEN-26NOV17-B66.5": 0.02,
+    "KXHIGHMIA-26NOV18-T78": 0.005
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -560,6 +562,10 @@
     [
      1794950843,
      50.0
+    ],
+    [
+     1794987960,
+     50.0
     ]
    ],
    "marks": {
@@ -790,7 +796,8 @@
     "KXHIGHPHIL-26NOV17-B58.5": 0.995,
     "KXHIGHDEN-26NOV17-B64.5": 0.235,
     "KXHIGHDEN-26NOV17-B62.5": 0.775,
-    "KXHIGHDEN-26NOV17-B66.5": 0.02
+    "KXHIGHDEN-26NOV17-B66.5": 0.02,
+    "KXHIGHMIA-26NOV18-T78": 0.005
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -1045,6 +1052,10 @@
     [
      1794950843,
      31.890140944766394
+    ],
+    [
+     1794987960,
+     31.890140944766394
     ]
    ],
    "marks": {
@@ -1270,10 +1281,11 @@
     "KXHIGHPHIL-26NOV17-B58.5": 0.995,
     "KXHIGHDEN-26NOV17-B64.5": 0.235,
     "KXHIGHDEN-26NOV17-B62.5": 0.775,
-    "KXHIGHDEN-26NOV17-B66.5": 0.02
+    "KXHIGHDEN-26NOV17-B66.5": 0.02,
+    "KXHIGHMIA-26NOV18-T78": 0.005
    },
-   "paused_until": 1794984477,
-   "kill_reset_ts": null
+   "paused_until": null,
+   "kill_reset_ts": 1794987960
   }
  }
 }
