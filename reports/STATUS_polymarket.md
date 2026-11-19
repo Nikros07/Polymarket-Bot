@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-19 08:03 UTC
+Stand: 2026-11-19 20:51 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,12 +8,12 @@ Stand: 2026-11-19 08:03 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 52.18 | +4.4 % | 30.77 | 21.46 | 5 | 3 | 66.7 % | 9.4 % | – |
-| favorite | 50.80 | +1.6 % | 30.99 | 19.25 | 4 | 1 | 100.0 % | 0.4 % | – |
+| momentum | 54.45 | +8.9 % | 30.77 | 21.46 | 5 | 3 | 66.7 % | 9.4 % | – |
+| favorite | 50.80 | +1.6 % | 31.23 | 19.26 | 4 | 2 | 100.0 % | 0.4 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 47.00 | -6.0 % | 27.92 | 18.08 | 4 | 1 | 0.0 % | 10.1 % | – |
+| random_control | 47.61 | -4.8 % | 28.17 | 18.08 | 4 | 2 | 50.0 % | 10.1 % | – |
 | reversion | 25.01 | -50.0 % | 25.01 | 0.00 | 0 | 10 | 10.0 % | 50.2 % | bis 2026-11-20 |
 
 ## Offene Positionen
@@ -22,8 +22,8 @@ Stand: 2026-11-19 08:03 UTC
 |---|---|---|---|---|---|---|
 | favorite | Strait of Hormuz traffic returns to normal by November 30? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
 | favorite | US-Iran Final Nuclear Deal by November 30, 2026? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
-| favorite | Will Anthropic IPO by November 30, 2026? | YES | 5.00 | 0.948 | 4.75 | 2026-11-09 |
 | favorite | Will there be no change in Fed interest rates after the December 2026… | NO | 5.00 | 0.979 | 4.90 | 2026-11-18 |
+| favorite | Will Jensen Huang rejoin NVIDIA by December 31, 2026? | NO | 5.00 | 0.949 | 4.76 | 2026-11-19 |
 | momentum | Israel x Iran ceasefire continues through November 30? | YES | 5.00 | 0.800 | 4.03 | 2026-11-09 |
 | momentum | Israel x Iran ceasefire continues through December 15? | YES | 5.48 | 0.720 | 3.99 | 2026-11-09 |
 | momentum | Will Bitcoin dip to $60,000 in November? | YES | 9.51 | 0.470 | 4.53 | 2026-11-15 |
@@ -31,13 +31,15 @@ Stand: 2026-11-19 08:03 UTC
 | momentum | Will Bitcoin dip to $60,000 by December 31, 2026? | YES | 5.90 | 0.720 | 4.29 | 2026-11-18 |
 | random_control | Strait of Hormuz traffic returns to normal by November 30? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
 | random_control | US-Iran Final Nuclear Deal by November 30, 2026? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
-| random_control | Will Anthropic IPO by November 30, 2026? | YES | 5.00 | 0.948 | 4.75 | 2026-11-09 |
 | random_control | Will there be no change in Fed interest rates after the December 2026… | YES | 169.13 | 0.022 | 3.72 | 2026-11-18 |
+| random_control | Will Jensen Huang rejoin NVIDIA by December 31, 2026? | NO | 5.00 | 0.949 | 4.76 | 2026-11-19 |
 
 ## Zuletzt aufgelöst
 
 | Strategie | Markt | Seite | Ergebnis | Gewinn (€) |
 |---|---|---|---|---|
+| favorite | Will Anthropic IPO by November 30, 2026? | YES | YES | +0.25 |
+| random_control | Will Anthropic IPO by November 30, 2026? | YES | YES | +0.25 |
 | favorite | Israel x Iran ceasefire continues through November 15? | YES | YES | +0.24 |
 | momentum | Israel x Iran ceasefire continues through November 15? | YES | YES | +0.24 |
 | random_control | Israel x Iran ceasefire continues through November 15? | NO | YES | -4.00 |
@@ -51,18 +53,16 @@ Stand: 2026-11-19 08:03 UTC
 | reversion | Will Bitcoin dip to $70,000 in November? | NO | YES | -3.29 |
 | reversion | Will Bitcoin dip to $72,000 November 9-15? | YES | YES | +6.08 |
 | reversion | Will Kai Cenat finish his GTA marathon by November 11, 2:59 PM ET? | NO | YES | -4.00 |
-| reversion | Will Kai Cenat finish his GTA marathon by November 11, 7:59 AM ET? | NO | YES | -3.94 |
-| reversion | Will Kai Cenat finish his GTA marathon by November 11? | NO | YES | -3.92 |
 
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 93
-- Signale: 78
-- gekauft: 0 (–)
-- abgerechnet: 0
+- handelbar: 87
+- Signale: 67
+- gekauft: 2 (favorite:6998285:NO@0.949, random_control:6998285:NO@0.949)
+- abgerechnet: 2
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Ende zu weit weg (92); Kategorie-Grenze erreicht (unbekannt) (76); unklare Auflösung (Stichwort) (11); zu kurz vor Ende (4); Preis über Höchstpreis (1); Spread zu groß (1)
+- häufigste Ablehnungsgründe: Ende zu weit weg (89); Kategorie-Grenze erreicht (unbekannt) (65); zu kurz vor Ende (10); unklare Auflösung (Stichwort) (10); zu wenig Liquidität (4)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
