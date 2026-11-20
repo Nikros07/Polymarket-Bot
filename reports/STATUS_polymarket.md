@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-20 20:36 UTC
+Stand: 2026-11-20 20:50 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-20 20:36 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 58.67 | +17.3 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
-| random_control | 57.45 | +14.9 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
+| momentum | 58.59 | +17.2 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
+| random_control | 57.40 | +14.8 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
 | favorite | 50.44 | +0.9 % | 31.23 | 19.26 | 4 | 2 | 100.0 % | 0.7 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| reversion | 25.47 | -49.1 % | 15.93 | 9.08 | 4 | 10 | 10.0 % | 50.2 % | – |
+| reversion | 25.42 | -49.2 % | 15.93 | 9.08 | 4 | 10 | 10.0 % | 50.2 % | – |
 
 ## Offene Positionen
 
@@ -62,12 +62,12 @@ Stand: 2026-11-20 20:36 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 106
-- Signale: 89
-- gekauft: 7 (random_control:6367372:YES@0.910, momentum:701501:YES@0.683, reversion:701501:NO@0.330, momentum:7018707:NO@0.940, reversion:6507392:NO@0.444, reversion:7150681:YES@0.210, reversion:7042822:YES@0.561)
-- abgerechnet: 2
+- handelbar: 107
+- Signale: 86
+- gekauft: 0 (–)
+- abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (69); Ende zu weit weg (52); zu kurz vor Ende (31); Spread zu groß (10); zu wenig Liquidität (6); unklare Auflösung (Stichwort) (5); Preis über Höchstpreis (2); Mindestgröße über Obergrenze pro Markt (1)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (70); Ende zu weit weg (49); zu kurz vor Ende (34); Spread zu groß (12); zu wenig Liquidität (5); unklare Auflösung (Stichwort) (5); Mindestgröße über Obergrenze pro Markt (2); Preis über Höchstpreis (2)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
