@@ -1,7 +1,7 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795246165,
+   "ts": 1795247382,
    "source": "kalshi",
    "enabled": true,
    "scanned": 54,
@@ -228,6 +228,10 @@
     [
      1795246165,
      50.0
+    ],
+    [
+     1795247382,
+     50.0
     ]
    ],
    "marks": {
@@ -535,8 +539,8 @@
     "KXHIGHPHIL-26NOV20-T71": 0.005,
     "KXHIGHPHIL-26NOV20-B70.5": 0.995,
     "KXHIGHPHIL-26NOV20-B68.5": 0.005,
-    "KXHIGHNY-26NOV21-B62.5": 0.4,
-    "KXHIGHNY-26NOV21-T65": 0.065
+    "KXHIGHNY-26NOV21-B62.5": 0.395,
+    "KXHIGHNY-26NOV21-T65": 0.060000000000000005
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -742,6 +746,10 @@
     [
      1795246165,
      50.0
+    ],
+    [
+     1795247382,
+     50.0
     ]
    ],
    "marks": {
@@ -1049,8 +1057,8 @@
     "KXHIGHPHIL-26NOV20-T71": 0.005,
     "KXHIGHPHIL-26NOV20-B70.5": 0.995,
     "KXHIGHPHIL-26NOV20-B68.5": 0.005,
-    "KXHIGHNY-26NOV21-B62.5": 0.4,
-    "KXHIGHNY-26NOV21-T65": 0.065
+    "KXHIGHNY-26NOV21-B62.5": 0.395,
+    "KXHIGHNY-26NOV21-T65": 0.060000000000000005
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -1457,6 +1465,10 @@
     [
      1795246165,
      19.017589367449453
+    ],
+    [
+     1795247382,
+     19.017589367449453
     ]
    ],
    "marks": {
@@ -1754,8 +1766,8 @@
     "KXHIGHPHIL-26NOV20-T71": 0.005,
     "KXHIGHPHIL-26NOV20-B70.5": 0.995,
     "KXHIGHPHIL-26NOV20-B68.5": 0.005,
-    "KXHIGHNY-26NOV21-B62.5": 0.4,
-    "KXHIGHNY-26NOV21-T65": 0.065
+    "KXHIGHNY-26NOV21-B62.5": 0.395,
+    "KXHIGHNY-26NOV21-T65": 0.060000000000000005
    },
    "paused_until": 1795678976,
    "kill_reset_ts": 1794987960
