@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-21 07:49 UTC
+Stand: 2026-11-21 19:32 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-21 07:49 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 58.90 | +17.8 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
-| random_control | 57.24 | +14.5 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
-| favorite | 50.49 | +1.0 % | 31.23 | 19.26 | 4 | 2 | 100.0 % | 0.7 % | – |
+| momentum | 58.06 | +16.1 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
+| random_control | 55.28 | +10.6 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
+| favorite | 50.44 | +0.9 % | 31.23 | 19.26 | 4 | 2 | 100.0 % | 0.7 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| reversion | 24.43 | -51.1 % | 15.93 | 9.08 | 4 | 10 | 10.0 % | 51.4 % | – |
+| reversion | 30.24 | -39.5 % | 16.08 | 11.09 | 5 | 11 | 18.2 % | 51.4 % | – |
 
 ## Offene Positionen
 
@@ -32,7 +32,8 @@ Stand: 2026-11-21 07:49 UTC
 | reversion | Will Bitcoin dip to $55,000 by December 31, 2026? | NO | 5.99 | 0.330 | 2.00 | 2026-11-20 |
 | reversion | Will Bitcoin dip to $55,000 in November? | NO | 5.00 | 0.444 | 2.25 | 2026-11-20 |
 | reversion | Will Bitcoin reach $65,000 in November? | YES | 9.42 | 0.210 | 1.99 | 2026-11-20 |
-| reversion | Will the price of Bitcoin be above $58,000 on November 21? | YES | 5.00 | 0.561 | 2.84 | 2026-11-20 |
+| reversion | AI bubble burst in 2026? | NO | 6.35 | 0.378 | 2.43 | 2026-11-21 |
+| reversion | Will Carlos Alcaraz win the 2026 Nitto ATP Finals? | NO | 7.49 | 0.320 | 2.42 | 2026-11-21 |
 | random_control | Strait of Hormuz traffic returns to normal by November 30? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
 | random_control | US-Iran Final Nuclear Deal by November 30, 2026? | NO | 5.00 | 0.958 | 4.80 | 2026-11-09 |
 | random_control | Will there be no change in Fed interest rates after the December 2026… | YES | 169.13 | 0.022 | 3.72 | 2026-11-18 |
@@ -43,6 +44,7 @@ Stand: 2026-11-21 07:49 UTC
 
 | Strategie | Markt | Seite | Ergebnis | Gewinn (€) |
 |---|---|---|---|---|
+| reversion | Will the price of Bitcoin be above $58,000 on November 21? | YES | YES | +2.16 |
 | momentum | Will Bitcoin dip to $60,000 in November? | YES | YES | +4.98 |
 | momentum | Will Bitcoin dip to $60,000 by December 31, 2026? | YES | YES | +1.61 |
 | favorite | Will Anthropic IPO by November 30, 2026? | YES | YES | +0.25 |
@@ -57,17 +59,16 @@ Stand: 2026-11-21 07:49 UTC
 | reversion | Will Bitcoin dip to $67,500 in November? | NO | YES | -2.83 |
 | reversion | Will the price of Bitcoin be above $70,000 on November 13? | YES | NO | -2.80 |
 | reversion | Will SCU Torreense vs. Sparta Prague end in a draw? | YES | NO | -3.00 |
-| reversion | Will Bitcoin dip to $70,000 in November? | NO | YES | -3.29 |
 
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 124
-- Signale: 114
-- gekauft: 0 (–)
-- abgerechnet: 0
+- handelbar: 106
+- Signale: 83
+- gekauft: 2 (reversion:691340:NO@0.378, reversion:7101622:NO@0.320)
+- abgerechnet: 1
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (103); Ende zu weit weg (51); zu kurz vor Ende (11); unklare Auflösung (Stichwort) (8); zu wenig Liquidität (5); Spread zu groß (5); Mindestgröße über Obergrenze pro Markt (4); Preis über Höchstpreis (2)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (75); Ende zu weit weg (50); zu kurz vor Ende (35); Preis über Höchstpreis (6); zu wenig Liquidität (5); unklare Auflösung (Stichwort) (4)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
