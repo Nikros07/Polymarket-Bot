@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-21 07:29 UTC
+Stand: 2026-11-21 07:49 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-21 07:29 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 58.77 | +17.5 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
-| random_control | 57.03 | +14.1 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
+| momentum | 58.90 | +17.8 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
+| random_control | 57.24 | +14.5 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
 | favorite | 50.49 | +1.0 % | 31.23 | 19.26 | 4 | 2 | 100.0 % | 0.7 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| reversion | 24.88 | -50.2 % | 15.93 | 9.08 | 4 | 10 | 10.0 % | 50.5 % | – |
+| reversion | 24.43 | -51.1 % | 15.93 | 9.08 | 4 | 10 | 10.0 % | 51.4 % | – |
 
 ## Offene Positionen
 
@@ -62,12 +62,12 @@ Stand: 2026-11-21 07:29 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 125
-- Signale: 117
+- handelbar: 124
+- Signale: 114
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (100); Ende zu weit weg (52); zu kurz vor Ende (10); unklare Auflösung (Stichwort) (8); Spread zu groß (7); Preis über Höchstpreis (5); Mindestgröße über Obergrenze pro Markt (5); zu wenig Liquidität (5)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (103); Ende zu weit weg (51); zu kurz vor Ende (11); unklare Auflösung (Stichwort) (8); zu wenig Liquidität (5); Spread zu groß (5); Mindestgröße über Obergrenze pro Markt (4); Preis über Höchstpreis (2)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
