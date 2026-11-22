@@ -1,19 +1,18 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795290840,
+   "ts": 1795331370,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 84,
-   "eligible": 17,
-   "signals": 2,
+   "scanned": 54,
+   "eligible": 3,
+   "signals": 0,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "Preis über Höchstpreis": 1,
-    "nur 4.98 Anteile ≤ 0.98 erreichbar": 1,
-    "zu wenig Volumen": 67
+    "zu kurz vor Ende": 7,
+    "zu wenig Volumen": 44
    },
    "errors": [],
    "warnings": [
@@ -22,7 +21,7 @@
    "paused": [
     "random_control"
    ],
-   "arb_checked": 17,
+   "arb_checked": 3,
    "arb_found": []
   }
  },
@@ -240,6 +239,10 @@
     [
      1795290840,
      50.0
+    ],
+    [
+     1795331370,
+     50.0
     ]
    ],
    "marks": {
@@ -563,7 +566,10 @@
     "KXHIGHCHI-26NOV21-B70.5": 0.2,
     "KXHIGHAUS-26NOV21-B76.5": 0.10500000000000001,
     "KXHIGHCHI-26NOV21-B68.5": 0.78,
-    "KXHIGHCHI-26NOV21-B66.5": 0.005
+    "KXHIGHCHI-26NOV21-B66.5": 0.005,
+    "KXHIGHCHI-26NOV22-B58.5": 0.005,
+    "KXHIGHCHI-26NOV22-B60.5": 0.855,
+    "KXHIGHCHI-26NOV22-T58": 0.005
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -781,6 +787,10 @@
     [
      1795290840,
      50.0
+    ],
+    [
+     1795331370,
+     50.0
     ]
    ],
    "marks": {
@@ -1104,7 +1114,10 @@
     "KXHIGHCHI-26NOV21-B70.5": 0.2,
     "KXHIGHAUS-26NOV21-B76.5": 0.10500000000000001,
     "KXHIGHCHI-26NOV21-B68.5": 0.78,
-    "KXHIGHCHI-26NOV21-B66.5": 0.005
+    "KXHIGHCHI-26NOV21-B66.5": 0.005,
+    "KXHIGHCHI-26NOV22-B58.5": 0.005,
+    "KXHIGHCHI-26NOV22-B60.5": 0.855,
+    "KXHIGHCHI-26NOV22-T58": 0.005
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -1523,6 +1536,10 @@
     [
      1795290840,
      19.017589367449453
+    ],
+    [
+     1795331370,
+     19.017589367449453
     ]
    ],
    "marks": {
@@ -1836,7 +1853,10 @@
     "KXHIGHCHI-26NOV21-B70.5": 0.2,
     "KXHIGHAUS-26NOV21-B76.5": 0.10500000000000001,
     "KXHIGHCHI-26NOV21-B68.5": 0.78,
-    "KXHIGHCHI-26NOV21-B66.5": 0.005
+    "KXHIGHCHI-26NOV21-B66.5": 0.005,
+    "KXHIGHCHI-26NOV22-B58.5": 0.005,
+    "KXHIGHCHI-26NOV22-B60.5": 0.855,
+    "KXHIGHCHI-26NOV22-T58": 0.005
    },
    "paused_until": 1795678976,
    "kill_reset_ts": 1794987960
