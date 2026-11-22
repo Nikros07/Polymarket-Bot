@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-22 07:36 UTC
+Stand: 2026-11-22 19:54 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-22 07:36 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 59.12 | +18.2 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
-| random_control | 54.56 | +9.1 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
-| favorite | 50.51 | +1.0 % | 31.23 | 19.26 | 4 | 2 | 100.0 % | 0.7 % | – |
+| momentum | 58.25 | +16.5 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
+| random_control | 54.60 | +9.2 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
+| favorite | 50.50 | +1.0 % | 31.23 | 19.26 | 4 | 2 | 100.0 % | 0.7 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| reversion | 28.31 | -43.4 % | 16.08 | 11.09 | 5 | 11 | 18.2 % | 51.4 % | – |
+| reversion | 29.10 | -41.8 % | 16.08 | 11.09 | 5 | 11 | 18.2 % | 51.4 % | – |
 
 ## Offene Positionen
 
@@ -63,12 +63,12 @@ Stand: 2026-11-22 07:36 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 126
-- Signale: 74
+- handelbar: 108
+- Signale: 80
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (72); Ende zu weit weg (44); zu kurz vor Ende (13); unklare Auflösung (Stichwort) (9); zu wenig Liquidität (8); Preis über Höchstpreis (2)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (77); Ende zu weit weg (42); zu kurz vor Ende (32); unklare Auflösung (Stichwort) (14); zu wenig Liquidität (4); Spread zu groß (2); Preis über Höchstpreis (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
