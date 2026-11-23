@@ -59,3 +59,5 @@
 {"ts": 1795289348, "strategy": "reversion", "event": "settle", "market_id": "7042822", "outcome": 1, "payout": 5.0, "pnl": 2.16045937025}
 {"ts": 1795289348, "strategy": "reversion", "event": "open", "market_id": "691340", "side": "NO", "shares": 6.35, "avg_price": 0.378, "fee": 0.028217446739999846, "signal_price": 0.37450000000000006, "signal_prob": null, "reason": "Gegenbewegung auf +0.34 in 1 Tagen"}
 {"ts": 1795289348, "strategy": "reversion", "event": "open", "market_id": "7101622", "side": "NO", "shares": 7.49, "avg_price": 0.32, "fee": 0.026077183999999805, "signal_price": 0.31499999999999995, "signal_prob": null, "reason": "Gegenbewegung auf +0.18 in 1 Tagen"}
+{"ts": 1795420456, "strategy": "reversion", "event": "settle", "market_id": "7101622", "outcome": 1, "payout": 0.0, "pnl": -2.422877184}
+{"ts": 1795420456, "strategy": "reversion", "event": "open", "market_id": "7097132", "side": "NO", "shares": 9.34, "avg_price": 0.26, "fee": 0.023361207999999824, "signal_price": 0.265, "signal_prob": null, "reason": "Gegenbewegung auf +0.42 in 1 Tagen"}
