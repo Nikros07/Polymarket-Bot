@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-23 07:57 UTC
+Stand: 2026-11-23 08:23 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-23 07:57 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 57.87 | +15.7 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
-| random_control | 54.03 | +8.1 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
+| momentum | 57.95 | +15.9 % | 36.76 | 22.06 | 5 | 5 | 80.0 % | 9.4 % | – |
+| random_control | 53.94 | +7.9 % | 23.58 | 22.67 | 5 | 2 | 50.0 % | 10.1 % | – |
 | favorite | 50.35 | +0.7 % | 31.23 | 19.26 | 4 | 2 | 100.0 % | 0.9 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| reversion | 30.67 | -38.7 % | 13.63 | 11.12 | 5 | 12 | 16.7 % | 51.4 % | – |
+| reversion | 30.48 | -39.0 % | 13.63 | 11.12 | 5 | 12 | 16.7 % | 51.4 % | – |
 
 ## Offene Positionen
 
@@ -63,12 +63,12 @@ Stand: 2026-11-23 07:57 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 112
-- Signale: 107
-- gekauft: 1 (reversion:7097132:NO@0.260)
-- abgerechnet: 1
+- handelbar: 114
+- Signale: 108
+- gekauft: 0 (–)
+- abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (104); Ende zu weit weg (58); unklare Auflösung (Stichwort) (17); zu kurz vor Ende (9); zu wenig Liquidität (4); Preis über Höchstpreis (1); Spread zu groß (1)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (106); Ende zu weit weg (57); unklare Auflösung (Stichwort) (16); zu kurz vor Ende (9); zu wenig Liquidität (4); Preis über Höchstpreis (1); Spread zu groß (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
