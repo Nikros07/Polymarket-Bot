@@ -1,18 +1,18 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795420651,
+   "ts": 1795422207,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 54,
+   "scanned": 48,
    "eligible": 1,
    "signals": 0,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "zu kurz vor Ende": 7,
-    "zu wenig Volumen": 46
+    "zu kurz vor Ende": 4,
+    "zu wenig Volumen": 43
    },
    "errors": [],
    "warnings": [
@@ -259,6 +259,10 @@
     [
      1795420651,
      50.0
+    ],
+    [
+     1795422207,
+     50.0
     ]
    ],
    "marks": {
@@ -603,7 +607,7 @@
     "KXHIGHLAX-26NOV22-B71.5": 0.005,
     "KXHIGHAUS-26NOV22-B73.5": 0.975,
     "KXHIGHAUS-26NOV22-B75.5": 0.035,
-    "KXHIGHMIA-26NOV23-B81.5": 0.36
+    "KXHIGHMIA-26NOV23-B81.5": 0.315
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -841,6 +845,10 @@
     [
      1795420651,
      50.0
+    ],
+    [
+     1795422207,
+     50.0
     ]
    ],
    "marks": {
@@ -1185,7 +1193,7 @@
     "KXHIGHLAX-26NOV22-B71.5": 0.005,
     "KXHIGHAUS-26NOV22-B73.5": 0.975,
     "KXHIGHAUS-26NOV22-B75.5": 0.035,
-    "KXHIGHMIA-26NOV23-B81.5": 0.36
+    "KXHIGHMIA-26NOV23-B81.5": 0.315
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -1624,6 +1632,10 @@
     [
      1795420651,
      19.017589367449453
+    ],
+    [
+     1795422207,
+     19.017589367449453
     ]
    ],
    "marks": {
@@ -1958,7 +1970,7 @@
     "KXHIGHLAX-26NOV22-B71.5": 0.005,
     "KXHIGHAUS-26NOV22-B73.5": 0.975,
     "KXHIGHAUS-26NOV22-B75.5": 0.035,
-    "KXHIGHMIA-26NOV23-B81.5": 0.36
+    "KXHIGHMIA-26NOV23-B81.5": 0.315
    },
    "paused_until": 1795678976,
    "kill_reset_ts": 1794987960
