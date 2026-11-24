@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-24 00:07 UTC
+Stand: 2026-11-24 00:29 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-24 00:07 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 53.44 | +6.9 % | 36.76 | 17.43 | 4 | 6 | 66.7 % | 9.7 % | – |
+| momentum | 53.66 | +7.3 % | 36.76 | 17.43 | 4 | 6 | 66.7 % | 9.7 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| favorite | 45.98 | -8.0 % | 31.23 | 14.50 | 3 | 3 | 66.7 % | 9.5 % | – |
-| random_control | 43.64 | -12.7 % | 23.58 | 17.91 | 4 | 3 | 33.3 % | 24.0 % | – |
-| reversion | 29.73 | -40.5 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
+| favorite | 46.00 | -8.0 % | 31.23 | 14.50 | 3 | 3 | 66.7 % | 9.5 % | – |
+| random_control | 42.97 | -14.1 % | 23.58 | 17.91 | 4 | 3 | 33.3 % | 25.2 % | – |
+| reversion | 29.69 | -40.6 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
 
 ## Offene Positionen
 
@@ -61,11 +61,11 @@ Stand: 2026-11-24 00:07 UTC
 
 - gescannt: 200
 - handelbar: 108
-- Signale: 74
-- gekauft: 1 (reversion:6994508:NO@0.080)
-- abgerechnet: 4
+- Signale: 70
+- gekauft: 0 (–)
+- abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (65); Ende zu weit weg (50); zu kurz vor Ende (24); unklare Auflösung (Stichwort) (11); zu wenig Liquidität (7); Preis über Höchstpreis (6); Spread zu groß (2)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (67); Ende zu weit weg (48); zu kurz vor Ende (25); unklare Auflösung (Stichwort) (12); zu wenig Liquidität (7); Spread zu groß (2); Preis über Höchstpreis (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
