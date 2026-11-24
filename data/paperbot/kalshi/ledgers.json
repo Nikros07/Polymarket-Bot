@@ -1,7 +1,7 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795559997,
+   "ts": 1795560664,
    "source": "kalshi",
    "enabled": true,
    "scanned": 84,
@@ -11,7 +11,8 @@
    "settled": [],
    "waiting": [],
    "skipped": {
-    "nur 4.98 Anteile ≤ 0.98 erreichbar": 4,
+    "nur 4.98 Anteile ≤ 0.98 erreichbar": 2,
+    "Spread zu groß": 2,
     "zu wenig Volumen": 62
    },
    "errors": [],
@@ -283,6 +284,10 @@
     [
      1795559997,
      50.0
+    ],
+    [
+     1795560664,
+     50.0
     ]
    ],
    "marks": {
@@ -640,7 +645,7 @@
     "KXHIGHCHI-26NOV23-B40.5": 0.005,
     "KXHIGHCHI-26NOV23-B42.5": 0.995,
     "KXHIGHNY-26NOV24-B49.5": 0.03,
-    "KXHIGHNY-26NOV24-B51.5": 0.97,
+    "KXHIGHNY-26NOV24-B51.5": 0.965,
     "KXHIGHNY-26NOV24-B53.5": 0.005,
     "KXHIGHNY-26NOV24-T49": 0.005,
     "KXHIGHMIA-26NOV24-B81.5": 0.005,
@@ -654,7 +659,7 @@
     "KXHIGHAUS-26NOV24-B51.5": 0.005,
     "KXHIGHDEN-26NOV24-B52.5": 0.925,
     "KXHIGHCHI-26NOV24-B42.5": 0.995,
-    "KXHIGHDEN-26NOV24-B54.5": 0.09,
+    "KXHIGHDEN-26NOV24-B54.5": 0.07,
     "KXHIGHCHI-26NOV24-T40": 0.005,
     "KXHIGHPHIL-26NOV24-B51.5": 0.005,
     "KXHIGHCHI-26NOV24-B44.5": 0.005,
@@ -922,6 +927,10 @@
     [
      1795559997,
      50.0
+    ],
+    [
+     1795560664,
+     50.0
     ]
    ],
    "marks": {
@@ -1279,7 +1288,7 @@
     "KXHIGHCHI-26NOV23-B40.5": 0.005,
     "KXHIGHCHI-26NOV23-B42.5": 0.995,
     "KXHIGHNY-26NOV24-B49.5": 0.03,
-    "KXHIGHNY-26NOV24-B51.5": 0.97,
+    "KXHIGHNY-26NOV24-B51.5": 0.965,
     "KXHIGHNY-26NOV24-B53.5": 0.005,
     "KXHIGHNY-26NOV24-T49": 0.005,
     "KXHIGHMIA-26NOV24-B81.5": 0.005,
@@ -1293,7 +1302,7 @@
     "KXHIGHAUS-26NOV24-B51.5": 0.005,
     "KXHIGHDEN-26NOV24-B52.5": 0.925,
     "KXHIGHCHI-26NOV24-B42.5": 0.995,
-    "KXHIGHDEN-26NOV24-B54.5": 0.09,
+    "KXHIGHDEN-26NOV24-B54.5": 0.07,
     "KXHIGHCHI-26NOV24-T40": 0.005,
     "KXHIGHPHIL-26NOV24-B51.5": 0.005,
     "KXHIGHCHI-26NOV24-B44.5": 0.005,
@@ -1762,6 +1771,10 @@
     [
      1795559997,
      19.017589367449453
+    ],
+    [
+     1795560664,
+     19.017589367449453
     ]
    ],
    "marks": {
@@ -2109,7 +2122,7 @@
     "KXHIGHCHI-26NOV23-B40.5": 0.005,
     "KXHIGHCHI-26NOV23-B42.5": 0.995,
     "KXHIGHNY-26NOV24-B49.5": 0.03,
-    "KXHIGHNY-26NOV24-B51.5": 0.97,
+    "KXHIGHNY-26NOV24-B51.5": 0.965,
     "KXHIGHNY-26NOV24-B53.5": 0.005,
     "KXHIGHNY-26NOV24-T49": 0.005,
     "KXHIGHMIA-26NOV24-B81.5": 0.005,
@@ -2123,7 +2136,7 @@
     "KXHIGHAUS-26NOV24-B51.5": 0.005,
     "KXHIGHDEN-26NOV24-B52.5": 0.925,
     "KXHIGHCHI-26NOV24-B42.5": 0.995,
-    "KXHIGHDEN-26NOV24-B54.5": 0.09,
+    "KXHIGHDEN-26NOV24-B54.5": 0.07,
     "KXHIGHCHI-26NOV24-T40": 0.005,
     "KXHIGHPHIL-26NOV24-B51.5": 0.005,
     "KXHIGHCHI-26NOV24-B44.5": 0.005,
