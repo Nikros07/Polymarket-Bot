@@ -1,7 +1,7 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795514983,
+   "ts": 1795516338,
    "source": "kalshi",
    "enabled": true,
    "scanned": 42,
@@ -275,6 +275,10 @@
     [
      1795514983,
      50.0
+    ],
+    [
+     1795516338,
+     50.0
     ]
    ],
    "marks": {
@@ -631,12 +635,12 @@
     "KXHIGHAUS-26NOV23-B61.5": 0.995,
     "KXHIGHCHI-26NOV23-B40.5": 0.005,
     "KXHIGHCHI-26NOV23-B42.5": 0.995,
-    "KXHIGHNY-26NOV24-B49.5": 0.445,
-    "KXHIGHNY-26NOV24-B51.5": 0.555,
+    "KXHIGHNY-26NOV24-B49.5": 0.48,
+    "KXHIGHNY-26NOV24-B51.5": 0.53,
     "KXHIGHNY-26NOV24-B53.5": 0.015,
     "KXHIGHNY-26NOV24-T49": 0.005,
     "KXHIGHMIA-26NOV24-B81.5": 0.405,
-    "KXHIGHLAX-26NOV24-T75": 0.08499999999999999
+    "KXHIGHLAX-26NOV24-T75": 0.08
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -890,6 +894,10 @@
     [
      1795514983,
      50.0
+    ],
+    [
+     1795516338,
+     50.0
     ]
    ],
    "marks": {
@@ -1246,12 +1254,12 @@
     "KXHIGHAUS-26NOV23-B61.5": 0.995,
     "KXHIGHCHI-26NOV23-B40.5": 0.005,
     "KXHIGHCHI-26NOV23-B42.5": 0.995,
-    "KXHIGHNY-26NOV24-B49.5": 0.445,
-    "KXHIGHNY-26NOV24-B51.5": 0.555,
+    "KXHIGHNY-26NOV24-B49.5": 0.48,
+    "KXHIGHNY-26NOV24-B51.5": 0.53,
     "KXHIGHNY-26NOV24-B53.5": 0.015,
     "KXHIGHNY-26NOV24-T49": 0.005,
     "KXHIGHMIA-26NOV24-B81.5": 0.405,
-    "KXHIGHLAX-26NOV24-T75": 0.08499999999999999
+    "KXHIGHLAX-26NOV24-T75": 0.08
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -1706,6 +1714,10 @@
     [
      1795514983,
      19.017589367449453
+    ],
+    [
+     1795516338,
+     19.017589367449453
     ]
    ],
    "marks": {
@@ -2052,12 +2064,12 @@
     "KXHIGHAUS-26NOV23-B61.5": 0.995,
     "KXHIGHCHI-26NOV23-B40.5": 0.005,
     "KXHIGHCHI-26NOV23-B42.5": 0.995,
-    "KXHIGHNY-26NOV24-B49.5": 0.445,
-    "KXHIGHNY-26NOV24-B51.5": 0.555,
+    "KXHIGHNY-26NOV24-B49.5": 0.48,
+    "KXHIGHNY-26NOV24-B51.5": 0.53,
     "KXHIGHNY-26NOV24-B53.5": 0.015,
     "KXHIGHNY-26NOV24-T49": 0.005,
     "KXHIGHMIA-26NOV24-B81.5": 0.405,
-    "KXHIGHLAX-26NOV24-T75": 0.08499999999999999
+    "KXHIGHLAX-26NOV24-T75": 0.08
    },
    "paused_until": 1795678976,
    "kill_reset_ts": 1794987960
