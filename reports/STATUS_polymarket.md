@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-24 00:29 UTC
+Stand: 2026-11-24 10:09 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-24 00:29 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 53.66 | +7.3 % | 36.76 | 17.43 | 4 | 6 | 66.7 % | 9.7 % | – |
+| momentum | 54.63 | +9.3 % | 32.39 | 21.80 | 5 | 6 | 66.7 % | 9.7 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| favorite | 46.00 | -8.0 % | 31.23 | 14.50 | 3 | 3 | 66.7 % | 9.5 % | – |
-| random_control | 42.97 | -14.1 % | 23.58 | 17.91 | 4 | 3 | 33.3 % | 25.2 % | – |
-| reversion | 29.69 | -40.6 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
+| favorite | 45.97 | -8.1 % | 31.23 | 14.50 | 3 | 3 | 66.7 % | 9.5 % | – |
+| random_control | 45.11 | -9.8 % | 23.58 | 17.91 | 4 | 3 | 33.3 % | 25.2 % | – |
+| reversion | 29.24 | -41.5 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
 
 ## Offene Positionen
 
@@ -27,6 +27,7 @@ Stand: 2026-11-24 00:29 UTC
 | momentum | Israel x Iran ceasefire continues through December 15? | YES | 5.48 | 0.720 | 3.99 | 2026-11-09 |
 | momentum | Will Bitcoin dip to $55,000 by December 31, 2026? | YES | 6.81 | 0.683 | 4.70 | 2026-11-20 |
 | momentum | Will Bitcoin reach $70,000 in November? | NO | 5.00 | 0.940 | 4.71 | 2026-11-20 |
+| momentum | Jensen Huang admits to another affair with a woman by December 31? | YES | 5.64 | 0.768 | 4.37 | 2026-11-24 |
 | reversion | Will Bitcoin dip to $55,000 by December 31, 2026? | NO | 5.99 | 0.330 | 2.00 | 2026-11-20 |
 | reversion | Will Bitcoin dip to $55,000 in November? | NO | 5.00 | 0.444 | 2.25 | 2026-11-20 |
 | reversion | Will Bitcoin reach $65,000 in November? | YES | 9.42 | 0.210 | 1.99 | 2026-11-20 |
@@ -60,12 +61,12 @@ Stand: 2026-11-24 00:29 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 108
-- Signale: 70
-- gekauft: 0 (–)
+- handelbar: 120
+- Signale: 92
+- gekauft: 1 (momentum:6989178:YES@0.768)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (67); Ende zu weit weg (48); zu kurz vor Ende (25); unklare Auflösung (Stichwort) (12); zu wenig Liquidität (7); Spread zu groß (2); Preis über Höchstpreis (1)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (88); Ende zu weit weg (54); unklare Auflösung (Stichwort) (14); zu kurz vor Ende (9); zu wenig Liquidität (3); Spread zu groß (2); Preis über Höchstpreis (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
