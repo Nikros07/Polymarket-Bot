@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (kalshi)
 
-Stand: 2026-11-24 22:51 UTC
+Stand: 2026-11-25 08:55 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -37,13 +37,13 @@ Keine offenen Positionen.
 
 ## Letzter Zyklus
 
-- gescannt: 84
-- handelbar: 22
-- Signale: 4
+- gescannt: 48
+- handelbar: 1
+- Signale: 0
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: zu wenig Volumen (62); nur 4.98 Anteile ≤ 0.98 erreichbar (2); Spread zu groß (2)
+- häufigste Ablehnungsgründe: zu wenig Volumen (43); zu kurz vor Ende (4)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
