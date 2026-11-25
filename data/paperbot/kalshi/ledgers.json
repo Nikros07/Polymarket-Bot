@@ -1,19 +1,18 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795560664,
+   "ts": 1795596896,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 84,
-   "eligible": 22,
-   "signals": 4,
+   "scanned": 48,
+   "eligible": 1,
+   "signals": 0,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "nur 4.98 Anteile ≤ 0.98 erreichbar": 2,
-    "Spread zu groß": 2,
-    "zu wenig Volumen": 62
+    "zu kurz vor Ende": 4,
+    "zu wenig Volumen": 43
    },
    "errors": [],
    "warnings": [
@@ -22,7 +21,7 @@
    "paused": [
     "random_control"
    ],
-   "arb_checked": 22,
+   "arb_checked": 1,
    "arb_found": []
   }
  },
@@ -288,6 +287,10 @@
     [
      1795560664,
      50.0
+    ],
+    [
+     1795596896,
+     50.0
     ]
    ],
    "marks": {
@@ -665,7 +668,8 @@
     "KXHIGHCHI-26NOV24-B44.5": 0.005,
     "KXHIGHPHIL-26NOV24-B53.5": 0.995,
     "KXHIGHMIA-26NOV24-T77": 0.005,
-    "KXHIGHAUS-26NOV24-B53.5": 0.995
+    "KXHIGHAUS-26NOV24-B53.5": 0.995,
+    "KXHIGHNY-26NOV25-B47.5": 0.305
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -931,6 +935,10 @@
     [
      1795560664,
      50.0
+    ],
+    [
+     1795596896,
+     50.0
     ]
    ],
    "marks": {
@@ -1308,7 +1316,8 @@
     "KXHIGHCHI-26NOV24-B44.5": 0.005,
     "KXHIGHPHIL-26NOV24-B53.5": 0.995,
     "KXHIGHMIA-26NOV24-T77": 0.005,
-    "KXHIGHAUS-26NOV24-B53.5": 0.995
+    "KXHIGHAUS-26NOV24-B53.5": 0.995,
+    "KXHIGHNY-26NOV25-B47.5": 0.305
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -1775,6 +1784,10 @@
     [
      1795560664,
      19.017589367449453
+    ],
+    [
+     1795596896,
+     19.017589367449453
     ]
    ],
    "marks": {
@@ -2142,7 +2155,8 @@
     "KXHIGHCHI-26NOV24-B44.5": 0.005,
     "KXHIGHPHIL-26NOV24-B53.5": 0.995,
     "KXHIGHMIA-26NOV24-T77": 0.005,
-    "KXHIGHAUS-26NOV24-B53.5": 0.995
+    "KXHIGHAUS-26NOV24-B53.5": 0.995,
+    "KXHIGHNY-26NOV25-B47.5": 0.305
    },
    "paused_until": 1795678976,
    "kill_reset_ts": 1794987960
