@@ -1,17 +1,21 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795598430,
+   "ts": 1795643604,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 42,
-   "eligible": 1,
-   "signals": 0,
+   "scanned": 84,
+   "eligible": 19,
+   "signals": 7,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "zu wenig Volumen": 41
+    "Spread zu groß": 1,
+    "nur 4.96 Anteile ≤ 0.98 erreichbar": 1,
+    "nur 4.98 Anteile ≤ 0.98 erreichbar": 4,
+    "Preis über Höchstpreis": 1,
+    "zu wenig Volumen": 65
    },
    "errors": [],
    "warnings": [
@@ -20,7 +24,7 @@
    "paused": [
     "random_control"
    ],
-   "arb_checked": 1,
+   "arb_checked": 19,
    "arb_found": []
   }
  },
@@ -294,6 +298,10 @@
     [
      1795598430,
      50.0
+    ],
+    [
+     1795643604,
+     50.0
     ]
    ],
    "marks": {
@@ -672,7 +680,25 @@
     "KXHIGHPHIL-26NOV24-B53.5": 0.995,
     "KXHIGHMIA-26NOV24-T77": 0.005,
     "KXHIGHAUS-26NOV24-B53.5": 0.995,
-    "KXHIGHNY-26NOV25-B47.5": 0.305
+    "KXHIGHNY-26NOV25-B47.5": 0.035,
+    "KXHIGHNY-26NOV25-T47": 0.96,
+    "KXHIGHLAX-26NOV25-B76.5": 0.055,
+    "KXHIGHLAX-26NOV25-B72.5": 0.005,
+    "KXHIGHMIA-26NOV25-T75": 0.955,
+    "KXHIGHLAX-26NOV25-B74.5": 0.945,
+    "KXHIGHCHI-26NOV25-B41.5": 0.44999999999999996,
+    "KXHIGHLAX-26NOV25-T77": 0.005,
+    "KXHIGHMIA-26NOV25-B75.5": 0.03,
+    "KXHIGHMIA-26NOV25-B79.5": 0.005,
+    "KXHIGHMIA-26NOV25-B77.5": 0.005,
+    "KXHIGHNY-26NOV25-B49.5": 0.005,
+    "KXHIGHCHI-26NOV25-B43.5": 0.48,
+    "KXHIGHCHI-26NOV25-B45.5": 0.02,
+    "KXHIGHDEN-26NOV25-T49": 0.7150000000000001,
+    "KXHIGHAUS-26NOV25-B60.5": 0.01,
+    "KXHIGHDEN-26NOV25-B49.5": 0.295,
+    "KXHIGHNY-26NOV25-B51.5": 0.005,
+    "KXHIGHCHI-26NOV25-B39.5": 0.005
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -946,6 +972,10 @@
     [
      1795598430,
      50.0
+    ],
+    [
+     1795643604,
+     50.0
     ]
    ],
    "marks": {
@@ -1324,7 +1354,25 @@
     "KXHIGHPHIL-26NOV24-B53.5": 0.995,
     "KXHIGHMIA-26NOV24-T77": 0.005,
     "KXHIGHAUS-26NOV24-B53.5": 0.995,
-    "KXHIGHNY-26NOV25-B47.5": 0.305
+    "KXHIGHNY-26NOV25-B47.5": 0.035,
+    "KXHIGHNY-26NOV25-T47": 0.96,
+    "KXHIGHLAX-26NOV25-B76.5": 0.055,
+    "KXHIGHLAX-26NOV25-B72.5": 0.005,
+    "KXHIGHMIA-26NOV25-T75": 0.955,
+    "KXHIGHLAX-26NOV25-B74.5": 0.945,
+    "KXHIGHCHI-26NOV25-B41.5": 0.44999999999999996,
+    "KXHIGHLAX-26NOV25-T77": 0.005,
+    "KXHIGHMIA-26NOV25-B75.5": 0.03,
+    "KXHIGHMIA-26NOV25-B79.5": 0.005,
+    "KXHIGHMIA-26NOV25-B77.5": 0.005,
+    "KXHIGHNY-26NOV25-B49.5": 0.005,
+    "KXHIGHCHI-26NOV25-B43.5": 0.48,
+    "KXHIGHCHI-26NOV25-B45.5": 0.02,
+    "KXHIGHDEN-26NOV25-T49": 0.7150000000000001,
+    "KXHIGHAUS-26NOV25-B60.5": 0.01,
+    "KXHIGHDEN-26NOV25-B49.5": 0.295,
+    "KXHIGHNY-26NOV25-B51.5": 0.005,
+    "KXHIGHCHI-26NOV25-B39.5": 0.005
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -1799,6 +1847,10 @@
     [
      1795598430,
      19.017589367449453
+    ],
+    [
+     1795643604,
+     19.017589367449453
     ]
    ],
    "marks": {
@@ -2167,7 +2219,25 @@
     "KXHIGHPHIL-26NOV24-B53.5": 0.995,
     "KXHIGHMIA-26NOV24-T77": 0.005,
     "KXHIGHAUS-26NOV24-B53.5": 0.995,
-    "KXHIGHNY-26NOV25-B47.5": 0.305
+    "KXHIGHNY-26NOV25-B47.5": 0.035,
+    "KXHIGHNY-26NOV25-T47": 0.96,
+    "KXHIGHLAX-26NOV25-B76.5": 0.055,
+    "KXHIGHLAX-26NOV25-B72.5": 0.005,
+    "KXHIGHMIA-26NOV25-T75": 0.955,
+    "KXHIGHLAX-26NOV25-B74.5": 0.945,
+    "KXHIGHCHI-26NOV25-B41.5": 0.44999999999999996,
+    "KXHIGHLAX-26NOV25-T77": 0.005,
+    "KXHIGHMIA-26NOV25-B75.5": 0.03,
+    "KXHIGHMIA-26NOV25-B79.5": 0.005,
+    "KXHIGHMIA-26NOV25-B77.5": 0.005,
+    "KXHIGHNY-26NOV25-B49.5": 0.005,
+    "KXHIGHCHI-26NOV25-B43.5": 0.48,
+    "KXHIGHCHI-26NOV25-B45.5": 0.02,
+    "KXHIGHDEN-26NOV25-T49": 0.7150000000000001,
+    "KXHIGHAUS-26NOV25-B60.5": 0.01,
+    "KXHIGHDEN-26NOV25-B49.5": 0.295,
+    "KXHIGHNY-26NOV25-B51.5": 0.005,
+    "KXHIGHCHI-26NOV25-B39.5": 0.005
    },
    "paused_until": 1795678976,
    "kill_reset_ts": 1794987960
