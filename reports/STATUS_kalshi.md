@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (kalshi)
 
-Stand: 2026-11-26 21:46 UTC
+Stand: 2026-11-26 22:02 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -14,7 +14,7 @@ Stand: 2026-11-26 21:46 UTC
 | momentum | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | reversion | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 17.87 | -64.3 % | 14.56 | 4.45 | 3 | 10 | 0.0 % | 63.0 % | – |
+| random_control | 18.00 | -64.0 % | 14.56 | 4.45 | 3 | 10 | 0.0 % | 63.0 % | – |
 
 ## Offene Positionen
 
@@ -42,12 +42,12 @@ Stand: 2026-11-26 21:46 UTC
 ## Letzter Zyklus
 
 - gescannt: 84
-- handelbar: 17
-- Signale: 12
-- gekauft: 3 (random_control:KXHIGHNY-26NOV26-B56.5:YES@0.080, random_control:KXHIGHCHI-26NOV26-B46.5:YES@0.055, random_control:KXHIGHDEN-26NOV26-B60.5:YES@0.060)
+- handelbar: 18
+- Signale: 7
+- gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: zu wenig Volumen (67); Spread zu groß (4); nur 4.98 Anteile ≤ 0.98 erreichbar (3); nur 4.94 Anteile ≤ 0.98 erreichbar (1); Mindestgröße über Obergrenze pro Markt (1)
+- häufigste Ablehnungsgründe: zu wenig Volumen (66); nur 4.98 Anteile ≤ 0.98 erreichbar (3); Spread zu groß (3); Mindestgröße über Obergrenze pro Markt (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.

@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-26 21:46 UTC
+Stand: 2026-11-26 22:02 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -13,8 +13,8 @@ Stand: 2026-11-26 21:46 UTC
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | favorite | 46.01 | -8.0 % | 31.23 | 14.50 | 3 | 3 | 66.7 % | 9.5 % | – |
-| random_control | 44.91 | -10.2 % | 25.02 | 16.91 | 4 | 4 | 50.0 % | 25.2 % | – |
-| reversion | 27.14 | -45.7 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
+| random_control | 44.82 | -10.4 % | 25.02 | 16.91 | 4 | 4 | 50.0 % | 25.2 % | – |
+| reversion | 27.04 | -45.9 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
 
 ## Offene Positionen
 
@@ -61,12 +61,12 @@ Stand: 2026-11-26 21:46 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 86
+- handelbar: 90
 - Signale: 63
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (61); zu kurz vor Ende (55); Ende zu weit weg (48); unklare Auflösung (Stichwort) (8); zu wenig Liquidität (3); Preis über Höchstpreis (1); Spread zu groß (1)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (61); Ende zu weit weg (53); zu kurz vor Ende (47); unklare Auflösung (Stichwort) (8); Preis über Höchstpreis (2); zu wenig Liquidität (2)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
