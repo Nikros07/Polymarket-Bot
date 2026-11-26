@@ -22,3 +22,6 @@
 {"ts": 1795121490, "strategy": "random_control", "event": "settle", "market_id": "KXHIGHLAX-26NOV18-B70.5", "outcome": 0, "payout": 0.0, "pnl": -2.546806463541202}
 {"ts": 1795121490, "strategy": "random_control", "event": "settle", "market_id": "KXHIGHPHIL-26NOV18-B66.5", "outcome": 1, "payout": 0.0, "pnl": -2.3976243939424697}
 {"ts": 1795682417, "strategy": "random_control", "event": "resume"}
+{"ts": 1795729573, "strategy": "random_control", "event": "open", "market_id": "KXHIGHNY-26NOV26-B56.5", "side": "YES", "shares": 17.74, "avg_price": 0.08, "fee": 0.1, "signal_price": 0.065, "signal_prob": null, "reason": "Zufallsseite (Zeitpunkt von favorite)"}
+{"ts": 1795729573, "strategy": "random_control", "event": "open", "market_id": "KXHIGHCHI-26NOV26-B46.5", "side": "YES", "shares": 25.5, "avg_price": 0.05451036662686861, "fee": 0.1, "signal_price": 0.04, "signal_prob": null, "reason": "Zufallsseite (Zeitpunkt von favorite)"}
+{"ts": 1795729573, "strategy": "random_control", "event": "open", "market_id": "KXHIGHDEN-26NOV26-B60.5", "side": "YES", "shares": 22.58, "avg_price": 0.05999999999999999, "fee": 0.09, "signal_price": 0.05, "signal_prob": null, "reason": "Zufallsseite (Zeitpunkt von favorite)"}
