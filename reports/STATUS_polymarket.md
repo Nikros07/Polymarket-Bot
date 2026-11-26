@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-26 09:00 UTC
+Stand: 2026-11-26 21:46 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-26 09:00 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 55.20 | +10.4 % | 32.39 | 21.80 | 5 | 6 | 66.7 % | 9.7 % | – |
+| momentum | 55.45 | +10.9 % | 32.39 | 21.80 | 5 | 6 | 66.7 % | 9.7 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| favorite | 46.00 | -8.0 % | 31.23 | 14.50 | 3 | 3 | 66.7 % | 9.5 % | – |
-| random_control | 44.57 | -10.9 % | 25.02 | 16.91 | 4 | 4 | 50.0 % | 25.2 % | – |
-| reversion | 30.29 | -39.4 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
+| favorite | 46.01 | -8.0 % | 31.23 | 14.50 | 3 | 3 | 66.7 % | 9.5 % | – |
+| random_control | 44.91 | -10.2 % | 25.02 | 16.91 | 4 | 4 | 50.0 % | 25.2 % | – |
+| reversion | 27.14 | -45.7 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
 
 ## Offene Positionen
 
@@ -61,12 +61,12 @@ Stand: 2026-11-26 09:00 UTC
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 103
-- Signale: 76
+- handelbar: 86
+- Signale: 63
 - gekauft: 0 (–)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (74); Ende zu weit weg (70); unklare Auflösung (Stichwort) (12); zu kurz vor Ende (11); zu wenig Liquidität (4); Preis über Höchstpreis (2)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (61); zu kurz vor Ende (55); Ende zu weit weg (48); unklare Auflösung (Stichwort) (8); zu wenig Liquidität (3); Preis über Höchstpreis (1); Spread zu groß (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
