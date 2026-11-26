@@ -1,29 +1,25 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795644220,
+   "ts": 1795682417,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 84,
-   "eligible": 20,
-   "signals": 7,
+   "scanned": 48,
+   "eligible": 1,
+   "signals": 0,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "nur 4.98 Anteile ≤ 0.98 erreichbar": 5,
-    "Spread zu groß": 1,
-    "Preis über Höchstpreis": 1,
-    "zu wenig Volumen": 64
+    "zu kurz vor Ende": 5,
+    "zu wenig Volumen": 42
    },
    "errors": [],
    "warnings": [
     "weather: kein Wettermodell – erst `backtest --source kalshi` (kauft nichts)"
    ],
-   "paused": [
-    "random_control"
-   ],
-   "arb_checked": 20,
+   "paused": [],
+   "arb_checked": 1,
    "arb_found": []
   }
  },
@@ -305,6 +301,10 @@
     [
      1795644220,
      50.0
+    ],
+    [
+     1795682417,
+     50.0
     ]
    ],
    "marks": {
@@ -702,7 +702,8 @@
     "KXHIGHDEN-26NOV25-B49.5": 0.385,
     "KXHIGHNY-26NOV25-B51.5": 0.005,
     "KXHIGHCHI-26NOV25-B39.5": 0.005,
-    "KXHIGHAUS-26NOV25-B56.5": 0.235
+    "KXHIGHAUS-26NOV25-B56.5": 0.235,
+    "KXHIGHNY-26NOV26-T56": 0.83
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -984,6 +985,10 @@
     [
      1795644220,
      50.0
+    ],
+    [
+     1795682417,
+     50.0
     ]
    ],
    "marks": {
@@ -1381,7 +1386,8 @@
     "KXHIGHDEN-26NOV25-B49.5": 0.385,
     "KXHIGHNY-26NOV25-B51.5": 0.005,
     "KXHIGHCHI-26NOV25-B39.5": 0.005,
-    "KXHIGHAUS-26NOV25-B56.5": 0.235
+    "KXHIGHAUS-26NOV25-B56.5": 0.235,
+    "KXHIGHNY-26NOV26-T56": 0.83
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -1864,6 +1870,10 @@
     [
      1795644220,
      19.017589367449453
+    ],
+    [
+     1795682417,
+     19.017589367449453
     ]
    ],
    "marks": {
@@ -2251,10 +2261,11 @@
     "KXHIGHDEN-26NOV25-B49.5": 0.385,
     "KXHIGHNY-26NOV25-B51.5": 0.005,
     "KXHIGHCHI-26NOV25-B39.5": 0.005,
-    "KXHIGHAUS-26NOV25-B56.5": 0.235
+    "KXHIGHAUS-26NOV25-B56.5": 0.235,
+    "KXHIGHNY-26NOV26-T56": 0.83
    },
-   "paused_until": 1795678976,
-   "kill_reset_ts": 1794987960
+   "paused_until": null,
+   "kill_reset_ts": 1795682417
   }
  }
 }

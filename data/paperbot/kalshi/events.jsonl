@@ -21,3 +21,4 @@
 {"ts": 1795121490, "strategy": "random_control", "event": "settle", "market_id": "KXHIGHLAX-26NOV18-B68.5", "outcome": 1, "payout": 0.0, "pnl": -2.4908474313614857}
 {"ts": 1795121490, "strategy": "random_control", "event": "settle", "market_id": "KXHIGHLAX-26NOV18-B70.5", "outcome": 0, "payout": 0.0, "pnl": -2.546806463541202}
 {"ts": 1795121490, "strategy": "random_control", "event": "settle", "market_id": "KXHIGHPHIL-26NOV18-B66.5", "outcome": 1, "payout": 0.0, "pnl": -2.3976243939424697}
+{"ts": 1795682417, "strategy": "random_control", "event": "resume"}
