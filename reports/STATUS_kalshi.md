@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (kalshi)
 
-Stand: 2026-11-27 09:13 UTC
+Stand: 2026-11-27 21:30 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -14,21 +14,22 @@ Stand: 2026-11-27 09:13 UTC
 | momentum | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | reversion | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 15.30 | -69.4 % | 13.33 | 5.69 | 4 | 10 | 0.0 % | 68.3 % | – |
+| random_control | 13.30 | -73.4 % | 12.25 | 2.32 | 2 | 13 | 0.0 % | 72.5 % | – |
 
 ## Offene Positionen
 
 | Strategie | Markt | Seite | Anteile | Preis | Einsatz (€) | seit |
 |---|---|---|---|---|---|---|
-| random_control | Will the maximum temperature be 56-57° on Nov 26, 2026? — 56° to 57° | YES | 17.74 | 0.080 | 1.52 | 2026-11-26 |
-| random_control | Will the maximum temperature be 46-47° on Nov 26, 2026? — 46° to 47° | YES | 25.50 | 0.055 | 1.49 | 2026-11-26 |
-| random_control | Will the maximum temperature be 60-61° on Nov 26, 2026? — 60° to 61° | YES | 22.58 | 0.060 | 1.44 | 2026-11-26 |
 | random_control | Will the maximum temperature be 59-60° on Nov 27, 2026? — 59° to 60° | YES | 38.58 | 0.030 | 1.24 | 2026-11-27 |
+| random_control | Will the maximum temperature be 81-82° on Nov 27, 2026? — 81° to 82° | NO | 9.51 | 0.106 | 1.08 | 2026-11-27 |
 
 ## Zuletzt aufgelöst
 
 | Strategie | Markt | Seite | Ergebnis | Gewinn (€) |
 |---|---|---|---|---|
+| random_control | Will the maximum temperature be 56-57° on Nov 26, 2026? — 56° to 57° | YES | NO | -1.52 |
+| random_control | Will the maximum temperature be 46-47° on Nov 26, 2026? — 46° to 47° | YES | NO | -1.49 |
+| random_control | Will the maximum temperature be 60-61° on Nov 26, 2026? — 60° to 61° | YES | NO | -1.44 |
 | random_control | Will the maximum temperature be 70-71° on Nov 18, 2026? — 70° to 71° | YES | NO | -2.55 |
 | random_control | Will the maximum temperature be 68-69° on Nov 18, 2026? — 68° to 69° | NO | YES | -2.49 |
 | random_control | Will the maximum temperature be 70-71° on Nov 18, 2026? — 70° to 71° | YES | NO | -2.45 |
@@ -42,13 +43,13 @@ Stand: 2026-11-27 09:13 UTC
 
 ## Letzter Zyklus
 
-- gescannt: 42
-- handelbar: 6
-- Signale: 2
-- gekauft: 1 (random_control:KXHIGHNY-26NOV27-B59.5:YES@0.030)
-- abgerechnet: 0
+- gescannt: 84
+- handelbar: 21
+- Signale: 4
+- gekauft: 1 (random_control:KXHIGHLAX-26NOV27-B81.5:NO@0.106)
+- abgerechnet: 3
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: zu wenig Volumen (36); nur 4.98 Anteile ≤ 0.98 erreichbar (1)
+- häufigste Ablehnungsgründe: zu wenig Volumen (63); nur 4.94 Anteile ≤ 0.98 erreichbar (1); nur 4.98 Anteile ≤ 0.98 erreichbar (1); Mindestgröße über Obergrenze pro Markt (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
