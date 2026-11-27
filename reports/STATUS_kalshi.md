@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (kalshi)
 
-Stand: 2026-11-27 08:51 UTC
+Stand: 2026-11-27 09:13 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -14,7 +14,7 @@ Stand: 2026-11-27 08:51 UTC
 | momentum | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | reversion | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| random_control | 15.58 | -68.8 % | 14.56 | 4.45 | 3 | 10 | 0.0 % | 67.7 % | – |
+| random_control | 15.30 | -69.4 % | 13.33 | 5.69 | 4 | 10 | 0.0 % | 68.3 % | – |
 
 ## Offene Positionen
 
@@ -23,6 +23,7 @@ Stand: 2026-11-27 08:51 UTC
 | random_control | Will the maximum temperature be 56-57° on Nov 26, 2026? — 56° to 57° | YES | 17.74 | 0.080 | 1.52 | 2026-11-26 |
 | random_control | Will the maximum temperature be 46-47° on Nov 26, 2026? — 46° to 47° | YES | 25.50 | 0.055 | 1.49 | 2026-11-26 |
 | random_control | Will the maximum temperature be 60-61° on Nov 26, 2026? — 60° to 61° | YES | 22.58 | 0.060 | 1.44 | 2026-11-26 |
+| random_control | Will the maximum temperature be 59-60° on Nov 27, 2026? — 59° to 60° | YES | 38.58 | 0.030 | 1.24 | 2026-11-27 |
 
 ## Zuletzt aufgelöst
 
@@ -41,13 +42,13 @@ Stand: 2026-11-27 08:51 UTC
 
 ## Letzter Zyklus
 
-- gescannt: 48
-- handelbar: 5
-- Signale: 0
-- gekauft: 0 (–)
+- gescannt: 42
+- handelbar: 6
+- Signale: 2
+- gekauft: 1 (random_control:KXHIGHNY-26NOV27-B59.5:YES@0.030)
 - abgerechnet: 0
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: zu wenig Volumen (38); zu kurz vor Ende (5)
+- häufigste Ablehnungsgründe: zu wenig Volumen (36); nur 4.98 Anteile ≤ 0.98 erreichbar (1)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
