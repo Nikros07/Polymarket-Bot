@@ -69,3 +69,5 @@
 {"ts": 1795514789, "strategy": "momentum", "event": "open", "market_id": "6989178", "side": "YES", "shares": 5.64, "avg_price": 0.768, "fee": 0.03858864537600008, "signal_price": 0.7675, "signal_prob": null, "reason": "Momentum +0.57 in 3 Tagen"}
 {"ts": 1795682241, "strategy": "random_control", "event": "settle", "market_id": "6367372", "outcome": 1, "payout": 5.02, "pnl": 0.43309322099999914}
 {"ts": 1795682241, "strategy": "random_control", "event": "open", "market_id": "3215009", "side": "YES", "shares": 162.78, "avg_price": 0.022, "fee": 0.0038526119279998572, "signal_price": 0.021, "signal_prob": null, "reason": "Zufallsseite (Zeitpunkt von favorite)"}
+{"ts": 1795769313, "strategy": "momentum", "event": "settle", "market_id": "6989178", "outcome": 1, "payout": 5.64, "pnl": 1.269891354623999}
+{"ts": 1795769313, "strategy": "momentum", "event": "open", "market_id": "7203506", "side": "YES", "shares": 8.37, "avg_price": 0.52, "fee": 0.054317951999999864, "signal_price": 0.5, "signal_prob": null, "reason": "Momentum +0.21 in 3 Tagen"}
