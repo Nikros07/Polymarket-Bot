@@ -1,32 +1,26 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795815048,
+   "ts": 1795815839,
    "source": "kalshi",
    "enabled": true,
    "scanned": 84,
    "eligible": 21,
-   "signals": 4,
-   "opened": [
-    "random_control:KXHIGHLAX-26NOV27-B81.5:NO@0.106"
-   ],
-   "settled": [
-    "random_control:KXHIGHCHI-26NOV26-B46.5",
-    "random_control:KXHIGHDEN-26NOV26-B60.5",
-    "random_control:KXHIGHNY-26NOV26-B56.5"
-   ],
+   "signals": 2,
+   "opened": [],
+   "settled": [],
    "waiting": [],
    "skipped": {
-    "nur 4.94 Anteile ≤ 0.98 erreichbar": 1,
-    "nur 4.98 Anteile ≤ 0.98 erreichbar": 1,
-    "Mindestgröße über Obergrenze pro Markt": 1,
+    "nur 4.98 Anteile ≤ 0.98 erreichbar": 2,
     "zu wenig Volumen": 63
    },
    "errors": [],
    "warnings": [
     "weather: kein Wettermodell – erst `backtest --source kalshi` (kauft nichts)"
    ],
-   "paused": [],
+   "paused": [
+    "random_control"
+   ],
    "arb_checked": 21,
    "arb_found": []
   }
@@ -336,6 +330,10 @@
     ],
     [
      1795815048,
+     50.0
+    ],
+    [
+     1795815839,
      50.0
     ]
    ],
@@ -761,16 +759,16 @@
     "KXHIGHNY-26NOV27-B59.5": 0.005,
     "KXHIGHPHIL-26NOV27-B59.5": 0.995,
     "KXHIGHMIA-26NOV27-B72.5": 0.005,
-    "KXHIGHLAX-26NOV27-B81.5": 0.91,
+    "KXHIGHLAX-26NOV27-B81.5": 0.925,
     "KXHIGHLAX-26NOV27-B83.5": 0.09,
     "KXHIGHMIA-26NOV27-B76.5": 0.005,
     "KXHIGHLAX-26NOV27-B79.5": 0.005,
     "KXHIGHMIA-26NOV27-B74.5": 0.995,
-    "KXHIGHAUS-26NOV27-B70.5": 0.165,
-    "KXHIGHAUS-26NOV27-T71": 0.005,
-    "KXHIGHCHI-26NOV27-B45.5": 0.54,
-    "KXHIGHAUS-26NOV27-B68.5": 0.8300000000000001,
-    "KXHIGHCHI-26NOV27-B47.5": 0.46499999999999997,
+    "KXHIGHAUS-26NOV27-B70.5": 0.12,
+    "KXHIGHAUS-26NOV27-T71": 0.01,
+    "KXHIGHCHI-26NOV27-B45.5": 0.595,
+    "KXHIGHAUS-26NOV27-B68.5": 0.895,
+    "KXHIGHCHI-26NOV27-B47.5": 0.385,
     "KXHIGHCHI-26NOV27-B43.5": 0.005,
     "KXHIGHPHIL-26NOV27-B61.5": 0.005,
     "KXHIGHAUS-26NOV27-B66.5": 0.005
@@ -1083,6 +1081,10 @@
     [
      1795815048,
      50.0
+    ],
+    [
+     1795815839,
+     50.0
     ]
    ],
    "marks": {
@@ -1507,16 +1509,16 @@
     "KXHIGHNY-26NOV27-B59.5": 0.005,
     "KXHIGHPHIL-26NOV27-B59.5": 0.995,
     "KXHIGHMIA-26NOV27-B72.5": 0.005,
-    "KXHIGHLAX-26NOV27-B81.5": 0.91,
+    "KXHIGHLAX-26NOV27-B81.5": 0.925,
     "KXHIGHLAX-26NOV27-B83.5": 0.09,
     "KXHIGHMIA-26NOV27-B76.5": 0.005,
     "KXHIGHLAX-26NOV27-B79.5": 0.005,
     "KXHIGHMIA-26NOV27-B74.5": 0.995,
-    "KXHIGHAUS-26NOV27-B70.5": 0.165,
-    "KXHIGHAUS-26NOV27-T71": 0.005,
-    "KXHIGHCHI-26NOV27-B45.5": 0.54,
-    "KXHIGHAUS-26NOV27-B68.5": 0.8300000000000001,
-    "KXHIGHCHI-26NOV27-B47.5": 0.46499999999999997,
+    "KXHIGHAUS-26NOV27-B70.5": 0.12,
+    "KXHIGHAUS-26NOV27-T71": 0.01,
+    "KXHIGHCHI-26NOV27-B45.5": 0.595,
+    "KXHIGHAUS-26NOV27-B68.5": 0.895,
+    "KXHIGHCHI-26NOV27-B47.5": 0.385,
     "KXHIGHCHI-26NOV27-B43.5": 0.005,
     "KXHIGHPHIL-26NOV27-B61.5": 0.005,
     "KXHIGHAUS-26NOV27-B66.5": 0.005
@@ -2130,6 +2132,10 @@
     [
      1795815048,
      13.296766499520835
+    ],
+    [
+     1795815839,
+     13.154116499520836
     ]
    ],
    "marks": {
@@ -2541,21 +2547,21 @@
     "KXHIGHNY-26NOV27-B59.5": 0.005,
     "KXHIGHPHIL-26NOV27-B59.5": 0.995,
     "KXHIGHMIA-26NOV27-B72.5": 0.005,
-    "KXHIGHLAX-26NOV27-B81.5": 0.91,
+    "KXHIGHLAX-26NOV27-B81.5": 0.925,
     "KXHIGHLAX-26NOV27-B83.5": 0.09,
     "KXHIGHMIA-26NOV27-B76.5": 0.005,
     "KXHIGHLAX-26NOV27-B79.5": 0.005,
     "KXHIGHMIA-26NOV27-B74.5": 0.995,
-    "KXHIGHAUS-26NOV27-B70.5": 0.165,
-    "KXHIGHAUS-26NOV27-T71": 0.005,
-    "KXHIGHCHI-26NOV27-B45.5": 0.54,
-    "KXHIGHAUS-26NOV27-B68.5": 0.8300000000000001,
-    "KXHIGHCHI-26NOV27-B47.5": 0.46499999999999997,
+    "KXHIGHAUS-26NOV27-B70.5": 0.12,
+    "KXHIGHAUS-26NOV27-T71": 0.01,
+    "KXHIGHCHI-26NOV27-B45.5": 0.595,
+    "KXHIGHAUS-26NOV27-B68.5": 0.895,
+    "KXHIGHCHI-26NOV27-B47.5": 0.385,
     "KXHIGHCHI-26NOV27-B43.5": 0.005,
     "KXHIGHPHIL-26NOV27-B61.5": 0.005,
     "KXHIGHAUS-26NOV27-B66.5": 0.005
    },
-   "paused_until": null,
+   "paused_until": 1796420639,
    "kill_reset_ts": 1795682417
   }
  }
