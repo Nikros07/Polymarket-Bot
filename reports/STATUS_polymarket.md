@@ -1,6 +1,6 @@
 # Papier-Bot: Stand (polymarket)
 
-Stand: 2026-11-26 22:02 UTC
+Stand: 2026-11-27 08:51 UTC
 
 > Nur Papiergeld. Es wird kein echtes Geld eingesetzt und keine Order gesendet.
 
@@ -8,13 +8,13 @@ Stand: 2026-11-26 22:02 UTC
 
 | Strategie | Wert (€) | Ertrag | Bargeld | investiert | offen | aufgelöst | Trefferquote | max. Rückgang | Notbremse |
 |---|---|---|---|---|---|---|---|---|---|
-| momentum | 55.45 | +10.9 % | 32.39 | 21.80 | 5 | 6 | 66.7 % | 9.7 % | – |
+| momentum | 54.90 | +9.8 % | 33.63 | 21.84 | 5 | 7 | 71.4 % | 9.7 % | – |
 | calibration | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | 0.0 % | – |
 | weather | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
 | llm_blend | 50.00 | +0.0 % | 50.00 | 0.00 | 0 | 0 | – | – | – |
-| favorite | 46.01 | -8.0 % | 31.23 | 14.50 | 3 | 3 | 66.7 % | 9.5 % | – |
-| random_control | 44.82 | -10.4 % | 25.02 | 16.91 | 4 | 4 | 50.0 % | 25.2 % | – |
-| reversion | 27.04 | -45.9 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
+| favorite | 46.02 | -8.0 % | 31.23 | 14.50 | 3 | 3 | 66.7 % | 9.5 % | – |
+| random_control | 44.06 | -11.9 % | 25.02 | 16.91 | 4 | 4 | 50.0 % | 25.2 % | – |
+| reversion | 28.24 | -43.5 % | 11.24 | 11.06 | 5 | 13 | 15.4 % | 51.4 % | – |
 
 ## Offene Positionen
 
@@ -27,7 +27,7 @@ Stand: 2026-11-26 22:02 UTC
 | momentum | Israel x Iran ceasefire continues through December 15? | YES | 5.48 | 0.720 | 3.99 | 2026-11-09 |
 | momentum | Will Bitcoin dip to $55,000 by December 31, 2026? | YES | 6.81 | 0.683 | 4.70 | 2026-11-20 |
 | momentum | Will Bitcoin reach $70,000 in November? | NO | 5.00 | 0.940 | 4.71 | 2026-11-20 |
-| momentum | Jensen Huang admits to another affair with a woman by December 31? | YES | 5.64 | 0.768 | 4.37 | 2026-11-24 |
+| momentum | Will the price of Bitcoin be between $60,000 and $62,000 on November … | YES | 8.37 | 0.520 | 4.41 | 2026-11-27 |
 | reversion | Will Bitcoin dip to $55,000 by December 31, 2026? | NO | 5.99 | 0.330 | 2.00 | 2026-11-20 |
 | reversion | Will Bitcoin dip to $55,000 in November? | NO | 5.00 | 0.444 | 2.25 | 2026-11-20 |
 | reversion | Will Bitcoin reach $65,000 in November? | YES | 9.42 | 0.210 | 1.99 | 2026-11-20 |
@@ -42,6 +42,7 @@ Stand: 2026-11-26 22:02 UTC
 
 | Strategie | Markt | Seite | Ergebnis | Gewinn (€) |
 |---|---|---|---|---|
+| momentum | Jensen Huang admits to another affair with a woman by December 31? | YES | YES | +1.27 |
 | random_control | Israel x Iran ceasefire continues through November 22? | YES | YES | +0.43 |
 | favorite | Will Jensen Huang rejoin NVIDIA by December 31, 2026? | NO | YES | -4.76 |
 | momentum | Will Jensen Huang rejoin NVIDIA by December 31, 2026? | NO | YES | -4.63 |
@@ -56,17 +57,16 @@ Stand: 2026-11-26 22:02 UTC
 | favorite | Israel x Iran ceasefire continues through November 15? | YES | YES | +0.24 |
 | momentum | Israel x Iran ceasefire continues through November 15? | YES | YES | +0.24 |
 | random_control | Israel x Iran ceasefire continues through November 15? | NO | YES | -4.00 |
-| momentum | Will Bitcoin dip to $62,000 November 9-15? | YES | NO | -4.55 |
 
 ## Letzter Zyklus
 
 - gescannt: 200
-- handelbar: 90
-- Signale: 63
-- gekauft: 0 (–)
-- abgerechnet: 0
+- handelbar: 108
+- Signale: 72
+- gekauft: 1 (momentum:7203506:YES@0.520)
+- abgerechnet: 1
 - wartet auf Auflösung: 0
-- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (61); Ende zu weit weg (53); zu kurz vor Ende (47); unklare Auflösung (Stichwort) (8); Preis über Höchstpreis (2); zu wenig Liquidität (2)
+- häufigste Ablehnungsgründe: Kategorie-Grenze erreicht (unbekannt) (71); Ende zu weit weg (67); unklare Auflösung (Stichwort) (12); zu kurz vor Ende (9); zu wenig Liquidität (4)
 - keine Fehler
 
 Diese Übersicht beweist keinen Vorteil. Aussagekräftig wird sie erst ab etwa 100 aufgelösten Märkten pro Strategie.
