@@ -1,18 +1,18 @@
 {
  "meta": {
   "last_cycle": {
-   "ts": 1795815839,
+   "ts": 1795853252,
    "source": "kalshi",
    "enabled": true,
-   "scanned": 84,
-   "eligible": 21,
-   "signals": 2,
+   "scanned": 48,
+   "eligible": 1,
+   "signals": 0,
    "opened": [],
    "settled": [],
    "waiting": [],
    "skipped": {
-    "nur 4.98 Anteile ≤ 0.98 erreichbar": 2,
-    "zu wenig Volumen": 63
+    "zu kurz vor Ende": 6,
+    "zu wenig Volumen": 41
    },
    "errors": [],
    "warnings": [
@@ -21,7 +21,7 @@
    "paused": [
     "random_control"
    ],
-   "arb_checked": 21,
+   "arb_checked": 1,
    "arb_found": []
   }
  },
@@ -335,6 +335,10 @@
     [
      1795815839,
      50.0
+    ],
+    [
+     1795853252,
+     50.0
     ]
    ],
    "marks": {
@@ -756,10 +760,10 @@
     "KXHIGHNY-26NOV27-T57": 0.005,
     "KXHIGHPHIL-26NOV27-T57": 0.005,
     "KXHIGHLAX-26NOV27-T84": 0.005,
-    "KXHIGHNY-26NOV27-B59.5": 0.005,
+    "KXHIGHNY-26NOV27-B59.5": 0.01,
     "KXHIGHPHIL-26NOV27-B59.5": 0.995,
     "KXHIGHMIA-26NOV27-B72.5": 0.005,
-    "KXHIGHLAX-26NOV27-B81.5": 0.925,
+    "KXHIGHLAX-26NOV27-B81.5": 0.995,
     "KXHIGHLAX-26NOV27-B83.5": 0.09,
     "KXHIGHMIA-26NOV27-B76.5": 0.005,
     "KXHIGHLAX-26NOV27-B79.5": 0.005,
@@ -771,7 +775,8 @@
     "KXHIGHCHI-26NOV27-B47.5": 0.385,
     "KXHIGHCHI-26NOV27-B43.5": 0.005,
     "KXHIGHPHIL-26NOV27-B61.5": 0.005,
-    "KXHIGHAUS-26NOV27-B66.5": 0.005
+    "KXHIGHAUS-26NOV27-B66.5": 0.005,
+    "KXHIGHNY-26NOV28-T52": 0.79
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -1085,6 +1090,10 @@
     [
      1795815839,
      50.0
+    ],
+    [
+     1795853252,
+     50.0
     ]
    ],
    "marks": {
@@ -1506,10 +1515,10 @@
     "KXHIGHNY-26NOV27-T57": 0.005,
     "KXHIGHPHIL-26NOV27-T57": 0.005,
     "KXHIGHLAX-26NOV27-T84": 0.005,
-    "KXHIGHNY-26NOV27-B59.5": 0.005,
+    "KXHIGHNY-26NOV27-B59.5": 0.01,
     "KXHIGHPHIL-26NOV27-B59.5": 0.995,
     "KXHIGHMIA-26NOV27-B72.5": 0.005,
-    "KXHIGHLAX-26NOV27-B81.5": 0.925,
+    "KXHIGHLAX-26NOV27-B81.5": 0.995,
     "KXHIGHLAX-26NOV27-B83.5": 0.09,
     "KXHIGHMIA-26NOV27-B76.5": 0.005,
     "KXHIGHLAX-26NOV27-B79.5": 0.005,
@@ -1521,7 +1530,8 @@
     "KXHIGHCHI-26NOV27-B47.5": 0.385,
     "KXHIGHCHI-26NOV27-B43.5": 0.005,
     "KXHIGHPHIL-26NOV27-B61.5": 0.005,
-    "KXHIGHAUS-26NOV27-B66.5": 0.005
+    "KXHIGHAUS-26NOV27-B66.5": 0.005,
+    "KXHIGHNY-26NOV28-T52": 0.79
    },
    "paused_until": null,
    "kill_reset_ts": null
@@ -2136,6 +2146,10 @@
     [
      1795815839,
      13.154116499520836
+    ],
+    [
+     1795853252,
+     12.681316499520834
     ]
    ],
    "marks": {
@@ -2544,10 +2558,10 @@
     "KXHIGHNY-26NOV27-T57": 0.005,
     "KXHIGHPHIL-26NOV27-T57": 0.005,
     "KXHIGHLAX-26NOV27-T84": 0.005,
-    "KXHIGHNY-26NOV27-B59.5": 0.005,
+    "KXHIGHNY-26NOV27-B59.5": 0.01,
     "KXHIGHPHIL-26NOV27-B59.5": 0.995,
     "KXHIGHMIA-26NOV27-B72.5": 0.005,
-    "KXHIGHLAX-26NOV27-B81.5": 0.925,
+    "KXHIGHLAX-26NOV27-B81.5": 0.995,
     "KXHIGHLAX-26NOV27-B83.5": 0.09,
     "KXHIGHMIA-26NOV27-B76.5": 0.005,
     "KXHIGHLAX-26NOV27-B79.5": 0.005,
@@ -2559,7 +2573,8 @@
     "KXHIGHCHI-26NOV27-B47.5": 0.385,
     "KXHIGHCHI-26NOV27-B43.5": 0.005,
     "KXHIGHPHIL-26NOV27-B61.5": 0.005,
-    "KXHIGHAUS-26NOV27-B66.5": 0.005
+    "KXHIGHAUS-26NOV27-B66.5": 0.005,
+    "KXHIGHNY-26NOV28-T52": 0.79
    },
    "paused_until": 1796420639,
    "kill_reset_ts": 1795682417
